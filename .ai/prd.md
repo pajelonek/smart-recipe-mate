@@ -147,21 +147,12 @@ Kryteria akceptacji:
 
 ### US-008. Edycja przepisu i tworzenie nowej wersji
 
-Opis: Jako użytkownik chcę edytować istniejący przepis, aby aktualizować go i zachować historię zmian.
+Opis: Jako użytkownik chcę edytować istniejący przepis, aby aktualizować go i zachowac date edycji.
 Kryteria akceptacji:
 
 - Formularz edycji pokazuje aktualną zawartość i pozwala na modyfikacje w obrębie szablonu tekstowego.
-- Zapis zmian automatycznie tworzy nową wersję z przyrostowym numerem i znacznikiem czasu.
-- Interfejs potwierdza utworzenie nowej wersji i udostępnia link do historii wersji.
-
-### US-009. Przegląd i przywracanie poprzednich wersji
-
-Opis: Jako użytkownik chcę zobaczyć historię wersji przepisu i przywrócić wybraną, aby odzyskać wcześniejszą treść.
-Kryteria akceptacji:
-
-- Widok historii wyświetla chronologicznie listę wersji z datą, autorem i opisem zmian.
-- Użytkownik może porównać dwie wersje, aby zobaczyć główne różnice (np. składniki dodane/usunięte).
-- Wybranie akcji przywrócenia tworzy nową wersję oznaczoną jako przywrócona i zastępuje bieżącą treść.
+- Zapis zmian automatycznie nadpisuje obecna wersje i mamy informacje o nowej date ostatniej edycji
+- Interfejs potwierdza edycje
 
 ### US-010. Usuwanie przepisu
 
@@ -205,8 +196,6 @@ Opis: Jako użytkownik chcę mieć dostęp do pełnej historii czatu dla danego 
 Kryteria akceptacji:
 
 - Widok czatu wyświetla chronologicznie wszystkie wiadomości użytkownika i AI dla danego przepisu.
-- Każda wiadomość AI wskazuje, czy została zapisana jako wersja przepisu.
-- Historia jest zachowywana co najmniej do czasu usunięcia przepisu.
 
 ### US-015. Monitorowanie statusu konta
 
