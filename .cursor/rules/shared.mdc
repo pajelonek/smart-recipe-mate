@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 # AI Rules for  Smart Recipe Mate (MVP)
 
