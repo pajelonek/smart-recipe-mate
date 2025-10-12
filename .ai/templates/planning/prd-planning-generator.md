@@ -1,30 +1,36 @@
 Jesteś doświadczonym menedżerem produktu, którego zadaniem jest stworzenie kompleksowego dokumentu wymagań produktu (PRD) w oparciu o poniższe opisy:
 
 <project_description>
+
 # Aplikacja - Smart Recipe Mate (MVP)
 
 ### Główny problem
+
 Dostosowywanie dostępnych w sieci przepisów kulinarnych do osobistych potrzeb i wymagań żywieniowych jest problematyczne. Aplikacja wykorzystuje AI oraz preferencje użytkownika do proponowania dopasowanych przepisów.
 
 ### Najmniejszy zestaw funkcjonalności
+
 - Zapisywanie, odczytywanie, przeglądanie i usuwanie przepisów w formie tekstowej
 - Prosty system kont użytkowników do powiązania użytkownika z własnymi przepisami
 - Strona profilu użytkownika służąca do zapisywania preferencji żywnościowych
 - Integracja z AI umożliwiająca tworzenie i znajdowanie przepisów w oparciu o posiadane produkty i preferencje.
 
 ### Co NIE wchodzi w zakres MVP
+
 - Import przepisów z adresu URL
 - Bogata obsługa multimediów (np. zdjęć przepisów)
 - Udostępnianie przepisów dla innych użytkowników
 - Funkcje społecznościowe
 
 ### Kryteria sukcesu
+
 - 90% użytkowników posiada wypełnioną sekcję preferencji żywnościowych w swoim profilu
 - 75% użytkowników generuje jeden lub więcej przepisów w tygodniu
-</project_description>
+  </project_description>
 
 <project_details>
 <conversation_summary><decisions>
+
 1. Przepisy w bazie przechowujemy wyłącznie jako tekst: tytuł, sekcja składników, sekcja przygotowania, bez dodatkowej walidacji.
 2. System wersjonowania przechowuje tylko datę i autora ostatniej edycji; brak historii zmian i przywracania wersji.
 3. Brak wersji roboczych; przepisy zawsze pobierane z bazy w aktualnej formie.
@@ -35,25 +41,26 @@ Dostosowywanie dostępnych w sieci przepisów kulinarnych do osobistych potrzeb 
 8. Czat AI komunikuje się w JSON-ie po REST; zapisujemy każdą wiadomość wychodzącą i przychodzącą wraz z sesją (nowa sesja po każdym odświeżeniu).
 9. Tryb edycji AI blokuje ręczną edycję przepisu do czasu powrotu odpowiedzi; użytkownik widzi zaktualizowany tekst oraz snackbar z informacją o nadpisaniu i potwierdza zmianę.
 10. Logujemy zdarzenia oraz błędy AI do bazy; brak dodatkowych KPI, powiadomień e-mail, exportu przepisów i terminów wydania.
-</decisions><matched_recommendations>
-1. Zdefiniowany szablon tekstowy przepisu (tytuł, składniki, przygotowanie) odpowiada rekomendacji doprecyzowania struktury zapisu.
-2. Wprowadzenie informacji o użytkowniku i czasie edycji wpisuje się w zalecenie dodania metadanych do wersjonowania.
-3. Autocomplete i limit tagów wykonują zalecenia uporządkowania taksonomii repozytorium.
-4. Potwierdzenie nadpisania przepisu przez AI realizuje rekomendację ochrony przed przypadkową utratą danych.
-5. Zachowanie historii wiadomości czatu (we/wy) oraz nieskończonej retencji spełnia rekomendację ustalenia polityki przechowywania interakcji AI.
-6. Snackbar i automatyczna aktualizacja widoku to odpowiedź na wskazanie informowania użytkownika o nowych wersjach przepisu.
-7. Obowiązkowy kreator preferencji przy rejestracji odnosi się do zalecenia jasnego ustalenia reguł przepływu użytkownika.
-8. Logowanie zdarzeń i błędów pokrywa rekomendację przygotowania podstawowego monitoringu.
-</matched_recommendations><prd_planning_summary>
+    </decisions><matched_recommendations>
+11. Zdefiniowany szablon tekstowy przepisu (tytuł, składniki, przygotowanie) odpowiada rekomendacji doprecyzowania struktury zapisu.
+12. Wprowadzenie informacji o użytkowniku i czasie edycji wpisuje się w zalecenie dodania metadanych do wersjonowania.
+13. Autocomplete i limit tagów wykonują zalecenia uporządkowania taksonomii repozytorium.
+14. Potwierdzenie nadpisania przepisu przez AI realizuje rekomendację ochrony przed przypadkową utratą danych.
+15. Zachowanie historii wiadomości czatu (we/wy) oraz nieskończonej retencji spełnia rekomendację ustalenia polityki przechowywania interakcji AI.
+16. Snackbar i automatyczna aktualizacja widoku to odpowiedź na wskazanie informowania użytkownika o nowych wersjach przepisu.
+17. Obowiązkowy kreator preferencji przy rejestracji odnosi się do zalecenia jasnego ustalenia reguł przepływu użytkownika.
+18. Logowanie zdarzeń i błędów pokrywa rekomendację przygotowania podstawowego monitoringu.
+    </matched_recommendations><prd_planning_summary>
+
 - Produkt Smart Recipe Mate (MVP) wspiera osoby na dietach wysokobiałkowych, eliminacyjnych czy z ograniczeniami alergicznymi w znajdowaniu i personalizowaniu przepisów poprzez AI oraz własne repozytorium. Kluczowe funkcje obejmują: konta użytkowników, pięcioetapowy kreator preferencji, profil z edycją, repozytorium przepisów z filtracją po nazwie i tagach, czat AI zwracający ustrukturyzowany JSON, zapis historii wiadomości oraz powiadomienia e-mail (rejestracja/reset).
 - Najważniejsze scenariusze: użytkownik podaje produkty i preferencje, generuje przepis poprzez AI, edytuje go ręcznie lub prosi AI o poprawki, zapisuje i przegląda listę przepisów, filtruje po nazwie, dodaje tagi, aktualizuje preferencje. Sesje czatu resetują się po odświeżeniu strony, ale każdy request/response jest archiwizowany.
 - Kryteria sukcesu z briefu (90% profili z preferencjami, 75% użytkowników generuje ≥1 przepis tygodniowo) nie mają jeszcze zaplanowanych sposobów pomiaru; system rejestruje zdarzenia i błędy, lecz nie definiuje KPI ani dashboardów.
 - Istotne decyzje techniczne: brak walidacji treści przepisu, brak historii wersji, brak progresu rejestracji, limit 10 tagów, brak planu mobilnego, brak exportu, czas działania AI nieograniczony, snackbar jako powiadomienie. Projekt realizuje jedna osoba, bez formalnych terminów.
-</prd_planning_summary><unresolved_issues>
+  </prd_planning_summary><unresolved_issues>
 - Brak ustalonego sposobu monitorowania sukcesu (pomiar KPI, dashboard) mimo zdefiniowanych celów.
 - Nieokreślone przyszłe potrzeby walidacji jakości przepisów i potencjalny wpływ na UX.
 - Brak strategii skalowania repozytorium (paginacja/lazy load) w przypadku większej liczby przepisów.
-</unresolved_issues></conversation_summary>
+  </unresolved_issues></conversation_summary>
 
 </project_details>
 

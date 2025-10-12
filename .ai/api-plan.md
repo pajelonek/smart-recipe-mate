@@ -14,14 +14,14 @@ This document defines the REST API for Smart Recipe Mate MVP. The API follows RE
 
 ## 1. Resources
 
-| Resource | Database Table | Description |
-|----------|---------------|-------------|
-| Onboarding | `smart_recipe_mate.user_onboarding` | User onboarding wizard progress |
-| Preferences | `smart_recipe_mate.user_preferences` | User dietary preferences and restrictions |
-| Recipes | `smart_recipe_mate.recipes` | User recipe repository |
-| Tags | `smart_recipe_mate.tags` | User-defined recipe tags |
-| Recipe Tags | `smart_recipe_mate.recipe_tags` | Recipe-tag associations |
-| AI Generations | `smart_recipe_mate.ai_generations` | AI recipe generation history |
+| Resource       | Database Table                       | Description                               |
+| -------------- | ------------------------------------ | ----------------------------------------- |
+| Onboarding     | `smart_recipe_mate.user_onboarding`  | User onboarding wizard progress           |
+| Preferences    | `smart_recipe_mate.user_preferences` | User dietary preferences and restrictions |
+| Recipes        | `smart_recipe_mate.recipes`          | User recipe repository                    |
+| Tags           | `smart_recipe_mate.tags`             | User-defined recipe tags                  |
+| Recipe Tags    | `smart_recipe_mate.recipe_tags`      | Recipe-tag associations                   |
+| AI Generations | `smart_recipe_mate.ai_generations`   | AI recipe generation history              |
 
 **Note:** Authentication resources (registration, login, logout, password reset) are handled directly by Supabase Auth SDK and are not exposed as custom API endpoints.
 
@@ -40,6 +40,7 @@ Get current user's onboarding status.
 **Query Parameters:** None
 
 **Response 200 OK:**
+
 ```json
 {
   "user_id": "uuid",
@@ -50,6 +51,7 @@ Get current user's onboarding status.
 ```
 
 **Response 404 Not Found:**
+
 ```json
 {
   "error": "Onboarding not started",
@@ -66,6 +68,7 @@ Update onboarding progress. This endpoint saves progress for the current step an
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "current_step": 2,
@@ -79,11 +82,13 @@ Update onboarding progress. This endpoint saves progress for the current step an
 ```
 
 **Validation:**
+
 - `current_step` must be between 1 and 5
 - When advancing to step 5, all preference fields must be complete
 - Cannot skip steps (must progress sequentially)
 
 **Response 200 OK:**
+
 ```json
 {
   "user_id": "uuid",
@@ -95,6 +100,7 @@ Update onboarding progress. This endpoint saves progress for the current step an
 ```
 
 **Response 400 Bad Request:**
+
 ```json
 {
   "error": "Invalid step",
@@ -111,6 +117,7 @@ Complete the onboarding wizard. Sets `completed_at` and `current_step = 5`.
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "preferences": {
@@ -124,10 +131,12 @@ Complete the onboarding wizard. Sets `completed_at` and `current_step = 5`.
 ```
 
 **Validation:**
+
 - All required preference fields must be provided
 - Can only complete if `current_step = 5`
 
 **Response 200 OK:**
+
 ```json
 {
   "user_id": "uuid",
@@ -148,6 +157,7 @@ Complete the onboarding wizard. Sets `completed_at` and `current_step = 5`.
 ```
 
 **Response 400 Bad Request:**
+
 ```json
 {
   "error": "Cannot complete",
@@ -168,6 +178,7 @@ Get current user's dietary preferences.
 **Query Parameters:** None
 
 **Response 200 OK:**
+
 ```json
 {
   "user_id": "uuid",
@@ -182,6 +193,7 @@ Get current user's dietary preferences.
 ```
 
 **Response 404 Not Found:**
+
 ```json
 {
   "error": "Preferences not found",
@@ -198,6 +210,7 @@ Replace all user preferences (full update).
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "diet_type": "vegan",
@@ -209,10 +222,12 @@ Replace all user preferences (full update).
 ```
 
 **Validation:**
+
 - `diet_type` is required
 - `preferred_ingredients`, `preferred_cuisines`, `allergens` default to empty string if not provided
 
 **Response 200 OK:**
+
 ```json
 {
   "user_id": "uuid",
@@ -227,6 +242,7 @@ Replace all user preferences (full update).
 ```
 
 **Response 400 Bad Request:**
+
 ```json
 {
   "error": "Validation failed",
@@ -243,6 +259,7 @@ Partially update user preferences.
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "allergens": "peanuts, tree nuts, soy"
@@ -250,10 +267,12 @@ Partially update user preferences.
 ```
 
 **Validation:**
+
 - At least one field must be provided
 - Only provided fields are updated
 
 **Response 200 OK:**
+
 ```json
 {
   "user_id": "uuid",
@@ -278,6 +297,7 @@ List user's recipes with optional search and filtering.
 **Authentication:** Required
 
 **Response 200 OK:**
+
 ```json
 {
   "recipes": [
@@ -316,9 +336,11 @@ Get a single recipe by ID.
 **Authentication:** Required
 
 **Path Parameters:**
+
 - `id` (uuid) - Recipe ID
 
 **Response 200 OK:**
+
 ```json
 {
   "id": "uuid",
@@ -340,6 +362,7 @@ Get a single recipe by ID.
 ```
 
 **Response 404 Not Found:**
+
 ```json
 {
   "error": "Recipe not found",
@@ -348,6 +371,7 @@ Get a single recipe by ID.
 ```
 
 **Response 403 Forbidden:**
+
 ```json
 {
   "error": "Access denied",
@@ -364,6 +388,7 @@ Create a new recipe.
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "title": "Vegetable Stir Fry",
@@ -375,12 +400,14 @@ Create a new recipe.
 ```
 
 **Validation:**
+
 - `title` is required (not empty)
 - `ingredients` is required (not empty)
 - `preparation` is required (not empty)
 - `tag_names` is optional, max 10 tags
 
 **Response 201 Created:**
+
 ```json
 {
   "id": "uuid",
@@ -412,6 +439,7 @@ Create a new recipe.
 ```
 
 **Response 400 Bad Request:**
+
 ```json
 {
   "error": "Validation failed",
@@ -420,6 +448,7 @@ Create a new recipe.
 ```
 
 **Response 422 Unprocessable Entity:**
+
 ```json
 {
   "error": "Too many tags",
@@ -436,9 +465,11 @@ Replace entire recipe (full update).
 **Authentication:** Required
 
 **Path Parameters:**
+
 - `id` (uuid) - Recipe ID
 
 **Request Body:**
+
 ```json
 {
   "title": "Updated Vegetable Stir Fry",
@@ -450,9 +481,11 @@ Replace entire recipe (full update).
 ```
 
 **Validation:**
+
 - Same as POST /api/recipes
 
 **Response 200 OK:**
+
 ```json
 {
   "id": "uuid",
@@ -484,6 +517,7 @@ Replace entire recipe (full update).
 ```
 
 **Response 404 Not Found:**
+
 ```json
 {
   "error": "Recipe not found",
@@ -492,6 +526,7 @@ Replace entire recipe (full update).
 ```
 
 **Response 403 Forbidden:**
+
 ```json
 {
   "error": "Access denied",
@@ -508,9 +543,11 @@ Partially update recipe.
 **Authentication:** Required
 
 **Path Parameters:**
+
 - `id` (uuid) - Recipe ID
 
 **Request Body:**
+
 ```json
 {
   "summary": "Updated summary only"
@@ -518,10 +555,12 @@ Partially update recipe.
 ```
 
 **Validation:**
+
 - At least one field must be provided
 - If updating required fields (title, ingredients, preparation), they must not be empty
 
 **Response 200 OK:**
+
 ```json
 {
   "id": "uuid",
@@ -551,6 +590,7 @@ Soft delete a recipe (sets `deleted_at` timestamp).
 **Authentication:** Required
 
 **Path Parameters:**
+
 - `id` (uuid) - Recipe ID
 
 **Response 204 No Content**
@@ -558,6 +598,7 @@ Soft delete a recipe (sets `deleted_at` timestamp).
 (Empty response body)
 
 **Response 404 Not Found:**
+
 ```json
 {
   "error": "Recipe not found",
@@ -566,12 +607,14 @@ Soft delete a recipe (sets `deleted_at` timestamp).
 ```
 
 **Response 403 Forbidden:**
+
 ```json
 {
   "error": "Access denied",
   "message": "You can only delete your own recipes"
 }
 ```
+
 ---
 
 ### 2.4 Tags
@@ -583,9 +626,11 @@ Get all tags for the current user (for autocomplete).
 **Authentication:** Required
 
 **Query Parameters:**
+
 - `search` (string, optional) - Filter tags by name (partial match)
 
 **Response 200 OK:**
+
 ```json
 {
   "tags": [
@@ -623,9 +668,11 @@ Add tags to a recipe. Creates new tags if they don't exist.
 **Authentication:** Required
 
 **Path Parameters:**
+
 - `recipeId` (uuid) - Recipe ID
 
 **Request Body:**
+
 ```json
 {
   "tag_names": ["Vegan", "High Protein", "Dinner"]
@@ -633,11 +680,13 @@ Add tags to a recipe. Creates new tags if they don't exist.
 ```
 
 **Validation:**
+
 - Recipe must not exceed 10 total tags after adding
 - Tag names are trimmed and validated (non-empty, max length 50)
 - Duplicate tag names for same user are handled (reuse existing tag)
 
 **Response 200 OK:**
+
 ```json
 {
   "recipe_id": "uuid",
@@ -663,6 +712,7 @@ Add tags to a recipe. Creates new tags if they don't exist.
 ```
 
 **Response 422 Unprocessable Entity:**
+
 ```json
 {
   "error": "Tag limit exceeded",
@@ -671,6 +721,7 @@ Add tags to a recipe. Creates new tags if they don't exist.
 ```
 
 **Response 404 Not Found:**
+
 ```json
 {
   "error": "Recipe not found",
@@ -687,6 +738,7 @@ Remove a tag from a recipe.
 **Authentication:** Required
 
 **Path Parameters:**
+
 - `recipeId` (uuid) - Recipe ID
 - `tagId` (uuid) - Tag ID
 
@@ -695,6 +747,7 @@ Remove a tag from a recipe.
 (Empty response body)
 
 **Response 404 Not Found:**
+
 ```json
 {
   "error": "Association not found",
@@ -713,6 +766,7 @@ Generate a new recipe using AI based on available ingredients and user preferenc
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "available_ingredients": ["chicken breast", "broccoli", "garlic", "olive oil"],
@@ -722,11 +776,13 @@ Generate a new recipe using AI based on available ingredients and user preferenc
 ```
 
 **Validation:**
+
 - `available_ingredients` is required (array, min 1 item)
 - User preferences are automatically included from user profile
 - System creates `ai_generations` record before calling AI
 
 **Response 200 OK:**
+
 ```json
 {
   "generation_id": "uuid",
@@ -752,6 +808,7 @@ Generate a new recipe using AI based on available ingredients and user preferenc
 ```
 
 **Response 422 Unprocessable Entity (No suggestions):**
+
 ```json
 {
   "error": "No recipe generated",
@@ -766,6 +823,7 @@ Generate a new recipe using AI based on available ingredients and user preferenc
 ```
 
 **Response 429 Too Many Requests:**
+
 ```json
 {
   "error": "Rate limit exceeded",
@@ -775,6 +833,7 @@ Generate a new recipe using AI based on available ingredients and user preferenc
 ```
 
 **Response 500 Internal Server Error:**
+
 ```json
 {
   "error": "AI service error",
@@ -794,9 +853,11 @@ Get AI generation history for current user.
 **Authentication:** Required
 
 **Query Parameters:**
+
 - `status` (string, optional) - Filter by status: "success", "error", "all" (default: "all")
 
 **Response 200 OK:**
+
 ```json
 {
   "generations": [
@@ -839,9 +900,11 @@ Get details of a specific AI generation.
 **Authentication:** Required
 
 **Path Parameters:**
+
 - `id` (uuid) - Generation ID
 
 **Response 200 OK:**
+
 ```json
 {
   "id": "uuid",
@@ -869,6 +932,7 @@ Get details of a specific AI generation.
 ```
 
 **Response 404 Not Found:**
+
 ```json
 {
   "error": "Generation not found",
@@ -877,6 +941,7 @@ Get details of a specific AI generation.
 ```
 
 **Response 403 Forbidden:**
+
 ```json
 {
   "error": "Access denied",
@@ -891,12 +956,14 @@ Get details of a specific AI generation.
 ### 3.1 Validation Rules
 
 #### Onboarding
+
 - `current_step` must be between 1 and 5
 - Cannot complete onboarding (set `completed_at`) unless `current_step = 5`
 - All preference fields must be filled before completing onboarding
 - Steps must be completed sequentially (no skipping)
 
 #### User Preferences
+
 - `diet_type` is required (cannot be empty)
 - `preferred_ingredients`, `preferred_cuisines`, `allergens` default to empty string
 - Maximum field lengths:
@@ -907,6 +974,7 @@ Get details of a specific AI generation.
   - `notes`: 2000 characters
 
 #### Recipes
+
 - `title` is required (1-200 characters)
 - `ingredients` is required (10-5000 characters)
 - `preparation` is required (10-10000 characters)
@@ -915,12 +983,14 @@ Get details of a specific AI generation.
 - `deleted_at` timestamp used for soft deletes (null = active)
 
 #### Tags
+
 - `name` is required (1-50 characters)
 - Tag names are trimmed of whitespace
 - Tag names must be unique per user (case-insensitive)
 - Empty or whitespace-only names are rejected
 
 #### AI Generations
+
 - `available_ingredients` array must have at least 1 item
 - Each ingredient string: 1-100 characters
 - `dietary_goals` optional (0-500 characters)
@@ -929,6 +999,7 @@ Get details of a specific AI generation.
 ### 3.2 Business Logic Implementation
 
 #### Onboarding Flow
+
 1. **User Registration:**
    - User registers via Supabase Auth
    - System creates `user_onboarding` record with `current_step = 1`
@@ -952,6 +1023,7 @@ Get details of a specific AI generation.
    - User can now access full application
 
 #### Recipe Management
+
 1. **Adding Recipe:**
    - `POST /api/recipes` with title, ingredients, preparation, optional tags
    - System validates required fields
@@ -981,6 +1053,7 @@ Get details of a specific AI generation.
    - Always filter `WHERE owner_id = auth.uid()`
 
 #### Tag Management
+
 1. **Tag Creation:**
    - Tags created implicitly when adding/updating recipes with `tag_names`
    - Or explicitly via recipe tag addition
@@ -1005,6 +1078,7 @@ Get details of a specific AI generation.
    - Users can see all their tags via `GET /api/tags`
 
 #### AI Recipe Generation
+
 1. **Generation Request:**
    - `POST /api/ai/generate-recipe` with ingredients and optional goals
    - Fetches user preferences from `user_preferences`
@@ -1026,8 +1100,8 @@ Get details of a specific AI generation.
    - All generations saved in `ai_generations` (success or failure)
    - Users can view history via `GET /api/ai/generations`
 
-
 #### Error Handling
+
 1. **Validation Errors (400):**
    - Missing required fields
    - Invalid field formats
@@ -1081,7 +1155,6 @@ Get details of a specific AI generation.
 
 ---
 
-
 ## 4. Error Response Format
 
 All error responses follow consistent format:
@@ -1097,6 +1170,7 @@ All error responses follow consistent format:
 ```
 
 **HTTP Status Codes Used:**
+
 - `200 OK` - Successful GET/PUT/PATCH
 - `201 Created` - Successful POST
 - `204 No Content` - Successful DELETE
@@ -1115,6 +1189,7 @@ All error responses follow consistent format:
 **Current Version:** v1 (implicit)
 
 All endpoints are under `/api` without explicit version prefix. Future versions will use:
+
 - `/api/v2/...` for breaking changes
 - v1 endpoints remain at `/api/...` for backward compatibility
 
@@ -1123,14 +1198,17 @@ All endpoints are under `/api` without explicit version prefix. Future versions 
 ## 6. Logging and Monitoring
 
 **Request Logging:**
+
 - All API requests logged with: timestamp, user_id, method, path, status, duration
 - PII (personally identifiable information) excluded from logs
 
 **Error Logging:**
+
 - All 5xx errors logged with stack traces
 - All AI service errors logged to `ai_generations.error_message`
 
 **Metrics:**
+
 - API endpoint response times
 - AI generation success/failure rates
 - Rate limit violations
@@ -1208,4 +1286,3 @@ All endpoints are under `/api` without explicit version prefix. Future versions 
 ---
 
 **End of API Plan**
-

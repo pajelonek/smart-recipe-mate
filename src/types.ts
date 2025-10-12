@@ -150,7 +150,3 @@ export interface ApiError {
   message: string;
   details?: Record<string, unknown>;
 }
-
-export type RateLimitError = ApiError & {
-  retry_after: number;
-};
