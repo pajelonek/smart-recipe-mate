@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "supabase:start": "supabase start"
+    "supabase:start": "supabase start",
+    "supabase:migrate": "supabase migration up",
+    "supabase:reset": "supabase reset"
   },
   "dependencies": {
     "@astrojs/node": "^9.4.3",
