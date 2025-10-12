@@ -20,6 +20,7 @@ const baseConfig = tseslint.config({
   rules: {
     "no-console": "warn",
     "no-unused-vars": "off",
+    "no-var": "off", // Allow var in global declarations
   },
 });
 

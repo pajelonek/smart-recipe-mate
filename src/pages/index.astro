@@ -1,8 +1,82 @@
 ---
-import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
+import Layout from '../layouts/Layout.astro';
+import { DashboardContent } from '../components/dashboard/DashboardContent';
+import { createServerSupabaseClient } from '../db/supabase.client';
+import { getUserRecipes } from '../lib/services/recipes.service';
+import type { UserStats, Recipe } from '../types';
+
+const supabase = createServerSupabaseClient(Astro);
+
+// DEVELOPMENT: Temporarily bypass auth for dashboard testing
+// Remove this when login page is implemented
+const user = {
+  id: "550e8400-e29b-41d4-a716-446655440000",
+  email: "dev@example.com",
+  user_metadata: { display_name: "Dev User" }
+};
+
+// Original code (uncomment when login is implemented):
+// const { data: { session }, error: authError } = await supabase.auth.getSession();
+// if (!session?.user) {
+//   return Astro.redirect('/login');
+// }
+// const user = session.user;
+
+// DEVELOPMENT: Temporarily bypass onboarding check for dashboard testing
+// Remove this when onboarding page is implemented
+const preferences = { user_id: user.id }; // Mock preferences
+
+// Original code (uncomment when onboarding is implemented):
+// const { data: preferences } = await supabase
+//   .from('user_preferences')
+//   .select('user_id')
+//   .eq('user_id', user.id)
+//   .maybeSingle();
+// if (!preferences) {
+//   return Astro.redirect('/onboarding');
+// }
+
+// Fetch recipes
+const recipes = await getUserRecipes(user.id, supabase);
+const recentRecipes: Recipe[] = recipes.slice(0, 10);
+
+// Fetch stats
+const { count: recipesCount, error: recipesError } = await supabase
+  .from('recipes')
+  .select('*', { count: 'exact', head: true })
+  .eq('owner_id', user.id)
+  .is('deleted_at', null);
+
+if (recipesError) {
+  console.error('Error fetching recipes count:', recipesError);
+  return Astro.response(new Response('Internal Server Error', { status: 500 }));
+}
+
+const { count: generationsCount, error: generationsError } = await supabase
+  .from('ai_generations')
+  .select('*', { count: 'exact', head: true })
+  .eq('user_id', user.id);
+
+if (generationsError) {
+  console.error('Error fetching generations count:', generationsError);
+  return Astro.response(new Response('Internal Server Error', { status: 500 }));
+}
+
+const stats: UserStats = {
+  recipesCount: recipesCount || 0,
+  generationsCount: generationsCount || 0,
+};
+
+const userName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User';
 ---
 
-<Layout>
-  <Welcome />
+<Layout title="Dashboard - Smart Recipe Mate">
+  <!-- Mock token for development -->
+  <DashboardContent
+    client:load
+    initialRecipes={recentRecipes}
+    initialStats={stats}
+    userName={userName}
+    sessionToken="dev-session-token"
+  />
 </Layout>
