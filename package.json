@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "supabase:start": "supabase start",
     "supabase:migrate": "supabase migration up",
-    "supabase:reset": "supabase reset"
+    "supabase:reset": "supabase db reset"
   },
   "dependencies": {
     "@astrojs/node": "^9.4.3",
