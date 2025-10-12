@@ -886,9 +886,9 @@ Get details of a specific AI generation.
 
 ---
 
-## 4. Validation and Business Logic
+## 3. Validation and Business Logic
 
-### 4.1 Validation Rules
+### 3.1 Validation Rules
 
 #### Onboarding
 - `current_step` must be between 1 and 5
@@ -926,7 +926,7 @@ Get details of a specific AI generation.
 - `dietary_goals` optional (0-500 characters)
 - `additional_context` optional (0-1000 characters)
 
-### 4.2 Business Logic Implementation
+### 3.2 Business Logic Implementation
 
 #### Onboarding Flow
 1. **User Registration:**
@@ -1058,7 +1058,7 @@ Get details of a specific AI generation.
    - AI service failures logged to `ai_generations.error_message`
    - Return generic "Internal server error" to user
 
-### 4.3 Data Integrity
+### 3.3 Data Integrity
 
 1. **Foreign Key Constraints:**
    - All user data cascades on user deletion (ON DELETE CASCADE)
@@ -1082,7 +1082,7 @@ Get details of a specific AI generation.
 ---
 
 
-## 6. Error Response Format
+## 4. Error Response Format
 
 All error responses follow consistent format:
 
@@ -1110,7 +1110,7 @@ All error responses follow consistent format:
 
 ---
 
-## 7. API Versioning
+## 5. API Versioning
 
 **Current Version:** v1 (implicit)
 
@@ -1120,7 +1120,7 @@ All endpoints are under `/api` without explicit version prefix. Future versions 
 
 ---
 
-## 9. Logging and Monitoring
+## 6. Logging and Monitoring
 
 **Request Logging:**
 - All API requests logged with: timestamp, user_id, method, path, status, duration
@@ -1138,7 +1138,7 @@ All endpoints are under `/api` without explicit version prefix. Future versions 
 
 ---
 
-## 11. Implementation Notes for Astro/Supabase
+## 7. Implementation Notes for Astro/Supabase
 
 **Tech Stack Integration:**
 
