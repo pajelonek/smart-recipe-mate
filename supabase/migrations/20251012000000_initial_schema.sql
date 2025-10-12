@@ -1,6 +1,7 @@
-create schema if not exists smart_recipe_mate;
+-- Use public schema (exposed by Supabase API)
+-- Tables for Smart Recipe Mate application
 
-create table smart_recipe_mate.user_onboarding (
+create table public.user_onboarding (
   user_id uuid not null references auth.users(id) on delete cascade,
   current_step smallint not null default 1,
   completed_at timestamptz,
@@ -10,7 +11,7 @@ create table smart_recipe_mate.user_onboarding (
   constraint completed_check check (completed_at is null or current_step = 5)
 );
 
-create table smart_recipe_mate.user_preferences (
+create table public.user_preferences (
   user_id uuid not null references auth.users(id) on delete cascade,
   diet_type text not null,
   preferred_ingredients text not null default '',
@@ -22,7 +23,7 @@ create table smart_recipe_mate.user_preferences (
   primary key (user_id)
 );
 
-create table smart_recipe_mate.recipes (
+create table public.recipes (
   id uuid not null default gen_random_uuid(),
   owner_id uuid not null references auth.users(id) on delete cascade,
   title text not null,
@@ -35,7 +36,7 @@ create table smart_recipe_mate.recipes (
   primary key (id)
 );
 
-create table smart_recipe_mate.tags (
+create table public.tags (
   id uuid not null default gen_random_uuid(),
   owner_id uuid not null references auth.users(id) on delete cascade,
   name text not null,
@@ -44,14 +45,14 @@ create table smart_recipe_mate.tags (
   unique (owner_id, name)
 );
 
-create table smart_recipe_mate.recipe_tags (
-  recipe_id uuid not null references smart_recipe_mate.recipes(id) on delete cascade,
-  tag_id uuid not null references smart_recipe_mate.tags(id) on delete cascade,
+create table public.recipe_tags (
+  recipe_id uuid not null references public.recipes(id) on delete cascade,
+  tag_id uuid not null references public.tags(id) on delete cascade,
   created_at timestamptz not null default timezone('utc', now()),
   primary key (recipe_id, tag_id)
 );
 
-create table smart_recipe_mate.ai_generations (
+create table public.ai_generations (
   id uuid not null default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   input_payload jsonb not null,

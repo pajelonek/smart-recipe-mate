@@ -19,7 +19,179 @@ export interface Database {
     CompositeTypes: Record<never, never>;
   };
   public: {
-    Tables: Record<never, never>;
+    Tables: {
+      ai_generations: {
+        Row: {
+          created_at: string;
+          error_message: string | null;
+          id: string;
+          input_payload: Json;
+          output_payload: Json | null;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          error_message?: string | null;
+          id?: string;
+          input_payload: Json;
+          output_payload?: Json | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          error_message?: string | null;
+          id?: string;
+          input_payload?: Json;
+          output_payload?: Json | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      recipe_tags: {
+        Row: {
+          created_at: string;
+          recipe_id: string;
+          tag_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          recipe_id: string;
+          tag_id: string;
+        };
+        Update: {
+          created_at?: string;
+          recipe_id?: string;
+          tag_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "recipe_tags_recipe_id_fkey";
+            columns: ["recipe_id"];
+            isOneToOne: false;
+            referencedRelation: "recipes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "recipe_tags_tag_id_fkey";
+            columns: ["tag_id"];
+            isOneToOne: false;
+            referencedRelation: "tags";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      recipes: {
+        Row: {
+          created_at: string;
+          deleted_at: string | null;
+          id: string;
+          ingredients: string;
+          owner_id: string;
+          preparation: string;
+          summary: string | null;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          ingredients: string;
+          owner_id: string;
+          preparation: string;
+          summary?: string | null;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          ingredients?: string;
+          owner_id?: string;
+          preparation?: string;
+          summary?: string | null;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      tags: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          owner_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          owner_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          owner_id?: string;
+        };
+        Relationships: [];
+      };
+      user_onboarding: {
+        Row: {
+          completed_at: string | null;
+          created_at: string;
+          current_step: number;
+          user_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          created_at?: string;
+          current_step?: number;
+          user_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          created_at?: string;
+          current_step?: number;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      user_preferences: {
+        Row: {
+          allergens: string;
+          created_at: string;
+          diet_type: string;
+          notes: string | null;
+          preferred_cuisines: string;
+          preferred_ingredients: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          allergens?: string;
+          created_at?: string;
+          diet_type: string;
+          notes?: string | null;
+          preferred_cuisines?: string;
+          preferred_ingredients?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          allergens?: string;
+          created_at?: string;
+          diet_type?: string;
+          notes?: string | null;
+          preferred_cuisines?: string;
+          preferred_ingredients?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+    };
     Views: Record<never, never>;
     Functions: Record<never, never>;
     Enums: Record<never, never>;
