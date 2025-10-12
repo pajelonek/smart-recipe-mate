@@ -2,11 +2,11 @@
 
 ## 1. Przegląd produktu
 
-HealthyMeal to webowa aplikacja MVP wspierająca osoby planujące posiłki w dostosowywaniu jadłospisu do preferencji dietetycznych i ograniczeń alergicznych. System łączy proste konto użytkownika, obowiązkową konfigurację preferencji żywieniowych oraz repozytorium przepisów przechowywanych w ustandaryzowanej strukturze tekstowej (tytuł, składniki, przygotowanie). Kluczową przewagą jest integracja z AI, która generuje od zera przepisy na podstawie podanych produktów z lodówki oraz zapisanych preferencji użytkownika, przekazując wynik w uzgodnionym formacie JSON. Aplikacja działa wyłącznie w przeglądarce desktopowej, a każda generacja AI, przepisy i preferencje są powiązane z kontem użytkownika.
+HealthyMeal to webowa aplikacja MVP wspierająca osoby planujące posiłki w dostosowywaniu jadłospisu do preferencji dietetycznych. System łączy proste konto użytkownika, obowiązkową konfigurację preferencji żywieniowych oraz repozytorium przepisów przechowywanych w ustandaryzowanej strukturze tekstowej (tytuł, składniki, przygotowanie). Kluczową przewagą jest integracja z AI, która generuje od zera przepisy na podstawie podanych produktów z lodówki oraz zapisanych preferencji użytkownika, przekazując wynik w uzgodnionym formacie JSON. Aplikacja działa wyłącznie w przeglądarce desktopowej, a każda generacja AI, przepisy i preferencje są powiązane z kontem użytkownika.
 
 ## 2. Problem użytkownika
 
-Użytkownicy z wymaganiami dietetycznymi muszą ręcznie dostosowywać przepisy znalezione w sieci, co jest czasochłonne, wymaga znajomości składników i często kończy się błędami skutkującymi alergiami lub brakiem zgodności z planem żywieniowym. Brakuje narzędzia, które zebrałoby preferencje od razu po rejestracji, pozwalało przechowywać przepisy w spójnym formacie oraz potrafiło wygenerować od podstaw dopasowany przepis z dostępnych składników. HealthyMeal eliminuje te bariery, prowadząc użytkownika przez konfigurację preferencji, zapewniając repozytorium własnych przepisów i udostępniając generowanie AI tworzące nowe przepisy w kontekście tych danych.
+Użytkownicy z wymaganiami dietetycznymi muszą ręcznie dostosowywać przepisy znalezione w sieci, co jest czasochłonne, wymaga znajomości składników i często kończy się brakiem zgodności z planem żywieniowym. Brakuje narzędzia, które zebrałoby preferencje od razu po rejestracji, pozwalało przechowywać przepisy w spójnym formacie oraz potrafiło wygenerować od podstaw dopasowany przepis z dostępnych składników. HealthyMeal eliminuje te bariery, prowadząc użytkownika przez konfigurację preferencji, zapewniając repozytorium własnych przepisów i udostępniając generowanie AI tworzące nowe przepisy w kontekście tych danych.
 
 ## 3. Wymagania funkcjonalne
 
@@ -17,13 +17,13 @@ Użytkownicy z wymaganiami dietetycznymi muszą ręcznie dostosowywać przepisy 
 - Ochrona zasobów po wylogowaniu (brak dostępu do przepisów i preferencji bez aktywnej sesji).
 
 ### 3.2 Onboarding preferencji
-- Obowiązkowy pięcioetapowy kreator uruchamiany przy pierwszym logowaniu (intro, typ diety, preferowane składniki, kuchnie, alergie) bez możliwości pomijania kroków ani zapisu częściowego postępu.
+- Obowiązkowy pięcioetapowy kreator uruchamiany przy pierwszym logowaniu (intro, typ diety, preferowane składniki, kuchnie, allergens) bez możliwości pomijania kroków ani zapisu częściowego postępu.
 - Każdy ekran waliduje wymagane pola przed przejściem dalej; przerwanie kreatora oznacza powrót do pierwszego kroku przy kolejnym logowaniu.
 - Po ukończeniu kreatora (current_step = 5) system ustawia completed_at w tabeli user_onboarding i przekierowuje użytkownika do repozytorium przepisów.
 
 ### 3.3 Profil preferencji
 - Strona profilu prezentuje zapisane preferencje oraz datę ostatniej modyfikacji.
-- Użytkownik może edytować typ diety, preferowane składniki, alergie i kuchnie; zmiany są walidowane i zapisywane atomowo.
+- Użytkownik może edytować typ diety, preferowane składniki, allergens i kuchnie; zmiany są walidowane i zapisywane atomowo.
 - Edycja preferencji aktualizuje datę modyfikacji oraz wyzwala odświeżenie widoku przepisów w sesji użytkownika.
 
 
@@ -49,15 +49,11 @@ Użytkownicy z wymaganiami dietetycznymi muszą ręcznie dostosowywać przepisy 
 - Generowanie przepisu przez AI blokuje możliwość równoległego wysyłania kolejnych zapytań do czasu otrzymania odpowiedzi, po czym interfejs wymaga potwierdzenia zapisu.
 - Integracja AI nie edytuje istniejących przepisów; służy wyłącznie do tworzenia nowych receptur.
 
-### 3.7 Ostrzeżenia i bezpieczeństwo żywieniowe
-- Przy zapisie przepisu system identyfikuje składniki oznaczone jako alergeny w profilu użytkownika i wyświetla ostrzeżenie bez blokowania zapisu.
-- Ostrzeżenia są widoczne na liście i w widoku szczegółowym przepisu, zawierając listę wykrytych alergenów oraz link do pomocy.
-
-### 3.8 Obsługa błędów AI
+### 3.7 Obsługa błędów AI
 - Błędy podczas generowania przepisów są przechowywane w tabeli generacji AI wraz z pełnym kontekstem żądania (input_payload) oraz komunikatem błędu.
 - Interfejs prezentuje użytkownikowi czytelny komunikat o błędzie z możliwością ponowienia próby.
 
-### 3.9 Dostępność i ograniczenia platformy
+### 3.8 Dostępność i ograniczenia platformy
 - Aplikacja wspiera najnowsze wersje przeglądarek desktopowych, bez natywnego wsparcia urządzeń mobilnych.
 - Interfejs i komunikaty kierowane do użytkownika są w języku angielskim; dokumentacja wewnętrzna może pozostać dwujęzyczna.
 
@@ -65,7 +61,7 @@ Użytkownicy z wymaganiami dietetycznymi muszą ręcznie dostosowywać przepisy 
 
 - Poza zakresem MVP: import przepisów z adresów URL, obsługa multimediów (obrazy, wideo, pliki), udostępnianie przepisów innym użytkownikom, funkcje społecznościowe, dodatkowe powiadomienia e-mail poza rejestracją i resetem, eksport przepisów oraz dashboard KPI.
 - Zależności: dostawca usług e-mail dla weryfikacji i resetów, zewnętrzne API AI zwracające odpowiedzi w JSON, baza danych przechowująca konta, preferencje, przepisy i logi, system uwierzytelniania zdolny do bezpiecznego przechowywania haseł.
-- Założenia: użytkownicy posiadają treści przepisu w formie tekstowej, akceptują regulamin obejmujący korzystanie z AI, dane preferencji i alergii definiują samodzielnie bez dodatkowej weryfikacji, aplikacja będzie rozwijana przez mały zespół bez odrębnego wsparcia mobilnego.
+- Założenia: użytkownicy posiadają treści przepisu w formie tekstowej, akceptują regulamin obejmujący korzystanie z AI, dane preferencji definiują samodzielnie bez dodatkowej weryfikacji, aplikacja będzie rozwijana przez mały zespół bez odrębnego wsparcia mobilnego.
 - Ryzyka i otwarte kwestie: brak zaplanowanej instrumentacji metryk sukcesu utrudni pomiar celów biznesowych, nieokreślony plan skalowania listy przepisów (paginacja, lazy loading) może ograniczyć wydajność przy rosnącej liczbie rekordów, niezawodność i koszty API AI wpływają na czas odpowiedzi, brak walidacji jakości treści przepisu może obniżać spójność danych.
 
 ## 5. Historyjki użytkowników
@@ -110,12 +106,12 @@ Opis: Jako istniejący użytkownik chcę aktualizować swoje preferencje na stro
 Kryteria akceptacji:
 - Widok profilu prezentuje bieżące wartości preferencji oraz datę ostatniej modyfikacji.
 - Formularz waliduje wymagane pola i blokuje zapis przy błędnych danych, wyświetlając wskazówki naprawcze.
-- Zapis zmian natychmiast aktualizuje preferencje w sesji użytkownika i odświeża ostrzeżenia alergiczne.
+- Zapis zmian natychmiast aktualizuje preferencje w sesji użytkownika.
 
 ### US-007 Przegląd listy przepisów
 Opis: Jako użytkownik chcę widzieć listę moich przepisów, aby szybko uzyskać dostęp do treści.
 Kryteria akceptacji:
-- Lista prezentuje tytuł, datę ostatniej edycji oraz znacznik ostrzeżeń alergicznych dla każdego przepisu.
+- Lista prezentuje tytuł oraz datę ostatniej edycji dla każdego przepisu.
 - Domyślnie wyświetlane są wyłącznie aktywne przepisy właściciela konta (nieusunięte).
 - Kliknięcie pozycji otwiera widok szczegółowy z pełną treścią.
 
@@ -166,8 +162,8 @@ Kryteria akceptacji:
 Opis: Jako użytkownik chcę widzieć historię moich generacji AI, aby wracać do poprzednio wygenerowanych receptur.
 Kryteria akceptacji:
 - System zapisuje każdą generację AI (input_payload, output_payload) wraz z datą utworzenia.
-- Przepisy zapisane w repozytorium zachowują powiązanie z rekordami generacji poprzez ai_generation_id.
-- Użytkownik może przeglądać zapisane przepisy wraz z informacją o źródle ich powstania (wygenerowane przez AI vs. dodane ręcznie).
+- Użytkownik może przeglądać historię swoich generacji AI.
+- Historia generacji zawiera pełny kontekst wejściowy i wyjściowy każdego zapytania.
 
 ### US-015 Obsługa braku propozycji AI
 Opis: Jako użytkownik chcę otrzymać jasną informację, gdy AI nie potrafi wygenerować przepisu na podstawie podanych składników.
@@ -176,21 +172,14 @@ Kryteria akceptacji:
 - Komunikat sugeruje możliwe kolejne kroki (np. dodanie nowych składników, rozluźnienie preferencji dietetycznych).
 - Po komunikacie użytkownik może wysłać kolejne zapytanie bez utraty dotychczasowych danych wejściowych.
 
-### US-016 Ostrzeżenia o alergenach
-Opis: Jako użytkownik z alergiami chcę otrzymać ostrzeżenie, gdy przepis zawiera niedozwolone składniki.
-Kryteria akceptacji:
-- Podczas zapisu przepisu system porównuje składniki z listą alergii w profilu.
-- Wykryte alergeny wyświetlane są w modalnym ostrzeżeniu przed finalnym potwierdzeniem zapisu.
-- Ostrzeżenia są również widoczne na liście przepisów i w widoku szczegółowym.
-
-### US-017 Przeglądanie generacji AI
+### US-016 Przeglądanie generacji AI
 Opis: Jako użytkownik chcę mieć dostęp do historii generacji AI, aby przeglądać wcześniejsze wyniki.
 Kryteria akceptacji:
 - System przechowuje wszystkie rekordy generacji AI (ai_generations) powiązane z użytkownikiem.
 - Każdy rekord zawiera znacznik czasu utworzenia, dane wejściowe (input_payload), odpowiedź AI (output_payload) oraz ewentualny błąd.
 - Użytkownik może przeglądać zapisane przepisy z AI i zobaczyć powiązane dane generacji.
 
-### US-018 Diagnostyka błędów AI
+### US-017 Diagnostyka błędów AI
 Opis: Jako członek zespołu operacyjnego chcę mieć dostęp do rekordów generacji AI, aby diagnozować błędy integracji.
 Kryteria akceptacji:
 - System zapisuje każdą generację AI w tabeli ai_generations wraz z pełnym kontekstem (input_payload, output_payload, error_message).

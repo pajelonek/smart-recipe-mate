@@ -29,7 +29,6 @@ create table smart_recipe_mate.recipes (
   summary text,
   ingredients text not null,
   preparation text not null,
-  ai_generation_id uuid,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now()),
   deleted_at timestamptz,
@@ -61,9 +60,3 @@ create table smart_recipe_mate.ai_generations (
   created_at timestamptz not null default timezone('utc', now()),
   primary key (id)
 );
-
-alter table smart_recipe_mate.recipes
-  add constraint recipes_ai_generation_fkey
-  foreign key (ai_generation_id)
-  references smart_recipe_mate.ai_generations(id)
-  on delete set null;

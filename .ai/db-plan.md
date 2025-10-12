@@ -35,7 +35,6 @@ Columns:
 - `summary text` – streszczenie przepisu; opcjonalne.
 - `ingredients text` – NOT NULL, lista składników.
 - `preparation text` – NOT NULL, kroki przygotowania.
-- `ai_generation_id uuid` – FK do `smart_recipe_mate.ai_generations(id)` ON DELETE SET NULL, łączy przepis z generacją AI.
 - `created_at timestamptz` – NOT NULL DEFAULT timezone('utc', now()).
 - `updated_at timestamptz` – NOT NULL DEFAULT timezone('utc', now()).
 - `deleted_at timestamptz` – znacznik miękkiego usunięcia.
@@ -78,14 +77,12 @@ Constraints:
 - `auth.users` (1) — (N) `smart_recipe_mate.tags` poprzez `owner_id`.
 - `auth.users` (1) — (N) `smart_recipe_mate.ai_generations` poprzez `user_id`.
 - `smart_recipe_mate.recipes` (N) — (N) `smart_recipe_mate.tags` poprzez tabelę łączącą `recipe_tags`.
-- `smart_recipe_mate.recipes` (N) — (0..1) `smart_recipe_mate.ai_generations` poprzez `ai_generation_id`; przepis wygenerowany przez AI posiada powiązanie z rekordami generacji.
 - `smart_recipe_mate.recipe_tags` (N) — (1) `smart_recipe_mate.recipes` poprzez `recipe_id`.
 - `smart_recipe_mate.recipe_tags` (N) — (1) `smart_recipe_mate.tags` poprzez `tag_id`.
 
 # 3. Indeksy
 Obecnie brak zdefiniowanych indeksów w migracji. Poniższe indeksy mogą zostać dodane w przyszłości dla optymalizacji wydajności:
 - Indeks na `recipes(owner_id)` WHERE `deleted_at IS NULL` dla szybkiego filtrowania aktywnych przepisów użytkownika.
-- Indeks na `recipes(ai_generation_id)` dla powiązań z generacjami AI.
 - Indeks na `recipe_tags(tag_id)` wspierający filtrowanie po tagach.
 - Indeks na `tags(owner_id, name)` dla autouzupełniania i wymuszenia unikalności na poziomie właściciela (częściowo pokryte przez UNIQUE constraint).
 - Indeks na `ai_generations(user_id, created_at DESC)` przydatny dla historii użytkownika.
