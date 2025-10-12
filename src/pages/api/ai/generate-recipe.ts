@@ -75,10 +75,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const generationId = await createAIGeneration(testUserId, inputPayload, locals.supabase);
 
     try {
-      const apiKey = import.meta.env.OPENROUTER_API_KEY;
-      if (!apiKey) {
-        throw new Error("OpenRouter API key not configured");
-      }
+      // NOTE: Using mock implementation - API key not required
+      const apiKey = import.meta.env.OPENROUTER_API_KEY || "mock-api-key";
 
       const recipe = await generateRecipe(inputPayload, apiKey);
 

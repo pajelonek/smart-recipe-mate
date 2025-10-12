@@ -7,17 +7,7 @@
 
 ## Wymagania wstępne
 
-### 1. Ustaw zmienną środowiskową OPENROUTER_API_KEY
-
-Utwórz plik `.env` w root projektu:
-
-```env
-OPENROUTER_API_KEY=sk-or-v1-your-api-key-here
-SUPABASE_URL=http://127.0.0.1:54321
-SUPABASE_KEY=your-supabase-anon-key
-```
-
-### 2. Upewnij się, że użytkownik ma preferencje (onboarding completed)
+### 1. Upewnij się, że użytkownik ma preferencje (onboarding completed)
 
 ```bash
 curl -X POST http://localhost:3001/api/onboarding/complete \
@@ -664,10 +654,10 @@ curl -s http://localhost:3001/api/ai/generations | jq '.generations | length'
 ## 📝 Notatki implementacyjne
 
 1. **Test User ID:** `00000000-0000-0000-0000-000000000000` jest hardcoded w MVP
-2. **OpenRouter API Key:** Musi być ustawiony w `.env` (kosztuje prawdziwe pieniądze!)
-3. **Timeout:** AI requests mają 30s timeout
-4. **Retry Logic:** 2 retry z exponential backoff (1s, 2s)
-5. **Database Logging:** Wszystkie próby (sukces i błąd) są zapisywane w `ai_generations`
+2. **Mock Implementation:** Obecnie używamy mocka zamiast prawdziwego OpenRouter API
+3. **Simulated Latency:** Mock symuluje 1-3 sekundy opóźnienia
+4. **Database Logging:** Wszystkie próby (sukces i błąd) są zapisywane w `ai_generations`
+5. **Production Ready:** Zamień mock na prawdziwe OpenRouter API gdy będzie potrzebne
 
 ---
 
