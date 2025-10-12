@@ -1,4 +1,4 @@
-import { StatCard } from "./StatCard";
+import { StatCard } from "./card/StatCard";
 import { ChefHat, Sparkles } from "lucide-react";
 import type { UserStatsProps, UserStats } from "../../types";
 

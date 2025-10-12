@@ -1,18 +1,18 @@
 import React from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
-import { Badge } from "../ui/badge";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../ui/card";
+import { Badge } from "../../ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
+} from "../../ui/dropdown-menu";
+import { Button } from "../../ui/button";
 import { MoreVertical } from "lucide-react";
-import type { RecipeCardProps } from "../../types";
-import { truncate } from "../../lib/utils/text-formatter";
-import { formatDate } from "../../lib/utils/date-formatter";
+import type { RecipeCardProps } from "../../../types";
+import { truncate } from "../../../lib/utils/text-formatter";
+import { formatDate } from "../../../lib/utils/date-formatter";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +22,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../ui/alert-dialog";
+} from "../../ui/alert-dialog";
 
 export function RecipeCard({ recipe, onDelete, onEdit, onView }: Readonly<RecipeCardProps>) {
   const [open, setOpen] = React.useState(false);

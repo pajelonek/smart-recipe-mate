@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import type { StatCardProps } from "../../types";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
+import type { StatCardProps } from "../../../types";
 
 export function StatCard({ icon, value, label, onClick }: Readonly<StatCardProps>) {
   return (

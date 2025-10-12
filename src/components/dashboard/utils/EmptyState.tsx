@@ -1,5 +1,5 @@
 import { ChefHat } from "lucide-react";
-import type { EmptyStateProps } from "../../types";
+import type { EmptyStateProps } from "../../../types";
 
 export function EmptyState({ title, description, action }: Readonly<EmptyStateProps>) {
   return (

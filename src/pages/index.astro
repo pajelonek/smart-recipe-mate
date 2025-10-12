@@ -1,9 +1,9 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { DashboardContent } from '../components/dashboard/DashboardContent';
-import { createServerSupabaseClient } from '../db/supabase.client';
-import { getUserRecipes } from '../lib/services/recipes.service';
-import type { UserStats, Recipe } from '../types';
+import Layout from "../layouts/Layout.astro";
+import { DashboardContent } from "../components/dashboard/DashboardContent";
+import { createServerSupabaseClient } from "../db/supabase.client";
+import { getUserRecipes } from "../lib/services/recipes.service";
+import type { UserStats, Recipe } from "../types";
 
 const supabase = createServerSupabaseClient(Astro);
 
@@ -12,7 +12,7 @@ const supabase = createServerSupabaseClient(Astro);
 const user = {
   id: "550e8400-e29b-41d4-a716-446655440000",
   email: "dev@example.com",
-  user_metadata: { display_name: "Dev User" }
+  user_metadata: { display_name: "Dev User" },
 };
 
 // Original code (uncomment when login is implemented):
@@ -42,24 +42,24 @@ const recentRecipes: Recipe[] = recipes.slice(0, 10);
 
 // Fetch stats
 const { count: recipesCount, error: recipesError } = await supabase
-  .from('recipes')
-  .select('*', { count: 'exact', head: true })
-  .eq('owner_id', user.id)
-  .is('deleted_at', null);
+  .from("recipes")
+  .select("*", { count: "exact", head: true })
+  .eq("owner_id", user.id)
+  .is("deleted_at", null);
 
 if (recipesError) {
-  console.error('Error fetching recipes count:', recipesError);
-  return Astro.response(new Response('Internal Server Error', { status: 500 }));
+  console.error("Error fetching recipes count:", recipesError);
+  return Astro.response(new Response("Internal Server Error", { status: 500 }));
 }
 
 const { count: generationsCount, error: generationsError } = await supabase
-  .from('ai_generations')
-  .select('*', { count: 'exact', head: true })
-  .eq('user_id', user.id);
+  .from("ai_generations")
+  .select("*", { count: "exact", head: true })
+  .eq("user_id", user.id);
 
 if (generationsError) {
-  console.error('Error fetching generations count:', generationsError);
-  return Astro.response(new Response('Internal Server Error', { status: 500 }));
+  console.error("Error fetching generations count:", generationsError);
+  return Astro.response(new Response("Internal Server Error", { status: 500 }));
 }
 
 const stats: UserStats = {
@@ -67,7 +67,7 @@ const stats: UserStats = {
   generationsCount: generationsCount || 0,
 };
 
-const userName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User';
+const userName = user.user_metadata?.display_name || user.email?.split("@")[0] || "User";
 ---
 
 <Layout title="Dashboard - Smart Recipe Mate">

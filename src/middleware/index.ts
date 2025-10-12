@@ -3,11 +3,15 @@ import { createServerSupabaseClient } from "../db/supabase.client";
 
 const PUBLIC_ROUTES = ["/login", "/register", "/onboarding", "/reset-password"];
 
+const API_PREFIX = "/api/";
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = new URL(context.request.url);
 
-  // Skip auth for public routes
-  if (PUBLIC_ROUTES.includes(pathname)) {
+  // Skip auth for public routes and API endpoints
+  if (PUBLIC_ROUTES.includes(pathname) || pathname.startsWith(API_PREFIX)) {
+    const supabase = createServerSupabaseClient(context);
+    context.locals.supabase = supabase;
     return next();
   }
 

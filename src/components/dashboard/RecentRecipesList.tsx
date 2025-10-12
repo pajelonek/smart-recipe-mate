@@ -1,8 +1,8 @@
 import React from "react";
 import { Button } from "../ui/button";
-import { RecipeCard } from "./RecipeCard";
+import { RecipeCard } from "./card/RecipeCard";
 import { RecipeListSkeleton } from "./RecipeListSkeleton";
-import { EmptyState } from "./EmptyState";
+import { EmptyState } from "./utils/EmptyState";
 import type { RecentRecipesListProps, Recipe } from "../../types";
 
 export function RecentRecipesList({ recipes, isLoading = false, onDelete }: Readonly<RecentRecipesListProps>) {
