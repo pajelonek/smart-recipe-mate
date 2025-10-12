@@ -1,17 +1,6 @@
 -- Use public schema (exposed by Supabase API)
 -- Tables for Smart Recipe Mate application
 
-create table public.user_onboarding (
-  -- user_id uuid not null references auth.users(id) on delete cascade,
-  user_id uuid not null,
-  current_step smallint not null default 1,
-  completed_at timestamptz,
-  created_at timestamptz not null default timezone('utc', now()),
-  primary key (user_id),
-  constraint valid_step check (current_step between 1 and 5),
-  constraint completed_check check (completed_at is null or current_step = 5)
-);
-
 create table public.user_preferences (
   -- user_id uuid not null references auth.users(id) on delete cascade,
   user_id uuid not null,

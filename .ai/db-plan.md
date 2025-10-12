@@ -6,18 +6,6 @@ Columns:
 
 - `id uuid` – klucz główny zarządzany przez Supabase Auth; wszystkie tabele użytkownika referencjonują tę kolumnę.
 
-#### smart_recipe_mate.user_onboarding
-
-Columns:
-
-- `user_id uuid` – klucz główny, FK do `auth.users(id)` ON DELETE CASCADE.
-- `current_step smallint` – NOT NULL DEFAULT 1, CHECK (current_step BETWEEN 1 AND 5).
-- `completed_at timestamptz` – znacznik ukończenia kreatora, NULL dopóki kreator nie został ukończony.
-- `created_at timestamptz` – NOT NULL DEFAULT timezone('utc', now()).
-  Constraints:
-- PRIMARY KEY (`user_id`).
-- CHECK (`completed_at` IS NULL OR `current_step` = 5).
-
 #### smart_recipe_mate.user_preferences
 
 Columns:
@@ -86,8 +74,7 @@ Columns:
 
 # 2. Relacje między tabelami
 
-- `auth.users` (1) — (1) `smart_recipe_mate.user_preferences` poprzez wspólny klucz `user_id`.
-- `auth.users` (1) — (1) `smart_recipe_mate.user_onboarding` poprzez `user_id`.
+- `auth.users` (1) — (0..1) `smart_recipe_mate.user_preferences` poprzez wspólny klucz `user_id` (optional - user may not have completed onboarding).
 - `auth.users` (1) — (N) `smart_recipe_mate.recipes` poprzez `owner_id`.
 - `auth.users` (1) — (N) `smart_recipe_mate.tags` poprzez `owner_id`.
 - `auth.users` (1) — (N) `smart_recipe_mate.ai_generations` poprzez `user_id`.
@@ -121,9 +108,6 @@ Obecnie brak zdefiniowanych zasad Row Level Security w migracji. Należy je doda
   - ENABLE ROW LEVEL SECURITY.
   - SELECT/INSERT/UPDATE policy: `user_id = auth.uid()`.
 
-- `smart_recipe_mate.user_onboarding`
-  - ENABLE ROW LEVEL SECURITY.
-  - SELECT/INSERT/UPDATE policy: `user_id = auth.uid()`.
 
 - `smart_recipe_mate.tags`
   - ENABLE ROW LEVEL SECURITY.

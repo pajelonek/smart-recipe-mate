@@ -16,6 +16,31 @@ export async function getUserPreferences(userId: string, supabase: SupabaseClien
   return data;
 }
 
+export async function createUserPreferences(
+  userId: string,
+  preferencesData: PreferencesUpdateInput,
+  supabase: SupabaseClient
+): Promise<UserPreferences> {
+  const { data, error } = await supabase
+    .from("user_preferences")
+    .insert({
+      user_id: userId,
+      diet_type: preferencesData.diet_type,
+      preferred_ingredients: preferencesData.preferred_ingredients || "",
+      preferred_cuisines: preferencesData.preferred_cuisines || "",
+      allergens: preferencesData.allergens || "",
+      notes: preferencesData.notes || null,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
 export async function updateUserPreferences(
   userId: string,
   preferencesData: PreferencesUpdateInput,

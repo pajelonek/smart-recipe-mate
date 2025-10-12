@@ -19,9 +19,10 @@ Użytkownicy z wymaganiami dietetycznymi muszą ręcznie dostosowywać przepisy 
 
 ### 3.2 Onboarding preferencji
 
-- Obowiązkowy pięcioetapowy kreator uruchamiany przy pierwszym logowaniu (intro, typ diety, preferowane składniki, kuchnie, allergens) bez możliwości pomijania kroków ani zapisu częściowego postępu.
-- Każdy ekran waliduje wymagane pola przed przejściem dalej; przerwanie kreatora oznacza powrót do pierwszego kroku przy kolejnym logowaniu.
-- Po ukończeniu kreatora (current_step = 5) system ustawia completed_at w tabeli user_onboarding i przekierowuje użytkownika do repozytorium przepisów.
+- Obowiązkowy kreator preferencji uruchamiany przy pierwszym logowaniu zbiera: typ diety, preferowane składniki, kuchnie oraz allergens.
+- Frontend może prezentować kreator jako wieloetapowy formularz, ale stan kroków zarządzany jest po stronie klienta (np. w pamięci lub localStorage).
+- Po ukończeniu kreatora system zapisuje preferencje do tabeli user_preferences i przekierowuje użytkownika do repozytorium przepisów.
+- Status onboardingu: użytkownik jest uznawany za "onboarded" jeśli posiada rekord w user_preferences.
 
 ### 3.3 Profil preferencji
 
@@ -90,7 +91,7 @@ Kryteria akceptacji:
 
 - Logowanie akceptuje wyłącznie poprawne zestawy e-mail/hasło powiązane ze zweryfikowanym kontem.
 - Nieudane logowanie prezentuje ogólny komunikat o błędzie bez ujawniania, czy konto istnieje.
-- Po zalogowaniu użytkownik trafia do kreatora, jeśli onboarding nie został ukończony (completed_at jest NULL), w przeciwnym razie na listę przepisów.
+- Po zalogowaniu użytkownik trafia do kreatora preferencji, jeśli nie posiada zapisanych preferencji (brak rekordu w user_preferences), w przeciwnym razie na listę przepisów.
 
 ### US-003 Wylogowanie i ochrona zasobów
 
@@ -112,12 +113,13 @@ Kryteria akceptacji:
 
 ### US-005 Obowiązkowy kreator preferencji
 
-Opis: Jako nowy użytkownik chcę przejść przez pięć kroków kreatora, aby aplikacja poznała moje wymagania żywieniowe.
+Opis: Jako nowy użytkownik chcę wypełnić kreator preferencji, aby aplikacja poznała moje wymagania żywieniowe.
 Kryteria akceptacji:
 
-- Kreator uruchamia się automatycznie po pierwszym logowaniu i nie posiada przycisku pomiń.
-- Każdy krok wymaga wypełnienia minimalnych pól przed przejściem dalej; powrót do poprzedniego kroku zachowuje wpisane dane.
-- Zamknięcie aplikacji podczas kreatora skutkuje rozpoczęciem od kroku pierwszego przy kolejnym logowaniu.
+- Kreator uruchamia się automatycznie po pierwszym logowaniu dla użytkowników bez zapisanych preferencji.
+- Formularz wymaga wypełnienia wszystkich wymaganych pól (typ diety) przed zapisem; pozostałe pola są opcjonalne.
+- Stan formularza może być zarządzany przez frontend (wieloetapowy UI) - przerwanie powoduje utratę danych i restart przy kolejnym logowaniu.
+- Po zapisaniu preferencji użytkownik jest przekierowywany do repozytorium przepisów.
 
 ### US-006 Edycja preferencji w profilu
 

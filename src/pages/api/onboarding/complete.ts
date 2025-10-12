@@ -1,11 +1,16 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { OnboardingCompleteInputSchema } from "../../../lib/validation/onboarding.schemas";
-import { completeOnboarding } from "../../../lib/services/onboarding.service";
+import { createUserPreferences, getUserPreferences } from "../../../lib/services/preferences.service";
 import type { ApiError } from "../../../types";
 
 export const prerender = false;
 
+/**
+ * POST /api/onboarding/complete
+ * Completes onboarding by creating user preferences
+ * Can only be called once per user (returns 409 if preferences already exist)
+ */
 export const POST: APIRoute = async ({ request, locals }) => {
   // TODO: Add authentication when ready
   const testUserId = "00000000-0000-0000-0000-000000000000";
@@ -43,38 +48,28 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   try {
-    const result = await completeOnboarding(testUserId, validatedData.preferences, locals.supabase);
+    // Check if user already has preferences (onboarding already completed)
+    const existingPreferences = await getUserPreferences(testUserId, locals.supabase);
 
-    return new Response(JSON.stringify(result), {
+    if (existingPreferences) {
+      const errorResponse: ApiError = {
+        error: "Already onboarded",
+        message: "User preferences already exist. Use PUT /api/preferences to update.",
+      };
+      return new Response(JSON.stringify(errorResponse), {
+        status: 409,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Create preferences
+    const preferences = await createUserPreferences(testUserId, validatedData.preferences, locals.supabase);
+
+    return new Response(JSON.stringify(preferences), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // Handle business rule violations
-    if (error instanceof Error) {
-      if (error.message === "Must be on step 5 to complete onboarding") {
-        const errorResponse: ApiError = {
-          error: "Cannot complete",
-          message: error.message,
-        };
-        return new Response(JSON.stringify(errorResponse), {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-
-      if (error.message === "Onboarding not started") {
-        const errorResponse: ApiError = {
-          error: "Onboarding not started",
-          message: "No onboarding record found. Start onboarding first.",
-        };
-        return new Response(JSON.stringify(errorResponse), {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-    }
-
     console.error("Error completing onboarding:", error);
     const errorResponse: ApiError = {
       error: "Internal server error",

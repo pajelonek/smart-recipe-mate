@@ -16,7 +16,6 @@ This document defines the REST API for Smart Recipe Mate MVP. The API follows RE
 
 | Resource       | Database Table                       | Description                               |
 | -------------- | ------------------------------------ | ----------------------------------------- |
-| Onboarding     | `smart_recipe_mate.user_onboarding`  | User onboarding wizard progress           |
 | Preferences    | `smart_recipe_mate.user_preferences` | User dietary preferences and restrictions |
 | Recipes        | `smart_recipe_mate.recipes`          | User recipe repository                    |
 | Tags           | `smart_recipe_mate.tags`             | User-defined recipe tags                  |
@@ -31,88 +30,9 @@ This document defines the REST API for Smart Recipe Mate MVP. The API follows RE
 
 ### 2.1 Onboarding
 
-#### GET /api/onboarding
-
-Get current user's onboarding status.
-
-**Authentication:** Required
-
-**Query Parameters:** None
-
-**Response 200 OK:**
-
-```json
-{
-  "user_id": "uuid",
-  "current_step": 3,
-  "completed_at": null,
-  "created_at": "2025-10-12T10:00:00Z"
-}
-```
-
-**Response 404 Not Found:**
-
-```json
-{
-  "error": "Onboarding not started",
-  "message": "No onboarding record found for user"
-}
-```
-
----
-
-#### PATCH /api/onboarding
-
-Update onboarding progress. This endpoint saves progress for the current step and optionally advances to the next step.
-
-**Authentication:** Required
-
-**Request Body:**
-
-```json
-{
-  "current_step": 2,
-  "preferences": {
-    "diet_type": "vegetarian",
-    "preferred_ingredients": "tomatoes, basil, cheese",
-    "preferred_cuisines": "Italian, Mediterranean",
-    "allergens": "peanuts, shellfish"
-  }
-}
-```
-
-**Validation:**
-
-- `current_step` must be between 1 and 5
-- When advancing to step 5, all preference fields must be complete
-- Cannot skip steps (must progress sequentially)
-
-**Response 200 OK:**
-
-```json
-{
-  "user_id": "uuid",
-  "current_step": 2,
-  "completed_at": null,
-  "created_at": "2025-10-12T10:00:00Z",
-  "updated_at": "2025-10-12T10:05:00Z"
-}
-```
-
-**Response 400 Bad Request:**
-
-```json
-{
-  "error": "Invalid step",
-  "message": "current_step must be between 1 and 5"
-}
-```
-
----
-
 #### POST /api/onboarding/complete
 
-Complete the onboarding wizard. Sets `completed_at` and `current_step = 5`.
+Complete the onboarding by creating user preferences. This is the only onboarding endpoint needed.
 
 **Authentication:** Required
 
@@ -132,27 +52,21 @@ Complete the onboarding wizard. Sets `completed_at` and `current_step = 5`.
 
 **Validation:**
 
-- All required preference fields must be provided
-- Can only complete if `current_step = 5`
+- `diet_type` is required (cannot be empty)
+- Other preference fields are optional
 
 **Response 200 OK:**
 
 ```json
 {
   "user_id": "uuid",
-  "current_step": 5,
-  "completed_at": "2025-10-12T10:10:00Z",
-  "created_at": "2025-10-12T10:00:00Z",
-  "preferences": {
-    "user_id": "uuid",
-    "diet_type": "vegetarian",
-    "preferred_ingredients": "tomatoes, basil, cheese",
-    "preferred_cuisines": "Italian, Mediterranean",
-    "allergens": "peanuts, shellfish",
-    "notes": "I prefer quick recipes under 30 minutes",
-    "created_at": "2025-10-12T10:10:00Z",
-    "updated_at": "2025-10-12T10:10:00Z"
-  }
+  "diet_type": "vegetarian",
+  "preferred_ingredients": "tomatoes, basil, cheese",
+  "preferred_cuisines": "Italian, Mediterranean",
+  "allergens": "peanuts, shellfish",
+  "notes": "I prefer quick recipes under 30 minutes",
+  "created_at": "2025-10-12T10:10:00Z",
+  "updated_at": "2025-10-12T10:10:00Z"
 }
 ```
 
@@ -160,10 +74,21 @@ Complete the onboarding wizard. Sets `completed_at` and `current_step = 5`.
 
 ```json
 {
-  "error": "Cannot complete",
-  "message": "Must be on step 5 to complete onboarding"
+  "error": "Validation failed",
+  "message": "diet_type is required"
 }
 ```
+
+**Response 409 Conflict:**
+
+```json
+{
+  "error": "Already onboarded",
+  "message": "User preferences already exist. Use PUT /api/preferences to update."
+}
+```
+
+**Note:** Onboarding status is determined by existence of user_preferences record. Use `GET /api/preferences` to check if user has completed onboarding (200 = completed, 404 = not completed).
 
 ---
 
@@ -957,10 +882,10 @@ Get details of a specific AI generation.
 
 #### Onboarding
 
-- `current_step` must be between 1 and 5
-- Cannot complete onboarding (set `completed_at`) unless `current_step = 5`
-- All preference fields must be filled before completing onboarding
-- Steps must be completed sequentially (no skipping)
+- `diet_type` is required for onboarding completion
+- Other preference fields are optional
+- Onboarding can only be completed once (prevents duplicate preferences)
+- Use `GET /api/preferences` to check onboarding status
 
 #### User Preferences
 
@@ -1002,25 +927,24 @@ Get details of a specific AI generation.
 
 1. **User Registration:**
    - User registers via Supabase Auth
-   - System creates `user_onboarding` record with `current_step = 1`
    - Email verification sent
+   - No onboarding record created yet
 
 2. **First Login:**
    - After email verification, user logs in
-   - Frontend checks `GET /api/onboarding`
-   - If `completed_at IS NULL`, redirect to onboarding wizard
-   - Otherwise, redirect to recipe list
+   - Frontend checks `GET /api/preferences`
+   - If 404 (no preferences), redirect to onboarding wizard
+   - If 200 (preferences exist), redirect to recipe list
 
-3. **Wizard Progress:**
-   - Each step calls `PATCH /api/onboarding` with current step data
-   - System validates step data and updates `current_step`
-   - Frontend cannot skip steps (enforced by API)
+3. **Onboarding Completion:**
+   - User fills out preference form (frontend can implement multi-step UI using local state)
+   - Frontend calls `POST /api/onboarding/complete` with all preferences
+   - System creates `user_preferences` record
+   - User is redirected to recipe list and can now access full application
 
-4. **Wizard Completion:**
-   - Step 5 calls `POST /api/onboarding/complete`
-   - System creates/updates `user_preferences` record
-   - Sets `onboarding.completed_at = now()` and `current_step = 5`
-   - User can now access full application
+4. **Onboarding Status:**
+   - Onboarding is considered "complete" if user has a record in `user_preferences`
+   - No separate tracking table needed
 
 #### Recipe Management
 
@@ -1259,15 +1183,12 @@ All endpoints are under `/api` without explicit version prefix. Future versions 
 1. **Register:** User calls Supabase Auth `signUp()`
 2. **Verify Email:** User clicks verification link
 3. **Login:** User calls Supabase Auth `signInWithPassword()`
-4. **Check Onboarding:** Frontend calls `GET /api/onboarding` → returns `current_step: 1, completed_at: null`
-5. **Complete Wizard:**
-   - Step 1: `PATCH /api/onboarding` with step 1 data
-   - Step 2: `PATCH /api/onboarding` with step 2 data
-   - ...
-   - Step 5: `POST /api/onboarding/complete` with all preferences
-6. **Redirect to Recipes:** Frontend navigates to recipe list
-7. **Add Recipe:** User calls `POST /api/recipes` with recipe data
-8. **View Recipe:** Recipe appears in `GET /api/recipes` list
+4. **Check Onboarding:** Frontend calls `GET /api/preferences` → returns 404 (not onboarded)
+5. **Show Onboarding Wizard:** Frontend displays preference form (can be multi-step UI)
+6. **Complete Onboarding:** Frontend calls `POST /api/onboarding/complete` with all preferences
+7. **Redirect to Recipes:** Frontend navigates to recipe list
+8. **Add Recipe:** User calls `POST /api/recipes` with recipe data
+9. **View Recipe:** Recipe appears in `GET /api/recipes` list
 
 ### Flow 2: AI Recipe Generation
 
@@ -1286,3 +1207,4 @@ All endpoints are under `/api` without explicit version prefix. Future versions 
 ---
 
 **End of API Plan**
+

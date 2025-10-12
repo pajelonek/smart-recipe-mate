@@ -3,7 +3,6 @@ import type { Database } from "./db/database.types";
 type PublicSchema = Database["public"]["Tables"];
 
 // Base entity types from database
-export type UserOnboardingEntity = PublicSchema["user_onboarding"]["Row"];
 export type UserPreferencesEntity = PublicSchema["user_preferences"]["Row"];
 export type RecipeEntity = PublicSchema["recipes"]["Row"];
 export type TagEntity = PublicSchema["tags"]["Row"];
@@ -11,10 +10,8 @@ export type RecipeTagEntity = PublicSchema["recipe_tags"]["Row"];
 export type AIGenerationEntity = PublicSchema["ai_generations"]["Row"];
 
 // =============================================================================
-// 1. ONBOARDING DTOs
+// 1. ONBOARDING / USER PREFERENCES DTOs
 // =============================================================================
-
-export type OnboardingStatus = UserOnboardingEntity;
 
 export interface PreferencesInput {
   diet_type: string;
@@ -24,27 +21,6 @@ export interface PreferencesInput {
   notes?: string;
 }
 
-export interface OnboardingUpdateInput {
-  current_step: number;
-  preferences?: PreferencesInput;
-}
-
-export interface OnboardingCompleteInput {
-  preferences: PreferencesInput;
-}
-
-export interface OnboardingCompleteResponse {
-  user_id: string;
-  current_step: number;
-  completed_at: string;
-  created_at: string;
-  preferences: UserPreferences;
-}
-
-// =============================================================================
-// 2. USER PREFERENCES DTOs
-// =============================================================================
-
 export type UserPreferences = UserPreferencesEntity;
 
 export type PreferencesUpdateInput = PreferencesInput;
@@ -52,7 +28,7 @@ export type PreferencesUpdateInput = PreferencesInput;
 export type PreferencesPartialUpdateInput = Partial<PreferencesInput>;
 
 // =============================================================================
-// 3. RECIPES DTOs
+// 2. RECIPES DTOs
 // =============================================================================
 
 export type Tag = Pick<TagEntity, "id" | "name" | "created_at">;
@@ -78,7 +54,7 @@ export type RecipeUpdateInput = RecipeCreateInput;
 export type RecipePartialUpdateInput = Partial<RecipeCreateInput>;
 
 // =============================================================================
-// 4. TAGS DTOs
+// 3. TAGS DTOs
 // =============================================================================
 
 export type TagWithCount = Tag & {
@@ -101,7 +77,7 @@ export interface AddTagsResponse {
 }
 
 // =============================================================================
-// 5. AI GENERATION DTOs
+// 4. AI GENERATION DTOs
 // =============================================================================
 
 export interface AIGeneratedRecipe {
@@ -142,7 +118,7 @@ export interface AIGenerationListResponse {
 }
 
 // =============================================================================
-// 6. COMMON DTOs
+// 5. COMMON DTOs
 // =============================================================================
 
 export interface ApiError {

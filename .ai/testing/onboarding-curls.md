@@ -23,53 +23,37 @@ npx supabase start
 
 ## Onboarding API - Testowanie
 
-### 📋 GET /api/onboarding - Pobierz status onboardingu
+### 📋 Sprawdzanie statusu onboardingu
 
-#### Test 1: Sprawdź status onboardingu (może być 404 jeśli nie rozpoczęto)
+Status onboardingu jest określany przez obecność preferencji użytkownika. Użyj endpointu preferences:
 
 ```bash
-curl -X GET http://localhost:4321/api/onboarding \
+curl -X GET http://localhost:4321/api/preferences \
   -H "Content-Type: application/json"
 ```
 
-**Oczekiwany status:**
+**Możliwe odpowiedzi:**
 
-- `200 OK` - jeśli onboarding istnieje
-- `404 Not Found` - jeśli onboarding nie został rozpoczęty
-
-**Przykładowa odpowiedź (200):**
-
-```json
-{
-  "id": "123e4567-e89b-12d3-a456-426614174000",
-  "user_id": "00000000-0000-0000-0000-000000000000",
-  "current_step": 3,
-  "is_completed": false,
-  "created_at": "2025-10-12T10:00:00.000Z",
-  "updated_at": "2025-10-12T10:05:00.000Z"
-}
-```
-
-**Przykładowa odpowiedź (404):**
-
-```json
-{
-  "error": "Onboarding not started",
-  "message": "No onboarding record found for user"
-}
-```
+- `404 Not Found` - użytkownik NIE ukończył onboardingu (brak preferencji)
+- `200 OK` - użytkownik UKOŃCZYŁ onboarding (preferencje istnieją)
 
 ---
 
-### 🔄 PATCH /api/onboarding - Aktualizuj krok onboardingu
+### ✅ POST /api/onboarding/complete - Zakończ onboarding
 
-#### Test 2: Rozpocznij onboarding - krok 1
+#### Test 1: Zakończ onboarding z pełnymi preferencjami (SUCCESS)
 
 ```bash
-curl -X PATCH http://localhost:4321/api/onboarding \
+curl -X POST http://localhost:4321/api/onboarding/complete \
   -H "Content-Type: application/json" \
   -d '{
-    "current_step": 1
+    "preferences": {
+      "diet_type": "vegetarian",
+      "preferred_ingredients": "tomatoes, basil, cheese",
+      "preferred_cuisines": "Italian, Mediterranean",
+      "allergens": "peanuts, shellfish",
+      "notes": "I prefer quick recipes under 30 minutes"
+    }
   }'
 ```
 
@@ -79,10 +63,12 @@ curl -X PATCH http://localhost:4321/api/onboarding \
 
 ```json
 {
-  "id": "123e4567-e89b-12d3-a456-426614174000",
   "user_id": "00000000-0000-0000-0000-000000000000",
-  "current_step": 1,
-  "is_completed": false,
+  "diet_type": "vegetarian",
+  "preferred_ingredients": "tomatoes, basil, cheese",
+  "preferred_cuisines": "Italian, Mediterranean",
+  "allergens": "peanuts, shellfish",
+  "notes": "I prefer quick recipes under 30 minutes",
   "created_at": "2025-10-12T10:00:00.000Z",
   "updated_at": "2025-10-12T10:00:00.000Z"
 }
@@ -90,176 +76,14 @@ curl -X PATCH http://localhost:4321/api/onboarding \
 
 ---
 
-#### Test 3: Przejdź do kroku 2
-
-```bash
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{
-    "current_step": 2
-  }'
-```
-
-**Oczekiwany status:** `200 OK`
-
----
-
-#### Test 4: Przejdź do kroku 3
-
-```bash
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{
-    "current_step": 3
-  }'
-```
-
-**Oczekiwany status:** `200 OK`
-
----
-
-#### Test 5: Przejdź do kroku 4
-
-```bash
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{
-    "current_step": 4
-  }'
-```
-
-**Oczekiwany status:** `200 OK`
-
----
-
-#### Test 6: Przejdź do kroku 5 (ostatni krok przed zakończeniem)
-
-```bash
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{
-    "current_step": 5
-  }'
-```
-
-**Oczekiwany status:** `200 OK`
-
----
-
-#### Test 7: Walidacja - nieprawidłowy krok (za niski)
-
-```bash
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{
-    "current_step": 0
-  }'
-```
-
-**Oczekiwany status:** `400 Bad Request`
-
-**Przykładowa odpowiedź:**
-
-```json
-{
-  "error": "Validation failed",
-  "message": "current_step must be at least 1",
-  "details": {
-    "fields": [
-      {
-        "code": "too_small",
-        "minimum": 1,
-        "type": "number",
-        "inclusive": true,
-        "exact": false,
-        "message": "current_step must be at least 1",
-        "path": ["current_step"]
-      }
-    ]
-  }
-}
-```
-
----
-
-#### Test 8: Walidacja - nieprawidłowy krok (za wysoki)
-
-```bash
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{
-    "current_step": 6
-  }'
-```
-
-**Oczekiwany status:** `400 Bad Request`
-
-**Przykładowa odpowiedź:**
-
-```json
-{
-  "error": "Validation failed",
-  "message": "current_step must be at most 5",
-  "details": {
-    "fields": [
-      {
-        "code": "too_big",
-        "maximum": 5,
-        "type": "number",
-        "inclusive": true,
-        "exact": false,
-        "message": "current_step must be at most 5",
-        "path": ["current_step"]
-      }
-    ]
-  }
-}
-```
-
----
-
-#### Test 9: Walidacja - nieprawidłowy typ (string zamiast number)
-
-```bash
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{
-    "current_step": "three"
-  }'
-```
-
-**Oczekiwany status:** `400 Bad Request`
-
----
-
-#### Test 10: Walidacja - brak wymaganego pola
-
-```bash
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
-**Oczekiwany status:** `400 Bad Request`
-
----
-
-### ✅ POST /api/onboarding/complete - Zakończ onboarding
-
-#### Test 11: Zakończ onboarding z pełnymi preferencjami (SUCCESS)
-
-**⚠️ Wymagane:** Musisz być na kroku 5! Jeśli nie jesteś, najpierw użyj Testu 6.
+#### Test 2: Zakończ onboarding tylko z diet_type (SUCCESS - minimalne dane)
 
 ```bash
 curl -X POST http://localhost:4321/api/onboarding/complete \
   -H "Content-Type: application/json" \
   -d '{
     "preferences": {
-      "diet_type": "omnivore",
-      "preferred_ingredients": "chicken, vegetables, pasta, rice, tomatoes",
-      "preferred_cuisines": "Italian, Asian, American, Mediterranean",
-      "allergens": "peanuts, shellfish",
-      "notes": "I prefer quick meals under 30 minutes. I love spicy food!"
+      "diet_type": "omnivore"
     }
   }'
 ```
@@ -270,116 +94,54 @@ curl -X POST http://localhost:4321/api/onboarding/complete \
 
 ```json
 {
-  "onboarding": {
-    "id": "123e4567-e89b-12d3-a456-426614174000",
-    "user_id": "00000000-0000-0000-0000-000000000000",
-    "current_step": 5,
-    "is_completed": true,
-    "created_at": "2025-10-12T10:00:00.000Z",
-    "updated_at": "2025-10-12T10:10:00.000Z"
-  },
-  "preferences": {
-    "id": "456e7890-e89b-12d3-a456-426614174000",
-    "user_id": "00000000-0000-0000-0000-000000000000",
-    "diet_type": "omnivore",
-    "preferred_ingredients": "chicken, vegetables, pasta, rice, tomatoes",
-    "preferred_cuisines": "Italian, Asian, American, Mediterranean",
-    "allergens": "peanuts, shellfish",
-    "notes": "I prefer quick meals under 30 minutes. I love spicy food!",
-    "created_at": "2025-10-12T10:10:00.000Z",
-    "updated_at": "2025-10-12T10:10:00.000Z"
-  }
+  "user_id": "00000000-0000-0000-0000-000000000000",
+  "diet_type": "omnivore",
+  "preferred_ingredients": "",
+  "preferred_cuisines": "",
+  "allergens": "",
+  "notes": null,
+  "created_at": "2025-10-12T10:00:00.000Z",
+  "updated_at": "2025-10-12T10:00:00.000Z"
 }
 ```
 
 ---
 
-#### Test 12: Zakończ onboarding z minimalnymi danymi (SUCCESS)
+#### Test 3: Próba ponownego zakończenia onboardingu (FAIL - 409)
 
-**⚠️ Wymagane:** Musisz być na kroku 5! Jeśli nie jesteś, najpierw użyj Testu 6.
+Jeśli już wcześniej zakończyłeś onboarding, próba ponownego wywołania zwróci błąd:
 
 ```bash
 curl -X POST http://localhost:4321/api/onboarding/complete \
   -H "Content-Type: application/json" \
   -d '{
     "preferences": {
-      "diet_type": "vegetarian"
+      "diet_type": "vegan"
     }
   }'
 ```
 
-**Oczekiwany status:** `200 OK`
+**Oczekiwany status:** `409 Conflict`
 
----
+**Przykładowa odpowiedź:**
 
-#### Test 13: Zakończ onboarding - dieta wegańska
-
-```bash
-curl -X POST http://localhost:4321/api/onboarding/complete \
-  -H "Content-Type: application/json" \
-  -d '{
-    "preferences": {
-      "diet_type": "vegan",
-      "preferred_ingredients": "tofu, quinoa, chickpeas, leafy greens",
-      "preferred_cuisines": "Indian, Thai, Mediterranean",
-      "allergens": "soy",
-      "notes": "Prefer organic ingredients when possible"
-    }
-  }'
+```json
+{
+  "error": "Already onboarded",
+  "message": "User preferences already exist. Use PUT /api/preferences to update."
+}
 ```
 
-**Oczekiwany status:** `200 OK`
-
 ---
 
-#### Test 14: Zakończ onboarding - dieta bezglutenowa
+#### Test 4: Brak diet_type (FAIL - 400)
 
 ```bash
 curl -X POST http://localhost:4321/api/onboarding/complete \
   -H "Content-Type: application/json" \
   -d '{
     "preferences": {
-      "diet_type": "gluten-free",
-      "preferred_ingredients": "rice, potatoes, corn, chicken, fish",
-      "preferred_cuisines": "Asian, Latin American",
-      "allergens": "gluten, wheat",
-      "notes": "Celiac disease - strict gluten-free required"
-    }
-  }'
-```
-
-**Oczekiwany status:** `200 OK`
-
----
-
-#### Test 15: Zakończ onboarding - dieta ketogeniczna
-
-```bash
-curl -X POST http://localhost:4321/api/onboarding/complete \
-  -H "Content-Type: application/json" \
-  -d '{
-    "preferences": {
-      "diet_type": "keto",
-      "preferred_ingredients": "bacon, eggs, avocado, cheese, salmon, spinach",
-      "preferred_cuisines": "American, Mediterranean",
-      "allergens": "none",
-      "notes": "Low carb, high fat. Aiming for under 20g carbs per day"
-    }
-  }'
-```
-
-**Oczekiwany status:** `200 OK`
-
----
-
-#### Test 16: Walidacja - brak diet_type (FAIL)
-
-```bash
-curl -X POST http://localhost:4321/api/onboarding/complete \
-  -H "Content-Type: application/json" \
-  -d '{
-    "preferences": {
-      "preferred_ingredients": "chicken, vegetables"
+      "preferred_ingredients": "chicken, rice"
     }
   }'
 ```
@@ -395,13 +157,8 @@ curl -X POST http://localhost:4321/api/onboarding/complete \
   "details": {
     "fields": [
       {
-        "code": "too_small",
-        "minimum": 1,
-        "type": "string",
-        "inclusive": true,
-        "exact": false,
-        "message": "diet_type is required",
-        "path": ["preferences", "diet_type"]
+        "path": ["preferences", "diet_type"],
+        "message": "diet_type is required"
       }
     ]
   }
@@ -410,7 +167,7 @@ curl -X POST http://localhost:4321/api/onboarding/complete \
 
 ---
 
-#### Test 17: Walidacja - pusty diet_type (FAIL)
+#### Test 5: Pusty diet_type (FAIL - 400)
 
 ```bash
 curl -X POST http://localhost:4321/api/onboarding/complete \
@@ -424,58 +181,23 @@ curl -X POST http://localhost:4321/api/onboarding/complete \
 
 **Oczekiwany status:** `400 Bad Request`
 
----
-
-#### Test 18: Walidacja - diet_type za długi (FAIL)
-
-```bash
-curl -X POST http://localhost:4321/api/onboarding/complete \
-  -H "Content-Type: application/json" \
-  -d '{
-    "preferences": {
-      "diet_type": "this-is-a-very-long-diet-type-name-that-exceeds-the-maximum-allowed-length-of-fifty-characters"
-    }
-  }'
-```
-
-**Oczekiwany status:** `400 Bad Request`
-
 **Przykładowa odpowiedź:**
 
 ```json
 {
   "error": "Validation failed",
-  "message": "diet_type must be at most 50 characters",
-  "details": {
-    "fields": [...]
-  }
+  "message": "diet_type is required"
 }
 ```
 
 ---
 
-#### Test 19: Próba zakończenia bez bycia na kroku 5 (FAIL)
-
-**Uwaga:** Najpierw ustaw krok na 3:
-
-```bash
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{
-    "current_step": 3
-  }'
-```
-
-Potem spróbuj zakończyć:
+#### Test 6: Nieprawidłowy JSON (FAIL - 400)
 
 ```bash
 curl -X POST http://localhost:4321/api/onboarding/complete \
   -H "Content-Type: application/json" \
-  -d '{
-    "preferences": {
-      "diet_type": "omnivore"
-    }
-  }'
+  -d '{invalid json'
 ```
 
 **Oczekiwany status:** `400 Bad Request`
@@ -484,155 +206,107 @@ curl -X POST http://localhost:4321/api/onboarding/complete \
 
 ```json
 {
-  "error": "Cannot complete",
-  "message": "Must be on step 5 to complete onboarding"
+  "error": "Invalid JSON",
+  "message": "Request body must be valid JSON"
 }
 ```
 
 ---
 
-#### Test 20: Próba zakończenia bez rozpoczętego onboardingu (FAIL)
+## 🔄 Typowy przepływ onboardingu
 
-**Uwaga:** Aby przetestować ten scenariusz, musisz mieć użytkownika bez rekorda onboarding w bazie. Możesz użyć innego user_id lub usunąć istniejący rekord z bazy.
+### Scenariusz 1: Nowy użytkownik
 
 ```bash
+# Krok 1: Sprawdź czy użytkownik ma preferencje
+curl -X GET http://localhost:4321/api/preferences
+
+# Odpowiedź: 404 Not Found → użytkownik NIE ma preferencji, pokaż onboarding
+
+# Krok 2: Użytkownik wypełnia formularz onboardingu (frontend może być wieloetapowy)
+# Frontend wysyła wszystkie dane naraz:
 curl -X POST http://localhost:4321/api/onboarding/complete \
   -H "Content-Type: application/json" \
   -d '{
     "preferences": {
-      "diet_type": "omnivore"
-    }
-  }'
-```
-
-**Oczekiwany status (jeśli nie rozpoczęto):** `404 Not Found`
-
-**Przykładowa odpowiedź:**
-
-```json
-{
-  "error": "Onboarding not started",
-  "message": "No onboarding record found. Start onboarding first."
-}
-```
-
----
-
-## 🔄 Pełny przepływ onboardingu (Happy Path)
-
-Oto kompletny przepływ od początku do końca:
-
-```bash
-# Krok 1: Rozpocznij onboarding
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{"current_step": 1}'
-
-# Krok 2: Sprawdź status
-curl -X GET http://localhost:4321/api/onboarding
-
-# Krok 3: Przejdź do kroku 2
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{"current_step": 2}'
-
-# Krok 4: Przejdź do kroku 3
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{"current_step": 3}'
-
-# Krok 5: Przejdź do kroku 4
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{"current_step": 4}'
-
-# Krok 6: Przejdź do kroku 5
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{"current_step": 5}'
-
-# Krok 7: Zakończ onboarding z preferencjami
-curl -X POST http://localhost:4321/api/onboarding/complete \
-  -H "Content-Type: application/json" \
-  -d '{
-    "preferences": {
-      "diet_type": "omnivore",
-      "preferred_ingredients": "chicken, vegetables, pasta",
-      "preferred_cuisines": "Italian, Asian",
+      "diet_type": "vegetarian",
+      "preferred_ingredients": "tofu, vegetables, rice",
+      "preferred_cuisines": "Asian, Mediterranean",
       "allergens": "peanuts",
-      "notes": "Quick meals preferred"
+      "notes": "Quick meals under 30 min"
     }
   }'
 
-# Krok 8: Sprawdź końcowy status
-curl -X GET http://localhost:4321/api/onboarding
+# Odpowiedź: 200 OK → onboarding zakończony, przekieruj do przepisów
+
+# Krok 3: Sprawdź status ponownie
+curl -X GET http://localhost:4321/api/preferences
+
+# Odpowiedź: 200 OK → użytkownik ukończył onboarding
+```
+
+---
+
+### Scenariusz 2: Próba ponownego onboardingu
+
+```bash
+# Użytkownik już ma preferencje
+curl -X POST http://localhost:4321/api/onboarding/complete \
+  -H "Content-Type: application/json" \
+  -d '{
+    "preferences": {
+      "diet_type": "vegan"
+    }
+  }'
+
+# Odpowiedź: 409 Conflict
+# Aby zaktualizować preferencje, użyj PUT /api/preferences
 ```
 
 ---
 
 ## 💡 Wskazówki
 
-### Szybkie testy
+### Frontend - wieloetapowy UI
 
-**Start + Complete (minimalna wersja):**
+Frontend może zaimplementować onboarding jako 5-krokowy wizard, ale **cały stan jest zarządzany po stronie klienta**:
 
-```bash
-# Ustaw krok 5
-curl -X PATCH http://localhost:4321/api/onboarding \
-  -H "Content-Type: application/json" \
-  -d '{"current_step": 5}'
+1. **Krok 1:** Ekran powitalny (tylko UI)
+2. **Krok 2:** Wybór typu diety → zapisz w state
+3. **Krok 3:** Preferowane składniki → zapisz w state
+4. **Krok 4:** Kuchnie i alergeny → zapisz w state
+5. **Krok 5:** Podsumowanie → wyślij wszystko przez `POST /api/onboarding/complete`
 
-# Zakończ onboarding
-curl -X POST http://localhost:4321/api/onboarding/complete \
-  -H "Content-Type: application/json" \
-  -d '{
-    "preferences": {
-      "diet_type": "omnivore"
-    }
-  }'
-```
+**Ważne:** Backend nie śledzi kroków. Frontend przechowuje stan w pamięci/localStorage.
 
-### Reset onboardingu
+---
 
-Jeśli chcesz zacząć od nowa, musisz usunąć rekordy z bazy danych:
+### Reset onboardingu (dla testów)
+
+Jeśli chcesz zacząć onboarding od nowa, usuń preferencje z bazy:
 
 ```sql
--- Połącz się z Supabase
--- Usuń preferencje
-DELETE FROM preferences WHERE user_id = '00000000-0000-0000-0000-000000000000';
-
--- Usuń onboarding
-DELETE FROM onboarding WHERE user_id = '00000000-0000-0000-0000-000000000000';
+-- Połącz się z lokalną bazą Supabase
+DELETE FROM user_preferences WHERE user_id = '00000000-0000-0000-0000-000000000000';
 ```
 
-Lub użyj Supabase Studio: `http://127.0.0.1:54323`
+Lub użyj endpointu DELETE (jeśli zostanie zaimplementowany):
+
+```bash
+curl -X DELETE http://localhost:4321/api/preferences
+```
 
 ---
 
-## 📊 Macierz testów
-
-| Test  | Endpoint                 | Metoda | Status  | Cel                     |
-| ----- | ------------------------ | ------ | ------- | ----------------------- |
-| 1     | /api/onboarding          | GET    | 200/404 | Sprawdź status          |
-| 2     | /api/onboarding          | PATCH  | 200     | Rozpocznij (krok 1)     |
-| 3-6   | /api/onboarding          | PATCH  | 200     | Przejdź przez kroki 2-5 |
-| 7-10  | /api/onboarding          | PATCH  | 400     | Walidacja kroków        |
-| 11-15 | /api/onboarding/complete | POST   | 200     | Zakończ (różne diety)   |
-| 16-18 | /api/onboarding/complete | POST   | 400     | Walidacja preferencji   |
-| 19    | /api/onboarding/complete | POST   | 400     | Błąd: nie na kroku 5    |
-| 20    | /api/onboarding/complete | POST   | 404     | Błąd: nie rozpoczęto    |
-
----
-
-## 🐛 Troubleshooting
+## 🔧 Troubleshooting
 
 ### Problem: 500 Internal Server Error
 
 **Rozwiązanie:**
 
-1. Sprawdź czy Supabase działa: `npx supabase status`
-2. Sprawdź logi serwera dev
-3. Sprawdź czy tabele `onboarding` i `preferences` istnieją w bazie
+1. Sprawdź logi serwera (`npm run dev`)
+2. Upewnij się, że Supabase działa: `npx supabase status`
+3. Sprawdź czy tabela `user_preferences` istnieje w bazie
 
 ### Problem: CORS errors
 
@@ -641,13 +315,26 @@ Lub użyj Supabase Studio: `http://127.0.0.1:54323`
 - Upewnij się, że używasz `http://localhost:4321` (nie `127.0.0.1`)
 - Sprawdź konfigurację CORS w Astro
 
-### Problem: Nie mogę zakończyć onboardingu
+---
 
-**Rozwiązanie:**
+## 📝 Uproszczenia w MVP
 
-- Upewnij się, że jesteś na kroku 5: `curl http://localhost:4321/api/onboarding`
-- Jeśli nie, użyj PATCH aby ustawić krok 5
+W porównaniu do wcześniejszej wersji:
+
+- ❌ **Usunięto:** Tabelę `user_onboarding`
+- ❌ **Usunięto:** `GET /api/onboarding` (sprawdzanie kroków)
+- ❌ **Usunięto:** `PATCH /api/onboarding` (aktualizacja kroków)
+- ✅ **Pozostało:** `POST /api/onboarding/complete` (jedyny endpoint)
+- ✅ **Status:** Sprawdzany przez `GET /api/preferences` (404 = nie ukończono, 200 = ukończono)
+
+**Korzyści:**
+
+- Prostszy backend (1 endpoint zamiast 3)
+- Mniej kodu do utrzymania
+- Frontend ma pełną kontrolę nad UX (może być wieloetapowy lub jednoetapowy)
+- Status onboardingu = czy istnieją preferencje (nie potrzeba osobnej tabeli)
 
 ---
 
 **Powodzenia w testowaniu! 🚀**
+
