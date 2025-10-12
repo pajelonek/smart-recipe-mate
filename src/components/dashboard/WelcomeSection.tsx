@@ -8,7 +8,7 @@ export function WelcomeSection({ userName, stats }: Readonly<WelcomeSectionProps
       <Card>
         <CardHeader>
           <CardTitle>Welcome back, {userName}!</CardTitle>
-          <CardDescription>Here's your recipe collection overview</CardDescription>
+          <CardDescription>Here&apos;s your recipe collection overview</CardDescription>
         </CardHeader>
         <CardContent>
           <UserStats stats={stats} />
