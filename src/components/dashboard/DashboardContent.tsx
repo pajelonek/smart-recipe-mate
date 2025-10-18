@@ -4,6 +4,7 @@ import { QuickActions } from "./QuickActions";
 import { RecentRecipesList } from "./RecentRecipesList";
 import { useDashboard } from "../../hooks/useDashboard";
 import type { DashboardContentProps } from "../../types";
+import { ModeToggle } from "../common/ModeToggle";
 
 export function DashboardContent({
   initialRecipes,
@@ -20,7 +21,7 @@ export function DashboardContent({
 
   if (error) {
     return (
-      <div className="dashboard-content p-8 text-center">
+      <div className="p-8 text-center">
         <h2 className="text-xl font-semibold mb-2">Error Loading Dashboard</h2>
         <p className="text-muted-foreground mb-4">{error}</p>
         <button
@@ -34,7 +35,10 @@ export function DashboardContent({
   }
 
   return (
-    <div className="dashboard-content max-w-7xl mx-auto p-6 space-y-8">
+    <div className="max-w-7xl mx-auto p-6 space-y-8">
+      <div className="w-auto text-right">
+        <ModeToggle />
+      </div>
       <WelcomeSection userName={userName} stats={stats} />
       <QuickActions />
       <RecentRecipesList recipes={recipes} isLoading={isLoading} onDelete={deleteRecipe} />
