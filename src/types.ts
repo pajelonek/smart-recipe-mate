@@ -205,3 +205,84 @@ export interface TruncateOptions {
   length: number;
   suffix?: string;
 }
+
+// =============================================================================
+// 6. OPENROUTER SERVICE TYPES
+// =============================================================================
+
+export interface OpenRouterConfig {
+  apiKey: string;
+  baseUrl?: string;
+  defaultModel?: string;
+}
+
+export interface ChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+export interface ModelParams {
+  temperature?: number; // 0-2, default 0.7
+  maxTokens?: number; // default 1000
+  topP?: number;
+}
+
+export interface JsonSchemaFormat {
+  type: "json_schema";
+  json_schema: {
+    name: string;
+    strict: boolean;
+    schema: {
+      type: string;
+      properties: Record<string, any>;
+      required?: string[];
+      additionalProperties?: boolean;
+    };
+  };
+}
+
+export interface ChatOptions {
+  model?: string;
+  responseFormat?: JsonSchemaFormat;
+  params?: ModelParams;
+}
+
+export interface ChatResponse {
+  content: string;
+  structured?: any;
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+  };
+}
+
+export interface GenerateRecipeInput {
+  userId: string;
+  ingredients: string[];
+  preferences?: UserPreferences;
+  model?: string;
+  params?: ModelParams;
+}
+
+export interface RecipeOutput {
+  title: string;
+  summary: string;
+  ingredients: string;
+  preparation: string;
+  nutrition?: {
+    calories?: number;
+    protein?: number;
+    carbohydrates?: number;
+    fat?: number;
+  };
+}
+
+export interface ModelInfo {
+  id: string;
+  name: string;
+  pricing: {
+    prompt: number;
+    completion: number;
+  };
+  context_length: number;
+}

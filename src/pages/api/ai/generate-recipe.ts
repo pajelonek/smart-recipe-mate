@@ -7,7 +7,7 @@ import {
   updateAIGenerationError,
 } from "../../../lib/services/ai-generation.service";
 import { getUserPreferences } from "../../../lib/services/preferences.service";
-import { generateRecipe, generateSuggestions } from "../../../lib/services/openrouter.service";
+import { generateRecipe, generateSuggestions } from "../../../lib/services/openrouter/openrouter.service";
 import type { ApiError, AIGenerateRecipeResponse, AIGenerateRecipeErrorResponse } from "../../../types";
 
 export const prerender = false;
