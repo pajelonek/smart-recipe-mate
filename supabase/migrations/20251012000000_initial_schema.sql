@@ -2,8 +2,7 @@
 -- Tables for Smart Recipe Mate application
 
 create table public.user_preferences (
-  -- user_id uuid not null references auth.users(id) on delete cascade,
-  user_id uuid not null,
+  user_id uuid not null references auth.users(id) on delete cascade,
   diet_type text not null,
   preferred_ingredients text not null default '',
   preferred_cuisines text not null default '',
@@ -16,8 +15,7 @@ create table public.user_preferences (
 
 create table public.recipes (
   id uuid not null default gen_random_uuid(),
-  -- owner_id uuid not null references auth.users(id) on delete cascade,
-  owner_id uuid not null,
+  owner_id uuid not null references auth.users(id) on delete cascade,
   title text not null,
   summary text,
   ingredients text not null,
@@ -30,8 +28,7 @@ create table public.recipes (
 
 create table public.tags (
   id uuid not null default gen_random_uuid(),
-  -- owner_id uuid not null references auth.users(id) on delete cascade,
-  owner_id uuid not null,
+  owner_id uuid not null references auth.users(id) on delete cascade,
   name text not null,
   created_at timestamptz not null default timezone('utc', now()),
   primary key (id),
@@ -47,8 +44,7 @@ create table public.recipe_tags (
 
 create table public.ai_generations (
   id uuid not null default gen_random_uuid(),
-  -- user_id uuid not null references auth.users(id) on delete cascade,
-  user_id uuid not null,
+  user_id uuid not null references auth.users(id) on delete cascade,
   input_payload jsonb not null,
   output_payload jsonb,
   error_message text,

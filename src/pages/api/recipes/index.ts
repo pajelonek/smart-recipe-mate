@@ -13,7 +13,7 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ locals }) => {
   // TODO: Add authentication when ready
-  const testUserId = "00000000-0000-0000-0000-000000000000";
+  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
 
   try {
     const recipes = await getUserRecipes(testUserId, locals.supabase);
@@ -44,7 +44,7 @@ export const GET: APIRoute = async ({ locals }) => {
  */
 export const POST: APIRoute = async ({ request, locals }) => {
   // TODO: Add authentication when ready
-  const testUserId = "00000000-0000-0000-0000-000000000000";
+  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
 
   // Parse JSON body
   let requestBody: unknown;

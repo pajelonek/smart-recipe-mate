@@ -17,7 +17,7 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ params, locals }) => {
   // TODO: Add authentication when ready
-  const testUserId = "00000000-0000-0000-0000-000000000000";
+  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
 
   // Validate recipe ID
   let recipeId: string;
@@ -72,7 +72,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
  */
 export const PUT: APIRoute = async ({ params, request, locals }) => {
   // TODO: Add authentication when ready
-  const testUserId = "00000000-0000-0000-0000-000000000000";
+  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
 
   // Validate recipe ID
   let recipeId: string;
@@ -162,7 +162,7 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
  */
 export const PATCH: APIRoute = async ({ params, request, locals }) => {
   // TODO: Add authentication when ready
-  const testUserId = "00000000-0000-0000-0000-000000000000";
+  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
 
   // Validate recipe ID
   let recipeId: string;
@@ -252,7 +252,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
  */
 export const DELETE: APIRoute = async ({ params, locals }) => {
   // TODO: Add authentication when ready
-  const testUserId = "00000000-0000-0000-0000-000000000000";
+  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
 
   // Validate recipe ID
   let recipeId: string;

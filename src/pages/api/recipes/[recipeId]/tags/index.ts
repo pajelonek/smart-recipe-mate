@@ -8,7 +8,7 @@ export const prerender = false;
 
 export const POST: APIRoute = async ({ params, request, locals }) => {
   // TODO: Add authentication when ready
-  const testUserId = "00000000-0000-0000-0000-000000000000";
+  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
 
   // Validate recipeId
   let recipeId: string;

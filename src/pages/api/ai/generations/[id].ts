@@ -5,7 +5,7 @@ import type { ApiError } from "../../../../types";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params, locals }) => {
-  const testUserId = "00000000-0000-0000-0000-000000000000";
+  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
 
   const generationId = params.id;
 

@@ -23,8 +23,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     // Create a mock user for development
     context.locals.user = {
-      id: "550e8400-e29b-41d4-a716-446655440000",
-      email: "dev@example.com",
+      id: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      email: "test@example.com",
       user_metadata: { display_name: "Dev User" },
       app_metadata: {},
       aud: "authenticated",
