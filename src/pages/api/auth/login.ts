@@ -4,10 +4,6 @@ import type { ApiError } from "../../../types";
 
 export const prerender = false;
 
-/**
- * POST /api/auth/login
- * Authenticate user with email and password
- */
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     // Parse and validate request body
@@ -28,7 +24,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const { email, password } = validationResult.data;
 
-    // Attempt authentication
     const supabase = locals.supabase;
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -36,7 +31,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
 
     if (error) {
-      // Handle specific Supabase auth errors
       let errorMessage: string;
 
       if (error.message.includes("Invalid login credentials")) {
@@ -60,7 +54,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    // Authentication successful - cookies are automatically set by Supabase client
     return new Response(
       JSON.stringify({
         success: true,

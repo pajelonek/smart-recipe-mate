@@ -1,13 +1,44 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import { createServerSupabaseClient } from "../../db/supabase.client";
 
-// TODO: This is a placeholder. Implement actual callback logic when backend is ready.
-// This page will:
-// 1. Process the token from URL
-// 2. Establish user session
-// 3. Check if user has preferences
-// 4. Redirect to /onboarding or / accordingly
+const supabase = createServerSupabaseClient(Astro);
 
-// For now, just redirect to homepage
-return Astro.redirect("/");
+const code = Astro.url.searchParams.get("code");
+const next = Astro.url.searchParams.get("next") || "/";
+
+if (Astro.url.searchParams.get("error")) {
+  return Astro.redirect("/login?error=auth_callback_failed");
+}
+
+if (!code) {
+  return Astro.redirect("/login");
+}
+
+const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+
+if (exchangeError) {
+  console.error("Error exchanging code for session:", exchangeError);
+  return Astro.redirect("/login?error=session_error");
+}
+
+const {
+  data: { user },
+  error: userError,
+} = await supabase.auth.getUser();
+
+if (userError || !user) {
+  return Astro.redirect("/login?error=user_not_found");
+}
+
+const { data: preferences } = await supabase
+  .from("user_preferences")
+  .select("user_id")
+  .eq("user_id", user.id)
+  .maybeSingle();
+
+if (!preferences) {
+  return Astro.redirect("/onboarding");
+}
+
+return Astro.redirect(next);
 ---
