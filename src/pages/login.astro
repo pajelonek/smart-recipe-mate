@@ -1,8 +1,8 @@
 ---
-import AuthLayout from "@/layouts/AuthLayout.astro";
+import PublicLayout from "@/layouts/PublicLayout.astro";
 import { LoginForm } from "../components/auth/LoginForm";
 ---
 
-<AuthLayout title="Zaloguj się do swojego konta">
+<PublicLayout title="Zaloguj się do swojego konta">
   <LoginForm client:load />
-</AuthLayout>
+</PublicLayout>

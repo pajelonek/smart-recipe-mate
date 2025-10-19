@@ -30,8 +30,10 @@ import { Toaster } from "sonner";
       }
     </script>
   </head>
-  <body>
-    <slot />
+  <body class="min-h-screen flex flex-col">
+    <div class="flex-1">
+      <slot />
+    </div>
     <Toaster position="bottom-left" richColors client:load />
     <footer class="border-t border-border py-6">
       <div class="mx-auto px-6 text-center text-muted-foreground">

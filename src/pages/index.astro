@@ -1,5 +1,5 @@
 ---
-// @ts-nocheck
+
 import Layout from "../layouts/Layout.astro";
 import { DashboardContent } from "../components/dashboard/DashboardContent";
 import { createServerSupabaseClient } from "../db/supabase.client";
@@ -65,15 +65,14 @@ if (user !== null) {
     generationsCount: generationsCount || 0,
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+   
   userName = user.user_metadata?.display_name || user.email?.split("@")[0] || "User";
 }
 ---
 <>
 {!user && (
-  <!-- Landing Page for Unauthenticated Users -->
-  <Layout>
-    <div class="min-h-screen bg-background flex flex-col">
+  <Layout title="Dopasuj przepisy do swoich potrzeb">
+    <div class="bg-background flex flex-col">
       <!-- Header with Theme Toggle and Login Button -->
       <header class="border-b border-border">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
@@ -88,22 +87,22 @@ if (user !== null) {
       </header>
 
       <!-- Hero Section -->
-      <main class="flex-1 flex items-center justify-center p-6">
+      <main class="flex-1 flex items-center justify-center p-6 mt-24">
         <div class="max-w-4xl w-full space-y-12">
           <!-- Main Hero -->
           <div class="text-center space-y-6">
             <h2 class="text-5xl font-bold tracking-tight">
-              Dopasuj przepisy<br />do swoich potrzeb
+              Dopasuj przepisy do swoich potrzeb
             </h2>
-            <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p class="text-xl text-muted-foreground max-w-2xl mx-auto pt-4">
               Smart Recipe Mate wykorzystuje AI do tworzenia i znajdowania przepisów kulinarnych 
               dopasowanych do Twoich preferencji żywieniowych i dostępnych produktów.
             </p>
-            <div class="flex gap-4 justify-center pt-4">
-              <Button asChild size="lg">
+            <div class="flex gap-4 justify-center pt-6">
+              <Button size="lg">
                 <a href="/register">Rozpocznij za darmo</a>
               </Button>
-              <Button asChild variant="outline" size="lg">
+              <Button variant="outline" size="lg">
                 <a href="/login">Mam już konto</a>
               </Button>
             </div>
@@ -143,9 +142,7 @@ if (user !== null) {
 )}
 
 {user && (
-  <!-- Dashboard for Authenticated Users -->
   <Layout title="Dashboard - Smart Recipe Mate">
-    <!-- Mock token for development -->
     <DashboardContent
       client:load
       initialRecipes={recentRecipes}
