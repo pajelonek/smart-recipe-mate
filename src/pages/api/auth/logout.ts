@@ -1,5 +1,4 @@
 import type { APIRoute } from "astro";
-import { AuthService } from "../../../lib/services/auth.service";
 import type { ApiError } from "../../../types";
 
 export const prerender = false;
@@ -11,7 +10,8 @@ export const prerender = false;
 export const POST: APIRoute = async ({ locals }) => {
   try {
     // Attempt logout
-    const { error } = await AuthService.signOut({ locals } as any);
+    const supabase = locals.supabase;
+    const { error } = await supabase.auth.signOut();
 
     if (error) {
       console.error("Logout error:", error);

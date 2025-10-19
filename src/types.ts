@@ -124,7 +124,7 @@ export interface AIGenerationListResponse {
 export interface ApiError {
   error: string;
   message: string;
-  details?: Record<string, unknown>;
+  details?: Record<string, unknown> | unknown[];
 }
 
 export interface DashboardData {

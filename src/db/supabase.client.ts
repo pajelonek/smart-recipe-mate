@@ -30,6 +30,24 @@ export function createServerSupabaseClient(context: APIContext) {
       autoRefreshToken: true,
       detectSessionInUrl: false,
       persistSession: true,
+      storage: {
+        getItem: (key: string) => {
+          return context.cookies.get(key)?.value ?? null;
+        },
+        setItem: (key: string, value: string) => {
+          context.cookies.set(key, value, {
+            path: "/",
+            maxAge: 60 * 60 * 24 * 365, // 1 year
+            sameSite: "lax",
+            secure: import.meta.env.PROD,
+          });
+        },
+        removeItem: (key: string) => {
+          context.cookies.delete(key, {
+            path: "/",
+          });
+        },
+      },
     },
     global: {
       headers: {

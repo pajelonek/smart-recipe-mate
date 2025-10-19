@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 import { updatePasswordSchema } from "../../../lib/validation/auth.schemas";
-import { AuthService } from "../../../lib/services/auth.service";
 import type { ApiError } from "../../../types";
 
 export const prerender = false;
@@ -30,7 +29,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const { password } = validationResult.data;
 
     // Update password
-    const { error } = await AuthService.updatePassword(password, { locals } as any);
+    const supabase = locals.supabase;
+    const { error } = await supabase.auth.updateUser({
+      password: password,
+    });
 
     if (error) {
       let errorMessage = "Wystąpił błąd podczas aktualizacji hasła";

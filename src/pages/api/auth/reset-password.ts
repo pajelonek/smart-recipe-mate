@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 import { resetPasswordSchema } from "../../../lib/validation/auth.schemas";
-import { AuthService } from "../../../lib/services/auth.service";
 import type { ApiError } from "../../../types";
 
 export const prerender = false;
@@ -9,7 +8,7 @@ export const prerender = false;
  * POST /api/auth/reset-password
  * Send password reset email
  */
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request, locals, url }) => {
   try {
     // Parse and validate request body
     const body = await request.json();
@@ -30,7 +29,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const { email } = validationResult.data;
 
     // Send reset password email
-    const { error } = await AuthService.resetPassword(email, { locals } as any);
+    const supabase = locals.supabase;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${url.origin}/auth/update-password`,
+    });
 
     if (error) {
       // For security reasons, don't reveal if email exists or not
