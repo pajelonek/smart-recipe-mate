@@ -1,18 +1,18 @@
 ---
 
-import Layout from "../layouts/Layout.astro";
+import PublicLayout from "../layouts/PublicLayout.astro";
+import AuthLayout from "../layouts/AuthLayout.astro";
 import { DashboardContent } from "../components/dashboard/DashboardContent";
 import { createServerSupabaseClient } from "../db/supabase.client";
 import { getUserRecipes } from "../lib/services/recipes.service";
 import type { UserStats, Recipe } from "../types";
-import { ModeToggle } from "../components/common/ModeToggle";
 import { Button } from "../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 
 const supabase = createServerSupabaseClient(Astro);
 
 // Get authenticated user from session
-const { data: { session }, error: authError } = await supabase.auth.getSession();
+const { data: { session } } = await supabase.auth.getSession();
 const user = session?.user || null;
 
 // Initialize variables for authenticated users
@@ -71,78 +71,63 @@ if (user !== null) {
 ---
 <>
 {!user && (
-  <Layout title="Dopasuj przepisy do swoich potrzeb">
-    <div class="bg-background flex flex-col">
-      <!-- Header with Theme Toggle and Login Button -->
-      <header class="border-b border-border">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 class="text-2xl font-bold">Smart Recipe Mate</h1>
-          <div class="flex items-center gap-4">
-            <ModeToggle client:load />
-            <Button asChild>
-              <a href="/login">Zaloguj się</a>
+  <PublicLayout pageTitle="Dopasuj przepisy do swoich potrzeb">
+    <!-- Hero Section -->
+    <div class="flex items-center justify-center p-6 mt-24">
+      <div class="max-w-4xl w-full space-y-12">
+        <!-- Main Hero -->
+        <div class="text-center space-y-6">
+          <h2 class="text-5xl font-bold tracking-tight">
+            Dopasuj przepisy do swoich potrzeb
+          </h2>
+          <p class="text-xl text-muted-foreground max-w-2xl mx-auto pt-8">
+            Smart Recipe Mate wykorzystuje AI do tworzenia i znajdowania przepisów kulinarnych 
+            dopasowanych do Twoich preferencji żywieniowych i dostępnych produktów.
+          </p>
+          <div class="flex gap-4 justify-center pt-6">
+            <Button size="lg">
+              <a href="/register">Rozpocznij za darmo</a>
+            </Button>
+            <Button variant="outline" size="lg">
+              <a href="/login">Mam już konto</a>
             </Button>
           </div>
         </div>
-      </header>
 
-      <!-- Hero Section -->
-      <main class="flex-1 flex items-center justify-center p-6 mt-24">
-        <div class="max-w-4xl w-full space-y-12">
-          <!-- Main Hero -->
-          <div class="text-center space-y-6">
-            <h2 class="text-5xl font-bold tracking-tight">
-              Dopasuj przepisy do swoich potrzeb
-            </h2>
-            <p class="text-xl text-muted-foreground max-w-2xl mx-auto pt-4">
-              Smart Recipe Mate wykorzystuje AI do tworzenia i znajdowania przepisów kulinarnych 
-              dopasowanych do Twoich preferencji żywieniowych i dostępnych produktów.
-            </p>
-            <div class="flex gap-4 justify-center pt-6">
-              <Button size="lg">
-                <a href="/register">Rozpocznij za darmo</a>
-              </Button>
-              <Button variant="outline" size="lg">
-                <a href="/login">Mam już konto</a>
-              </Button>
-            </div>
-          </div>
-
-          <!-- Features -->
-          <div class="grid md:grid-cols-3 gap-6 pt-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>Preferencje żywieniowe</CardTitle>
-                <CardDescription>
-                  Zapisz swoje wymagania dietetyczne i preferencje smakowe
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Generowanie przepisów AI</CardTitle>
-                <CardDescription>
-                  Twórz przepisy na podstawie dostępnych produktów i swoich preferencji
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Repozytorium przepisów</CardTitle>
-                <CardDescription>
-                  Zarządzaj swoimi ulubionymi przepisami w jednym miejscu
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
+        <!-- Features -->
+        <div class="grid md:grid-cols-3 gap-6 pt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Preferencje żywieniowe</CardTitle>
+              <CardDescription>
+                Zapisz swoje wymagania dietetyczne i preferencje smakowe
+              </CardDescription>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Generowanie przepisów AI</CardTitle>
+              <CardDescription>
+                Twórz przepisy na podstawie dostępnych produktów i swoich preferencji
+              </CardDescription>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Repozytorium przepisów</CardTitle>
+              <CardDescription>
+                Zarządzaj swoimi ulubionymi przepisami w jednym miejscu
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </div>
-      </main>
+      </div>
     </div>
-  </Layout>
+  </PublicLayout>
 )}
 
 {user && (
-  <Layout title="Dashboard - Smart Recipe Mate">
+  <AuthLayout pageTitle="Dashboard - Smart Recipe Mate" userName={userName}>
     <DashboardContent
       client:load
       initialRecipes={recentRecipes}
@@ -150,6 +135,6 @@ if (user !== null) {
       userName={userName}
       sessionToken="dev-session-token"
     />
-  </Layout>
+  </AuthLayout>
 )}
 </>

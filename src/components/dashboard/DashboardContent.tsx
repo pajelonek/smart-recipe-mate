@@ -4,7 +4,6 @@ import { QuickActions } from "./QuickActions";
 import { RecentRecipesList } from "./RecentRecipesList";
 import { useDashboard } from "../../hooks/useDashboard";
 import type { DashboardContentProps } from "../../types";
-import { ModeToggle } from "../common/ModeToggle";
 
 export function DashboardContent({
   initialRecipes,
@@ -36,9 +35,6 @@ export function DashboardContent({
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
-      <div className="w-auto text-right">
-        <ModeToggle />
-      </div>
       <WelcomeSection userName={userName} stats={stats} />
       {recipes.length > 0 && <QuickActions />}
       <RecentRecipesList recipes={recipes} isLoading={isLoading} onDelete={deleteRecipe} />
