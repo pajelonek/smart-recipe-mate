@@ -13,13 +13,11 @@ export function LoginForm() {
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
   const [successMessage, setSuccessMessage] = useState<string>("");
 
-  // Check for success message in URL params
   useEffect(() => {
     const urlParams = new URLSearchParams(globalThis.location.search);
     const message = urlParams.get("message");
     if (message) {
       setSuccessMessage(message);
-      // Clean up URL
       const newUrl = globalThis.location.pathname;
       globalThis.history.replaceState({}, "", newUrl);
     }
@@ -154,7 +152,7 @@ export function LoginForm() {
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col space-y-4">
+        <CardFooter className="flex flex-col space-y-4 mt-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
