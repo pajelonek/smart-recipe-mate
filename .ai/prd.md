@@ -1,8 +1,8 @@
-# Dokument wymagań produktu (PRD) - HealthyMeal
+# Dokument wymagań produktu (PRD) - Smart Recipe Mate
 
 ## 1. Przegląd produktu
 
-HealthyMeal to webowa aplikacja MVP wspierająca osoby planujące posiłki w dostosowywaniu jadłospisu do preferencji dietetycznych. System łączy proste konto użytkownika, obowiązkową konfigurację preferencji żywieniowych oraz repozytorium przepisów przechowywanych w ustandaryzowanej strukturze tekstowej (tytuł, składniki, przygotowanie). Kluczową przewagą jest integracja z AI, która generuje od zera przepisy na podstawie podanych produktów z lodówki oraz zapisanych preferencji użytkownika, przekazując wynik w uzgodnionym formacie JSON. Aplikacja działa wyłącznie w przeglądarce desktopowej, a każda generacja AI, przepisy i preferencje są powiązane z kontem użytkownika.
+Smart Recipe Mate to webowa aplikacja MVP wspierająca osoby planujące posiłki w dostosowywaniu jadłospisu do preferencji dietetycznych. System łączy proste konto użytkownika, obowiązkową konfigurację preferencji żywieniowych oraz repozytorium przepisów przechowywanych w ustandaryzowanej strukturze tekstowej (tytuł, składniki, przygotowanie). Kluczową przewagą jest integracja z AI, która generuje od zera przepisy na podstawie podanych produktów z lodówki oraz zapisanych preferencji użytkownika, przekazując wynik w uzgodnionym formacie JSON. Aplikacja działa wyłącznie w przeglądarce desktopowej, a każda generacja AI, przepisy i preferencje są powiązane z kontem użytkownika.
 
 ## 2. Problem użytkownika
 
@@ -10,46 +10,40 @@ Użytkownicy z wymaganiami dietetycznymi muszą ręcznie dostosowywać przepisy 
 
 ## 3. Wymagania funkcjonalne
 
-### 3.1 Konta i bezpieczeństwo
-
-- Rejestracja konta na podstawie adresu e-mail i hasła z polityką złożoności oraz wymogiem potwierdzenia e-mail.
-- Logowanie do aplikacji dostępne wyłącznie dla zweryfikowanych kont; sesja utrzymywana do wylogowania lub wygaśnięcia tokenu.
-- Reset hasła z wykorzystaniem jednorazowego linku przesyłanego e-mailem.
-- Ochrona zasobów po wylogowaniu (brak dostępu do przepisów i preferencji bez aktywnej sesji).
-
-### 3.2 Onboarding preferencji
+### 3.1 Onboarding preferencji
 
 - Obowiązkowy kreator preferencji uruchamiany przy pierwszym logowaniu zbiera: typ diety, preferowane składniki, kuchnie oraz allergens.
 - Frontend może prezentować kreator jako wieloetapowy formularz, ale stan kroków zarządzany jest po stronie klienta (np. w pamięci lub localStorage).
-- Po ukończeniu kreatora system zapisuje preferencje do tabeli user_preferences i przekierowuje użytkownika do repozytorium przepisów.
+- Po ukończeniu kreatora system zapisuje preferencje do tabeli user_preferences i przekierowuje użytkownika do strony dashboardu.
 - Status onboardingu: użytkownik jest uznawany za "onboarded" jeśli posiada rekord w user_preferences.
 
-### 3.3 Profil preferencji
+### 3.2 Profil preferencji
 
 - Strona profilu prezentuje zapisane preferencje oraz datę ostatniej modyfikacji.
 - Użytkownik może edytować typ diety, preferowane składniki, allergens i kuchnie; zmiany są walidowane i zapisywane atomowo.
 - Edycja preferencji aktualizuje datę modyfikacji oraz wyzwala odświeżenie widoku przepisów w sesji użytkownika.
+- Do profilu preferencji mozemy przejsc klikajac w ikonke avatara po prawej stroni navbaru i z listy wybieraniej klikamy "Konto".
 
-### 3.4 Repozytorium przepisów
+### 3.3 Repozytorium przepisów
 
 - Przepisy przechowywane są jako tekst z trzema sekcjami obligatoryjnymi: tytuł, składniki, przygotowanie; brak dodatkowej walidacji poza obecnością sekcji.
 - Lista przepisów pokazuje wpisy właściciela, zapewnia wyszukiwanie po tytule oraz filtr tagów dołączonych do przepisu.
 - Każdy przepis może posiadać do 10 tagów; interfejs wspiera autouzupełnianie istniejących tagów i tworzenie nowych z natychmiastowym przypisaniem do użytkownika.
 
-### 3.5 Generowanie przepisów przez AI
+### 3.4 Generowanie przepisów przez AI
 
 - Dedykowany widok umożliwia podanie listy dostępnych składników z lodówki oraz celów dietetycznych wynikających z preferencji profilu.
 - Po wysłaniu danych AI generuje od zera nowy przepis w uzgodnionej strukturze (Summary, Ingredients, Preparation) i prezentuje go w interfejsie.
 - Użytkownik może zaakceptować wygenerowany przepis, przypisać mu tagi i zapisać w repozytorium; odrzucenie zamyka wynik bez tworzenia wpisu.
 - Każde zapytanie zapisuje dane wejściowe (input_payload) i odpowiedź AI (output_payload) w tabeli generacji, co umożliwia powiązanie przepisu z jego źródłem.
 
-### 3.6 Zarządzanie ręcznie dodanym przepisem
+### 3.5 Zarządzanie ręcznie dodanym przepisem
 
 - Dodawanie przepisu odbywa się poprzez wklejenie treści do szablonu tekstowego; zapis tworzy rekord z datą utworzenia powiązany z właścicielem.
 - Ręczna edycja przepisu nadpisuje jego treść, aktualizuje datę ostatniej edycji oraz wyświetla snackbar z potwierdzeniem zapisu.
 - Usunięcie przepisu wymaga potwierdzenia; po zatwierdzeniu przepis jest oznaczany jako usunięty (soft delete) i znika z listy użytkownika.
 
-### 3.7 Integracja AI
+### 3.6 Integracja AI
 
 - Interfejs generowania komunikuje się z usługą AI poprzez REST, przekazując i odbierając dane w strukturze JSON zgodnej ze specyfikacją API.
 - Każde zapytanie AI tworzy rekord generacji zawierający dane wejściowe (input_payload), odpowiedź (output_payload) oraz ewentualny komunikat błędu.
@@ -61,10 +55,6 @@ Użytkownicy z wymaganiami dietetycznymi muszą ręcznie dostosowywać przepisy 
 - Błędy podczas generowania przepisów są przechowywane w tabeli generacji AI wraz z pełnym kontekstem żądania (input_payload) oraz komunikatem błędu.
 - Interfejs prezentuje użytkownikowi czytelny komunikat o błędzie z możliwością ponowienia próby.
 
-### 3.8 Dostępność i ograniczenia platformy
-
-- Aplikacja wspiera najnowsze wersje przeglądarek desktopowych, bez natywnego wsparcia urządzeń mobilnych.
-- Interfejs i komunikaty kierowane do użytkownika są w języku angielskim; dokumentacja wewnętrzna może pozostać dwujęzyczna.
 
 ## 4. Granice produktu
 
@@ -75,41 +65,21 @@ Użytkownicy z wymaganiami dietetycznymi muszą ręcznie dostosowywać przepisy 
 
 ## 5. Historyjki użytkowników
 
-### US-001 Rejestracja konta e-mail
+## US-001: Bezpieczny dostęp i uwierzytelnianie
 
-Opis: Jako nowy użytkownik chcę utworzyć konto za pomocą adresu e-mail, aby zapisywać preferencje i przepisy.
-Kryteria akceptacji:
-
-- Formularz wymaga unikalnego adresu e-mail, hasła spełniającego politykę złożoności oraz potwierdzenia hasła.
-- Zarejestrowanie konta wysyła e-mail weryfikacyjny z jednorazowym linkiem aktywacyjnym.
-- Dopóki e-mail nie zostanie potwierdzony, użytkownik nie może tworzyć ani modyfikować przepisów.
-
-### US-002 Logowanie do zweryfikowanego konta
-
-Opis: Jako zweryfikowany użytkownik chcę zalogować się do aplikacji, aby korzystać z mojego profilu i przepisów.
-Kryteria akceptacji:
-
-- Logowanie akceptuje wyłącznie poprawne zestawy e-mail/hasło powiązane ze zweryfikowanym kontem.
-- Nieudane logowanie prezentuje ogólny komunikat o błędzie bez ujawniania, czy konto istnieje.
-- Po zalogowaniu użytkownik trafia do kreatora preferencji, jeśli nie posiada zapisanych preferencji (brak rekordu w user_preferences), w przeciwnym razie na listę przepisów.
-
-### US-003 Wylogowanie i ochrona zasobów
-
-Opis: Jako zalogowany użytkownik chcę móc się wylogować i mieć pewność, że moje dane są chronione po zakończeniu sesji.
-Kryteria akceptacji:
-
-- Menu konta zawiera przycisk wylogowania, który natychmiast unieważnia token sesji.
-- Dostęp do stron wymagających autoryzacji po wylogowaniu przekierowuje na ekran logowania.
-- Próba użycia wygasłej sesji (np. otwartej w innej zakładce) wymaga ponownej autoryzacji.
-
-### US-004 Reset hasła
-
-Opis: Jako użytkownik, który zapomniał hasła, chcę odzyskać dostęp do konta.
-Kryteria akceptacji:
-
-- Formularz resetu przyjmuje adres e-mail i potwierdza wysłanie wiadomości niezależnie od tego, czy konto istnieje.
-- Wiadomość resetująca zawiera jednorazowy link ważny przez skonfigurowany czas.
-- Ustawienie nowego hasła umożliwia natychmiastowe logowanie z nowymi danymi.
+- Tytuł: Bezpieczny dostęp
+- Opis: Jako użytkownik chcę mieć możliwość rejestracji i logowania się do systemu w sposób zapewniający bezpieczeństwo moich danych.
+- Kryteria akceptacji:
+  - Logowanie i rejestracja odbywają się na dedykowanych stronach.
+  - Logowanie wymaga podania adresu email i hasła.
+  - Rejestracja wymaga podania adresu email, hasła i potwierdzenia hasła.
+  - Użytkownik NIE MOŻE miec dostepu do wszelkiego api bez logowania.
+  - Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
+  - Użytkownik może się wylogować z systemu poprzez przycisk w prawym górnym rogu w głównym @Layout.astro.
+  - Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
+  - Odzyskiwanie hasła powinno być możliwe.
+  - Po zalogowaniu user jezeli nie posiada preferencji to uruchamiamy obowiazkowy kreator (US-005)
+  - Jezeli uzytkonik nie jest zalogowany to pokazujemy mu pusta reklamowa strone z przyciskiem zaloguj sie i informacja co aplikacja robi.
 
 ### US-005 Obowiązkowy kreator preferencji
 
@@ -119,7 +89,8 @@ Kryteria akceptacji:
 - Kreator uruchamia się automatycznie po pierwszym logowaniu dla użytkowników bez zapisanych preferencji.
 - Formularz wymaga wypełnienia wszystkich wymaganych pól (typ diety) przed zapisem; pozostałe pola są opcjonalne.
 - Stan formularza może być zarządzany przez frontend (wieloetapowy UI) - przerwanie powoduje utratę danych i restart przy kolejnym logowaniu.
-- Po zapisaniu preferencji użytkownik jest przekierowywany do repozytorium przepisów.
+- Po zapisaniu preferencji użytkownik jest przekierowywany do strony dashboardu (strona główna `/` zawierająca repozytorium przepisów).
+- Uzytkonik nie ma mozliwosci wylaczenia tego kreatora, nie moze korzystac z serwisu po zalogowaniu bez wypelnienia tego kreatora.
 
 ### US-006 Edycja preferencji w profilu
 

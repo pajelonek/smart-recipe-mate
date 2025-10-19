@@ -40,7 +40,7 @@ export function DashboardContent({
         <ModeToggle />
       </div>
       <WelcomeSection userName={userName} stats={stats} />
-      <QuickActions />
+      {recipes.length > 0 && <QuickActions />}
       <RecentRecipesList recipes={recipes} isLoading={isLoading} onDelete={deleteRecipe} />
     </div>
   );

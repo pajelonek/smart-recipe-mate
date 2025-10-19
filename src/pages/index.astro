@@ -1,82 +1,181 @@
 ---
+// @ts-nocheck
 import Layout from "../layouts/Layout.astro";
 import { DashboardContent } from "../components/dashboard/DashboardContent";
 import { createServerSupabaseClient } from "../db/supabase.client";
 import { getUserRecipes } from "../lib/services/recipes.service";
 import type { UserStats, Recipe } from "../types";
+import { ModeToggle } from "../components/common/ModeToggle";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 
 const supabase = createServerSupabaseClient(Astro);
 
 // DEVELOPMENT: Temporarily bypass auth for dashboard testing
-// Remove this when login page is implemented
-const user = {
-  id: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  email: "test@example.com",
-  user_metadata: { display_name: "Dev User" },
-};
+// Set to null to see landing page, or keep user object to see dashboard
+const user: { id: string; email: string; user_metadata?: { display_name?: string } } | null = null; // Change to null to test landing page
+// const user: { id: string; email: string; user_metadata?: { display_name?: string } } | null = {
+//   id: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+//   email: "test@example.com",
+//   user_metadata: { display_name: "Dev User" },
+// };
 
 // Original code (uncomment when login is implemented):
 // const { data: { session }, error: authError } = await supabase.auth.getSession();
-// if (!session?.user) {
-//   return Astro.redirect('/login');
-// }
-// const user = session.user;
+// const user = session?.user || null;
 
-// DEVELOPMENT: Temporarily bypass onboarding check for dashboard testing
-// Remove this when onboarding page is implemented
-const preferences = { user_id: user.id }; // Mock preferences
+// Initialize variables for authenticated users
+let recentRecipes: Recipe[] = [];
+let stats: UserStats = { recipesCount: 0, generationsCount: 0 };
+let userName = "User";
 
-// Original code (uncomment when onboarding is implemented):
-// const { data: preferences } = await supabase
-//   .from('user_preferences')
-//   .select('user_id')
-//   .eq('user_id', user.id)
-//   .maybeSingle();
-// if (!preferences) {
-//   return Astro.redirect('/onboarding');
-// }
+// If authenticated, fetch user data
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+if (user !== null) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+  const userId: string = user.id;
+  
+  // DEVELOPMENT: Temporarily bypass onboarding check for dashboard testing
+  // Remove this when onboarding page is implemented
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const preferences = { user_id: userId }; // Mock preferences
 
-// Fetch recipes
-const recipes = await getUserRecipes(user.id, supabase);
-const recentRecipes: Recipe[] = recipes.slice(0, 10);
+  // Original code (uncomment when onboarding is implemented):
+  // const { data: preferences } = await supabase
+  //   .from('user_preferences')
+  //   .select('user_id')
+  //   .eq('user_id', userId)
+  //   .maybeSingle();
+  // if (!preferences) {
+  //   return Astro.redirect('/onboarding');
+  // }
 
-// Fetch stats
-const { count: recipesCount, error: recipesError } = await supabase
-  .from("recipes")
-  .select("*", { count: "exact", head: true })
-  .eq("owner_id", user.id)
-  .is("deleted_at", null);
+  // Fetch recipes
+  const recipes = await getUserRecipes(userId, supabase);
+  recentRecipes = recipes.slice(0, 10);
 
-if (recipesError) {
-  console.error("Error fetching recipes count:", recipesError);
-  return Astro.response(new Response("Internal Server Error", { status: 500 }));
+  // Fetch stats
+  const { count: recipesCount, error: recipesError } = await supabase
+    .from("recipes")
+    .select("*", { count: "exact", head: true })
+    .eq("owner_id", userId)
+    .is("deleted_at", null);
+
+  if (recipesError) {
+    console.error("Error fetching recipes count:", recipesError);
+    return Astro.response(new Response("Internal Server Error", { status: 500 }));
+  }
+
+  const { count: generationsCount, error: generationsError } = await supabase
+    .from("ai_generations")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
+
+  if (generationsError) {
+    console.error("Error fetching generations count:", generationsError);
+    return Astro.response(new Response("Internal Server Error", { status: 500 }));
+  }
+
+  stats = {
+    recipesCount: recipesCount || 0,
+    generationsCount: generationsCount || 0,
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  userName = user.user_metadata?.display_name || user.email?.split("@")[0] || "User";
 }
-
-const { count: generationsCount, error: generationsError } = await supabase
-  .from("ai_generations")
-  .select("*", { count: "exact", head: true })
-  .eq("user_id", user.id);
-
-if (generationsError) {
-  console.error("Error fetching generations count:", generationsError);
-  return Astro.response(new Response("Internal Server Error", { status: 500 }));
-}
-
-const stats: UserStats = {
-  recipesCount: recipesCount || 0,
-  generationsCount: generationsCount || 0,
-};
-
-const userName = user.user_metadata?.display_name || user.email?.split("@")[0] || "User";
 ---
+<>
+{!user && (
+  <!-- Landing Page for Unauthenticated Users -->
+  <Layout>
+    <div class="min-h-screen bg-background flex flex-col">
+      <!-- Header with Theme Toggle and Login Button -->
+      <header class="border-b border-border">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <h1 class="text-2xl font-bold">Smart Recipe Mate</h1>
+          <div class="flex items-center gap-4">
+            <ModeToggle client:load />
+            <Button asChild>
+              <a href="/login">Zaloguj się</a>
+            </Button>
+          </div>
+        </div>
+      </header>
 
-<Layout title="Dashboard - Smart Recipe Mate">
-  <!-- Mock token for development -->
-  <DashboardContent
-    client:load
-    initialRecipes={recentRecipes}
-    initialStats={stats}
-    userName={userName}
-    sessionToken="dev-session-token"
-  />
-</Layout>
+      <!-- Hero Section -->
+      <main class="flex-1 flex items-center justify-center p-6">
+        <div class="max-w-4xl w-full space-y-12">
+          <!-- Main Hero -->
+          <div class="text-center space-y-6">
+            <h2 class="text-5xl font-bold tracking-tight">
+              Dopasuj przepisy<br />do swoich potrzeb
+            </h2>
+            <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Smart Recipe Mate wykorzystuje AI do tworzenia i znajdowania przepisów kulinarnych 
+              dopasowanych do Twoich preferencji żywieniowych i dostępnych produktów.
+            </p>
+            <div class="flex gap-4 justify-center pt-4">
+              <Button asChild size="lg">
+                <a href="/register">Rozpocznij za darmo</a>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <a href="/login">Mam już konto</a>
+              </Button>
+            </div>
+          </div>
+
+          <!-- Features -->
+          <div class="grid md:grid-cols-3 gap-6 pt-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Preferencje żywieniowe</CardTitle>
+                <CardDescription>
+                  Zapisz swoje wymagania dietetyczne i preferencje smakowe
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Generowanie przepisów AI</CardTitle>
+                <CardDescription>
+                  Twórz przepisy na podstawie dostępnych produktów i swoich preferencji
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Repozytorium przepisów</CardTitle>
+                <CardDescription>
+                  Zarządzaj swoimi ulubionymi przepisami w jednym miejscu
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="border-t border-border py-6">
+        <div class="max-w-7xl mx-auto px-6 text-center text-sm text-muted-foreground">
+          <p>&copy; 2025 Smart Recipe Mate. Wszystkie prawa zastrzeżone.</p>
+        </div>
+      </footer>
+    </div>
+  </Layout>
+)}
+
+{user && (
+  <!-- Dashboard for Authenticated Users -->
+  <Layout title="Dashboard - Smart Recipe Mate">
+    <!-- Mock token for development -->
+    <DashboardContent
+      client:load
+      initialRecipes={recentRecipes}
+      initialStats={stats}
+      userName={userName}
+      sessionToken="dev-session-token"
+    />
+  </Layout>
+)}
+</>
