@@ -120,7 +120,6 @@ export interface AIGenerationListResponse {
 // =============================================================================
 // 5. COMMON DTOs
 // =============================================================================
-
 export interface ApiError {
   error: string;
   message: string;

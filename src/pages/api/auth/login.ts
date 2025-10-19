@@ -1,12 +1,14 @@
 import type { APIRoute } from "astro";
+import { AuthService } from "../../../lib/services/auth.service";
 import { loginSchema } from "../../../lib/validation/auth.schemas";
 import type { ApiError } from "../../../types";
+import type { LoginRequest } from "../../../types/auth/types";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async (context) => {
   try {
-    const body = await request.json();
+    const body = await context.request.json();
 
     const validationResult = loginSchema.safeParse(body);
     if (!validationResult.success) {
@@ -21,13 +23,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    const { email, password } = validationResult.data;
+    const loginRequest: LoginRequest = validationResult.data;
 
-    const supabase = locals.supabase;
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } = await AuthService.signIn(loginRequest, context);
 
     if (error) {
       let errorMessage: string;
@@ -67,8 +65,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         headers: { "Content-Type": "application/json" },
       }
     );
-  } catch (error) {
-    console.error("Login error:", error);
+  } catch {
     const errorResponse: ApiError = {
       error: "Internal server error",
       message: "Wystąpił błąd podczas logowania. Spróbuj ponownie.",

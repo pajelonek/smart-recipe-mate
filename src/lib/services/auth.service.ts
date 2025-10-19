@@ -1,4 +1,5 @@
 import type { APIContext } from "astro";
+import type { LoginRequest } from "../../types/auth/types";
 import { createServerSupabaseClient } from "../../db/supabase.client";
 
 /**
@@ -9,11 +10,11 @@ export class AuthService {
   /**
    * Sign in a user with email and password
    */
-  static async signIn(email: string, password: string, context: APIContext) {
+  static async signIn(loginRequest: LoginRequest, context: APIContext) {
     const supabase = createServerSupabaseClient(context);
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
+      email: loginRequest.email,
+      password: loginRequest.password,
     });
     return { data, error };
   }
@@ -27,8 +28,8 @@ export class AuthService {
       email,
       password,
       options: {
-        emailRedirectTo: `${context.url.origin}/auth/callback`
-      }
+        emailRedirectTo: `${context.url.origin}/auth/callback`,
+      },
     });
     return { data, error };
   }
@@ -48,7 +49,7 @@ export class AuthService {
   static async resetPassword(email: string, context: APIContext) {
     const supabase = createServerSupabaseClient(context);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${context.url.origin}/auth/update-password`
+      redirectTo: `${context.url.origin}/auth/update-password`,
     });
     return { error };
   }
@@ -59,7 +60,7 @@ export class AuthService {
   static async updatePassword(newPassword: string, context: APIContext) {
     const supabase = createServerSupabaseClient(context);
     const { error } = await supabase.auth.updateUser({
-      password: newPassword
+      password: newPassword,
     });
     return { error };
   }
@@ -69,7 +70,10 @@ export class AuthService {
    */
   static async getUser(context: APIContext) {
     const supabase = createServerSupabaseClient(context);
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
     return { user, error };
   }
 
@@ -78,7 +82,10 @@ export class AuthService {
    */
   static async getSession(context: APIContext) {
     const supabase = createServerSupabaseClient(context);
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
     return { session, error };
   }
 }
