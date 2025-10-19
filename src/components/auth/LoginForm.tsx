@@ -41,15 +41,37 @@ export function LoginForm() {
 
     setIsLoading(true);
 
-    // TODO: Replace with actual API call
-    console.log("Login attempt:", { email, password });
+    try {
+      // Call login API
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    // Simulate API call
-    setTimeout(() => {
+      const data = await response.json();
+
+      if (response.ok) {
+        // Login successful - redirect to intended page or dashboard
+        const urlParams = new URLSearchParams(globalThis.location.search);
+        const redirectTo = urlParams.get("redirect") || "/";
+        globalThis.location.href = redirectTo;
+      } else {
+        // Handle API errors
+        if (data.message) {
+          setErrors({ general: data.message });
+        } else {
+          setErrors({ general: "Wystąpił błąd podczas logowania. Spróbuj ponownie." });
+        }
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrors({ general: "Wystąpił błąd podczas logowania. Sprawdź połączenie internetowe i spróbuj ponownie." });
+    } finally {
       setIsLoading(false);
-      // For now, just log success
-      console.log("Login successful (placeholder)");
-    }, 1000);
+    }
   };
 
   return (
@@ -140,4 +162,3 @@ export function LoginForm() {
     </Card>
   );
 }
-
