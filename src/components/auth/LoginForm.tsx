@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,6 @@ import type { LoginRequest } from "@/types/auth/types";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string>("");
   const [generalError, setGeneralError] = useState<string>("");
   const {
     register,
@@ -25,7 +25,7 @@ export function LoginForm() {
     const urlParams = new URLSearchParams(globalThis.location.search);
     const message = urlParams.get("message");
     if (message) {
-      setSuccessMessage(message);
+      toast.success(message);
       const newUrl = globalThis.location.pathname;
       globalThis.history.replaceState({}, "", newUrl);
     }
@@ -69,12 +69,6 @@ export function LoginForm() {
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
-          {successMessage && (
-            <div className="p-3 text-sm text-green-800 dark:text-green-200 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-md">
-              {successMessage}
-            </div>
-          )}
-
           {generalError && (
             <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive rounded-md">
               {generalError}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff, Loader2, Check, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,7 +25,6 @@ export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string>("");
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -44,7 +44,6 @@ export function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    setSuccessMessage("");
 
     // Client-side validation
     const newErrors: {
@@ -95,7 +94,7 @@ export function RegisterForm() {
         // Check if email confirmation is required
         if (data.requiresEmailConfirmation) {
           // Show success message with email confirmation instructions
-          setSuccessMessage(data.message);
+          toast.success(data.message);
           // Clear form fields
           setEmail("");
           setPassword("");
@@ -127,12 +126,6 @@ export function RegisterForm() {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
-          {successMessage && (
-            <div className="p-3 text-sm text-green-800 dark:text-green-200 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-md">
-              {successMessage}
-            </div>
-          )}
-
           {errors.general && (
             <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive rounded-md">
               {errors.general}
@@ -234,7 +227,7 @@ export function RegisterForm() {
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col space-y-4">
+        <CardFooter className="flex flex-col space-y-4 mt-6">
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
