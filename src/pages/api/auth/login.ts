@@ -30,7 +30,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const { email, password } = validationResult.data;
 
     // Attempt authentication
-    const { data, error } = await AuthService.signIn(email, password, { locals } as any);
+    const { data, error } = await AuthService.signIn(email, password, {
+      locals,
+      request,
+      url: new URL(request.url),
+    } as any);
 
     if (error) {
       // Handle specific Supabase auth errors

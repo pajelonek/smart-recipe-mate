@@ -19,7 +19,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const errorResponse: ApiError = {
         error: "Validation error",
         message: "Invalid registration data",
-        details: validationResult.error.issues,
+        details: validationResult.error.issues as any,
       };
       return new Response(JSON.stringify(errorResponse), {
         status: 400,
@@ -30,7 +30,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const { email, password } = validationResult.data;
 
     // Attempt registration
-    const { data, error } = await AuthService.signUp(email, password, { locals } as any);
+    const { data, error } = await AuthService.signUp(email, password, {
+      locals,
+      request,
+      url: new URL(request.url),
+    } as any);
 
     if (error) {
       // Handle specific Supabase auth errors
@@ -56,11 +60,23 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    // Registration successful - user can log in immediately
+    // Check if email confirmation is required
+    // If session is null, it means email confirmation is required
+    const requiresEmailConfirmation = !data.session;
+
+    let message = "Rejestracja zakończona pomyślnie. ";
+    if (requiresEmailConfirmation) {
+      message += "Sprawdź swoją skrzynkę email i kliknij w link aktywacyjny, aby potwierdzić konto.";
+    } else {
+      message += "Możesz się teraz zalogować.";
+    }
+
+    // Registration successful
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Rejestracja zakończona pomyślnie. Możesz się teraz zalogować.",
+        message,
+        requiresEmailConfirmation,
         user: {
           id: data.user?.id,
           email: data.user?.email,

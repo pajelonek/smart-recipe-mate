@@ -14,7 +14,7 @@ const passwordRequirements: PasswordRequirement[] = [
   { label: "Co najmniej 8 znaków", test: (p) => p.length >= 8 },
   { label: "Wielka litera", test: (p) => /[A-Z]/.test(p) },
   { label: "Mała litera", test: (p) => /[a-z]/.test(p) },
-  { label: "Cyfra", test: (p) => /[0-9]/.test(p) },
+  { label: "Cyfra", test: (p) => /\d/.test(p) },
 ];
 
 export function RegisterForm() {
@@ -24,6 +24,7 @@ export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -43,6 +44,7 @@ export function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setSuccessMessage("");
 
     // Client-side validation
     const newErrors: {
@@ -76,15 +78,45 @@ export function RegisterForm() {
 
     setIsLoading(true);
 
-    // TODO: Replace with actual API call
-    console.log("Registration attempt:", { email, password });
+    try {
+      // Call registration API
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, confirmPassword }),
+      });
 
-    // Simulate API call
-    setTimeout(() => {
+      const data = await response.json();
+
+      if (response.ok) {
+        // Registration successful
+        // Check if email confirmation is required
+        if (data.requiresEmailConfirmation) {
+          // Show success message with email confirmation instructions
+          setSuccessMessage(data.message);
+          // Clear form fields
+          setEmail("");
+          setPassword("");
+          setConfirmPassword("");
+        } else {
+          // Email confirmation not required - redirect to login
+          globalThis.location.href = `/login?message=${encodeURIComponent(data.message)}`;
+        }
+      } else {
+        // Handle API errors
+        setErrors({ general: data.message || "Wystąpił błąd podczas rejestracji. Spróbuj ponownie." });
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Registration error:", error);
+      setErrors({
+        general: "Wystąpił błąd podczas rejestracji. Sprawdź połączenie internetowe i spróbuj ponownie.",
+      });
+    } finally {
       setIsLoading(false);
-      // For now, just log success
-      console.log("Registration successful (placeholder)");
-    }, 1000);
+    }
   };
 
   return (
@@ -95,6 +127,12 @@ export function RegisterForm() {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
+          {successMessage && (
+            <div className="p-3 text-sm text-green-800 dark:text-green-200 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-md">
+              {successMessage}
+            </div>
+          )}
+
           {errors.general && (
             <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive rounded-md">
               {errors.general}
@@ -146,10 +184,10 @@ export function RegisterForm() {
             {/* Password Requirements */}
             {password && (
               <div className="space-y-1 pt-2">
-                {passwordRequirements.map((req, index) => {
+                {passwordRequirements.map((req) => {
                   const isValid = req.test(password);
                   return (
-                    <div key={index} className="flex items-center gap-2 text-sm">
+                    <div key={req.label} className="flex items-center gap-2 text-sm">
                       {isValid ? (
                         <Check className="h-4 w-4 text-primary" />
                       ) : (

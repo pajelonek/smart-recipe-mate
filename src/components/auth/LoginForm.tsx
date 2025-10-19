@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,19 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+  const [successMessage, setSuccessMessage] = useState<string>("");
+
+  // Check for success message in URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(globalThis.location.search);
+    const message = urlParams.get("message");
+    if (message) {
+      setSuccessMessage(message);
+      // Clean up URL
+      const newUrl = globalThis.location.pathname;
+      globalThis.history.replaceState({}, "", newUrl);
+    }
+  }, []);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,11 +73,7 @@ export function LoginForm() {
         globalThis.location.href = redirectTo;
       } else {
         // Handle API errors
-        if (data.message) {
-          setErrors({ general: data.message });
-        } else {
-          setErrors({ general: "Wystąpił błąd podczas logowania. Spróbuj ponownie." });
-        }
+        setErrors({ general: data.message || "Wystąpił błąd podczas logowania. Spróbuj ponownie." });
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -82,6 +91,12 @@ export function LoginForm() {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
+          {successMessage && (
+            <div className="p-3 text-sm text-green-800 dark:text-green-200 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-md">
+              {successMessage}
+            </div>
+          )}
+
           {errors.general && (
             <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive rounded-md">
               {errors.general}
