@@ -16,8 +16,7 @@ export const prerender = false;
  * Returns recipe with expanded tags or 404 if not found/deleted
  */
 export const GET: APIRoute = async ({ params, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   // Validate recipe ID
   let recipeId: string;
@@ -35,7 +34,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
   }
 
   try {
-    const recipe = await getRecipeById(recipeId, testUserId, locals.supabase);
+    const recipe = await getRecipeById(recipeId, userId, locals.supabase);
 
     if (!recipe) {
       const errorResponse: ApiError = {
@@ -71,8 +70,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
  * Requires all mandatory fields (title, ingredients, preparation)
  */
 export const PUT: APIRoute = async ({ params, request, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   // Validate recipe ID
   let recipeId: string;
@@ -125,7 +123,7 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
 
   // Update recipe
   try {
-    const recipe = await updateRecipe(recipeId, testUserId, validatedData, locals.supabase);
+    const recipe = await updateRecipe(recipeId, userId, validatedData, locals.supabase);
 
     if (!recipe) {
       const errorResponse: ApiError = {
@@ -161,8 +159,7 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
  * At least one field must be provided
  */
 export const PATCH: APIRoute = async ({ params, request, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   // Validate recipe ID
   let recipeId: string;
@@ -215,7 +212,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
 
   // Patch recipe
   try {
-    const recipe = await patchRecipe(recipeId, testUserId, validatedData, locals.supabase);
+    const recipe = await patchRecipe(recipeId, userId, validatedData, locals.supabase);
 
     if (!recipe) {
       const errorResponse: ApiError = {
@@ -251,8 +248,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
  * Returns 204 No Content on success
  */
 export const DELETE: APIRoute = async ({ params, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   // Validate recipe ID
   let recipeId: string;
@@ -271,7 +267,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
 
   // Delete recipe
   try {
-    const deleted = await deleteRecipe(recipeId, testUserId, locals.supabase);
+    const deleted = await deleteRecipe(recipeId, userId, locals.supabase);
 
     if (!deleted) {
       const errorResponse: ApiError = {

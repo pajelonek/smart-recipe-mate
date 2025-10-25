@@ -13,8 +13,7 @@ import type { ApiError, AIGenerateRecipeResponse, AIGenerateRecipeErrorResponse 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   let requestBody: unknown;
   try {
@@ -49,7 +48,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   try {
-    const preferences = await getUserPreferences(testUserId, locals.supabase);
+    const preferences = await getUserPreferences(userId, locals.supabase);
     if (!preferences) {
       const errorResponse: ApiError = {
         error: "Preferences not found",
@@ -72,7 +71,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       },
     };
 
-    const generationId = await createAIGeneration(testUserId, inputPayload, locals.supabase);
+    const generationId = await createAIGeneration(userId, inputPayload, locals.supabase);
 
     try {
       // NOTE: Using mock implementation - API key not required
@@ -122,7 +121,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
 
       console.error("AI generation error:", {
-        userId: testUserId,
+        userId,
         generationId,
         error: errorMessage,
         timestamp: new Date().toISOString(),

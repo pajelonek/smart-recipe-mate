@@ -12,8 +12,7 @@ export const prerender = false;
  * Can only be called once per user (returns 409 if preferences already exist)
  */
 export const POST: APIRoute = async ({ request, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   let requestBody: unknown;
   try {
@@ -49,7 +48,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   try {
     // Check if user already has preferences (onboarding already completed)
-    const existingPreferences = await getUserPreferences(testUserId, locals.supabase);
+    const existingPreferences = await getUserPreferences(userId, locals.supabase);
 
     if (existingPreferences) {
       const errorResponse: ApiError = {
@@ -63,7 +62,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Create preferences
-    const preferences = await createUserPreferences(testUserId, validatedData.preferences, locals.supabase);
+    const preferences = await createUserPreferences(userId, validatedData.preferences, locals.supabase);
 
     return new Response(JSON.stringify(preferences), {
       status: 200,

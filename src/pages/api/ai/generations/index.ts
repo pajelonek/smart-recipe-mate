@@ -7,8 +7,7 @@ import type { ApiError, AIGenerationListResponse } from "../../../../types";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ url, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   let queryParams;
   try {
@@ -31,7 +30,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
   }
 
   try {
-    const generations = await getUserGenerations(testUserId, queryParams.status, locals.supabase);
+    const generations = await getUserGenerations(userId, queryParams.status, locals.supabase);
 
     const response: AIGenerationListResponse = {
       generations,

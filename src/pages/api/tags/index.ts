@@ -7,8 +7,7 @@ import type { ApiError, TagListResponse } from "../../../types";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ url, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   // Parse query params
   let search: string | undefined;
@@ -32,7 +31,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
   }
 
   try {
-    const tags = await getUserTags(testUserId, locals.supabase, search);
+    const tags = await getUserTags(userId, locals.supabase, search);
     const response: TagListResponse = { tags };
 
     return new Response(JSON.stringify(response), {

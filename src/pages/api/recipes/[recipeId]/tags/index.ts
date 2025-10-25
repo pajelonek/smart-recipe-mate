@@ -7,8 +7,7 @@ import type { ApiError } from "../../../../../types";
 export const prerender = false;
 
 export const POST: APIRoute = async ({ params, request, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   // Validate recipeId
   let recipeId: string;
@@ -61,7 +60,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
 
   // Add tags to recipe
   try {
-    const result = await addTagsToRecipe(testUserId, recipeId, validatedData.tag_names, locals.supabase);
+    const result = await addTagsToRecipe(userId, recipeId, validatedData.tag_names, locals.supabase);
 
     return new Response(JSON.stringify(result), {
       status: 200,

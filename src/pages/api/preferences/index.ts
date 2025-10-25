@@ -11,11 +11,10 @@ import type { ApiError } from "../../../types";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   try {
-    const preferences = await getUserPreferences(testUserId, locals.supabase);
+    const preferences = await getUserPreferences(userId, locals.supabase);
 
     if (!preferences) {
       const errorResponse: ApiError = {
@@ -46,9 +45,8 @@ export const GET: APIRoute = async ({ locals }) => {
 };
 
 export const PUT: APIRoute = async ({ request, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
-  console.log("preferences");
+  const userId = locals.user.id;
+
   let requestBody: unknown;
   try {
     requestBody = await request.json();
@@ -82,7 +80,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
   }
 
   try {
-    const updatedPreferences = await updateUserPreferences(testUserId, validatedData, locals.supabase);
+    const updatedPreferences = await updateUserPreferences(userId, validatedData, locals.supabase);
 
     return new Response(JSON.stringify(updatedPreferences), {
       status: 200,
@@ -102,8 +100,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
 };
 
 export const PATCH: APIRoute = async ({ request, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   let requestBody: unknown;
   try {
@@ -138,7 +135,7 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
   }
 
   try {
-    const updatedPreferences = await patchUserPreferences(testUserId, validatedData, locals.supabase);
+    const updatedPreferences = await patchUserPreferences(userId, validatedData, locals.supabase);
 
     if (!updatedPreferences) {
       const errorResponse: ApiError = {

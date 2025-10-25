@@ -6,8 +6,7 @@ import type { ApiError } from "../../../../../types";
 export const prerender = false;
 
 export const DELETE: APIRoute = async ({ params, locals }) => {
-  // TODO: Add authentication when ready
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   // Validate recipeId and tagId
   let recipeId: string;
@@ -27,7 +26,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
   }
 
   try {
-    await removeTagFromRecipe(testUserId, recipeId, tagId, locals.supabase);
+    await removeTagFromRecipe(userId, recipeId, tagId, locals.supabase);
 
     // 204 No Content - empty response
     return new Response(null, {

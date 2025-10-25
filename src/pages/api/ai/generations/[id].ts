@@ -5,7 +5,7 @@ import type { ApiError } from "../../../../types";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params, locals }) => {
-  const testUserId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+  const userId = locals.user.id;
 
   const generationId = params.id;
 
@@ -35,7 +35,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
       });
     }
 
-    if (generation.user_id !== testUserId) {
+    if (generation.user_id !== userId) {
       const errorResponse: ApiError = {
         error: "Access denied",
         message: "You can only access your own AI generations",
