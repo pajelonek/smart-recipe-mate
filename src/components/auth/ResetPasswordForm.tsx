@@ -1,50 +1,54 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { resetPasswordSchema, type ResetPasswordData } from "@/lib/validation/auth.schemas";
 
 export function ResetPasswordForm() {
-  const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; general?: string }>({});
+  const [submittedEmail, setSubmittedEmail] = useState("");
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<ResetPasswordData>({
+    resolver: zodResolver(resetPasswordSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
+  const onSubmit = async (data: ResetPasswordData) => {
+    try {
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    // Client-side validation
-    const newErrors: { email?: string } = {};
+      const responseData = await response.json();
 
-    if (!email) {
-      newErrors.email = "Email jest wymagany";
-    } else if (!validateEmail(email)) {
-      newErrors.email = "Wprowadź prawidłowy adres email";
-    }
+      if (!response.ok) {
+        setError("root.serverError", {
+          type: "manual",
+          message: responseData.message || "Wystąpił błąd podczas wysyłania linku resetującego",
+        });
+        return;
+      }
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setIsLoading(true);
-
-    // TODO: Replace with actual API call
-    console.log("Password reset request:", { email });
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+      setSubmittedEmail(data.email);
       setIsSuccess(true);
-      console.log("Password reset email sent (placeholder)");
-    }, 1000);
+    } catch {
+      setError("root.serverError", {
+        type: "manual",
+        message: "Wystąpił błąd połączenia. Spróbuj ponownie.",
+      });
+    }
   };
 
   if (isSuccess) {
@@ -56,7 +60,8 @@ export function ResetPasswordForm() {
           </div>
           <CardTitle className="text-center">Link wysłany!</CardTitle>
           <CardDescription className="text-center">
-            Sprawdź swoją skrzynkę email. Wysłaliśmy link do resetowania hasła na adres <strong>{email}</strong>
+            Sprawdź swoją skrzynkę email. Wysłaliśmy link do resetowania hasła na adres{" "}
+            <strong>{submittedEmail}</strong>
           </CardDescription>
         </CardHeader>
         <CardFooter className="flex flex-col space-y-4">
@@ -80,11 +85,11 @@ export function ResetPasswordForm() {
         <CardTitle>Zresetuj hasło</CardTitle>
         <CardDescription>Wprowadź swój adres email aby otrzymać link do resetowania hasła</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
-          {errors.general && (
+          {errors.root?.serverError && (
             <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive rounded-md">
-              {errors.general}
+              {errors.root.serverError.message}
             </div>
           )}
 
@@ -94,18 +99,17 @@ export function ResetPasswordForm() {
               id="email"
               type="email"
               placeholder="twoj@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
+              {...register("email")}
+              disabled={isSubmitting}
               aria-invalid={!!errors.email}
             />
-            {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
+        <CardFooter className="flex flex-col space-y-4 mt-4">
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Wysyłanie...

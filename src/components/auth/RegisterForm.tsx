@@ -1,120 +1,63 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface PasswordRequirement {
-  label: string;
-  test: (password: string) => boolean;
-}
-
-const passwordRequirements: PasswordRequirement[] = [
-  { label: "Co najmniej 8 znaków", test: (p) => p.length >= 8 },
-  { label: "Wielka litera", test: (p) => /[A-Z]/.test(p) },
-  { label: "Mała litera", test: (p) => /[a-z]/.test(p) },
-  { label: "Cyfra", test: (p) => /\d/.test(p) },
-];
+import { registerSchema, passwordRequirements, type RegisterData } from "@/lib/validation/auth.schemas";
 
 export function RegisterForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-    general?: string;
-  }>({});
+  const [generalError, setGeneralError] = useState<string>("");
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-  const validatePassword = (password: string) => {
-    return passwordRequirements.every((req) => req.test(password));
-  };
+  const password = watch("password", "");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-
-    // Client-side validation
-    const newErrors: {
-      email?: string;
-      password?: string;
-      confirmPassword?: string;
-    } = {};
-
-    if (!email) {
-      newErrors.email = "Email jest wymagany";
-    } else if (!validateEmail(email)) {
-      newErrors.email = "Wprowadź prawidłowy adres email";
-    }
-
-    if (!password) {
-      newErrors.password = "Hasło jest wymagane";
-    } else if (!validatePassword(password)) {
-      newErrors.password = "Hasło musi spełniać wszystkie wymagania";
-    }
-
-    if (!confirmPassword) {
-      newErrors.confirmPassword = "Potwierdzenie hasła jest wymagane";
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Hasła nie są identyczne";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setIsLoading(true);
+  const onSubmit = async (data: RegisterData) => {
+    setGeneralError("");
 
     try {
-      // Call registration API
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, confirmPassword }),
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
       if (response.ok) {
-        // Registration successful
-        // Check if email confirmation is required
-        if (data.requiresEmailConfirmation) {
-          // Show success message with email confirmation instructions
-          toast.success(data.message);
-          // Clear form fields
-          setEmail("");
-          setPassword("");
-          setConfirmPassword("");
+        if (responseData.requiresEmailConfirmation) {
+          toast.success(responseData.message);
+          reset();
         } else {
-          // Email confirmation not required - redirect to login
-          globalThis.location.href = `/login?message=${encodeURIComponent(data.message)}`;
+          toast.success(responseData.message);
+          globalThis.location.href = "/login";
         }
       } else {
-        // Handle API errors
-        setErrors({ general: data.message || "Wystąpił błąd podczas rejestracji. Spróbuj ponownie." });
+        setGeneralError(responseData.message || "Wystąpił błąd podczas rejestracji. Spróbuj ponownie.");
       }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Registration error:", error);
-      setErrors({
-        general: "Wystąpił błąd podczas rejestracji. Sprawdź połączenie internetowe i spróbuj ponownie.",
-      });
-    } finally {
-      setIsLoading(false);
+    } catch {
+      setGeneralError("Wystąpił błąd podczas rejestracji. Sprawdź połączenie internetowe i spróbuj ponownie.");
     }
   };
 
@@ -124,11 +67,11 @@ export function RegisterForm() {
         <CardTitle>Zarejestruj się</CardTitle>
         <CardDescription>Utwórz nowe konto aby zacząć korzystać z aplikacji</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
-          {errors.general && (
+          {generalError && (
             <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive rounded-md">
-              {errors.general}
+              {generalError}
             </div>
           )}
 
@@ -138,12 +81,11 @@ export function RegisterForm() {
               id="email"
               type="email"
               placeholder="twoj@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
+              {...register("email")}
+              disabled={isSubmitting}
               aria-invalid={!!errors.email}
             />
-            {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
@@ -153,9 +95,8 @@ export function RegisterForm() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
+                {...register("password")}
+                disabled={isSubmitting}
                 aria-invalid={!!errors.password}
               />
               <Button
@@ -193,7 +134,7 @@ export function RegisterForm() {
               </div>
             )}
 
-            {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+            {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
           </div>
 
           <div className="space-y-2">
@@ -203,9 +144,8 @@ export function RegisterForm() {
                 id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={isLoading}
+                {...register("confirmPassword")}
+                disabled={isSubmitting}
                 aria-invalid={!!errors.confirmPassword}
               />
               <Button
@@ -223,13 +163,13 @@ export function RegisterForm() {
                 )}
               </Button>
             </div>
-            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
+            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
           </div>
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4 mt-6">
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Rejestracja...

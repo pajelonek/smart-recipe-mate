@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,30 +11,19 @@ import type { LoginRequest } from "@/types/auth/types";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [generalError, setGeneralError] = useState<string>("");
+  const [successMessage] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    setError,
   } = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
   });
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(globalThis.location.search);
-    const message = urlParams.get("message");
-    if (message) {
-      toast.success(message);
-      const newUrl = globalThis.location.pathname;
-      globalThis.history.replaceState({}, "", newUrl);
-    }
-  }, []);
-
   const onSubmit = async (data: LoginRequest) => {
-    setGeneralError("");
-
     try {
-      // Call login API
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -44,20 +32,19 @@ export function LoginForm() {
         body: JSON.stringify(data),
       });
 
-      const responseData = await response.json();
-
-      if (response.ok) {
-        // Login successful - redirect to intended page or dashboard
-        const urlParams = new URLSearchParams(globalThis.location.search);
-        const redirectTo = urlParams.get("redirect") || "/";
-        // eslint-disable-next-line react-compiler/react-compiler
-        globalThis.location.href = redirectTo;
-      } else {
-        // Handle API errors
-        setGeneralError(responseData.message || "Wystąpił błąd podczas logowania. Spróbuj ponownie.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Wystąpił błąd podczas logowania. Spróbuj ponownie.");
       }
-    } catch {
-      setGeneralError("Wystąpił błąd podczas logowania. Sprawdź połączenie internetowe i spróbuj ponownie.");
+
+      const urlParams = new URLSearchParams(globalThis.location.search);
+      const redirectTo = urlParams.get("redirect") || "/";
+      globalThis.location.href = redirectTo;
+    } catch (error) {
+      setError("root.serverError", {
+        type: "manual",
+        message: error instanceof Error ? error.message : "Wystąpił błąd podczas logowania. Spróbuj ponownie.",
+      });
     }
   };
 
@@ -69,9 +56,15 @@ export function LoginForm() {
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
-          {generalError && (
+          {successMessage && (
+            <div className="p-3 text-sm text-primary-foreground bg-primary/10 border border-primary rounded-md">
+              {successMessage}
+            </div>
+          )}
+
+          {errors.root?.serverError && (
             <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive rounded-md">
-              {generalError}
+              {errors.root.serverError.message}
             </div>
           )}
 

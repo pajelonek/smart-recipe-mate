@@ -9,25 +9,35 @@ const PUBLIC_ROUTES = new Set([
   "/auth/callback",
   "/auth/update-password",
 ]);
-const PUBLIC_API_ROUTES = new Set(["/api/auth/login", "/api/auth/register", "/api/auth/reset-password"]);
+const PUBLIC_API_ROUTES = new Set([
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/reset-password",
+  "/api/auth/update-password",
+]);
 const ONBOARDING_ROUTE = "/onboarding";
 const API_PREFIX = "/api/";
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = new URL(context.request.url);
 
-  const supabase = createServerSupabaseClient(context);
-  context.locals.supabase = supabase;
-
-  // Skip auth for public routes
+  // Skip auth for public routes (create supabase client after to avoid cookie issues)
   if (PUBLIC_ROUTES.has(pathname)) {
+    const supabase = createServerSupabaseClient(context);
+    context.locals.supabase = supabase;
     return next();
   }
 
   // Allow public API routes
   if (PUBLIC_API_ROUTES.has(pathname)) {
+    const supabase = createServerSupabaseClient(context);
+    context.locals.supabase = supabase;
     return next();
   }
+
+  // Create Supabase client for protected routes
+  const supabase = createServerSupabaseClient(context);
+  context.locals.supabase = supabase;
 
   // For other API routes, require authentication
   if (pathname.startsWith(API_PREFIX)) {

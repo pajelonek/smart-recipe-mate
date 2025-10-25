@@ -1,77 +1,57 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { passwordRequirements, updatePasswordSchema, type UpdatePasswordData } from "@/lib/validation/auth.schemas";
 
-interface PasswordRequirement {
-  label: string;
-  test: (password: string) => boolean;
-}
-
-const passwordRequirements: PasswordRequirement[] = [
-  { label: "Co najmniej 8 znaków", test: (p) => p.length >= 8 },
-  { label: "Wielka litera", test: (p) => /[A-Z]/.test(p) },
-  { label: "Mała litera", test: (p) => /[a-z]/.test(p) },
-  { label: "Cyfra", test: (p) => /[0-9]/.test(p) },
-];
+const redirectToLogin = () => {
+  globalThis.location.href = "/login?message=password_updated";
+};
 
 export function UpdatePasswordForm() {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{
-    password?: string;
-    confirmPassword?: string;
-    general?: string;
-  }>({});
+  const [generalError, setGeneralError] = useState<string>();
 
-  const validatePassword = (password: string) => {
-    return passwordRequirements.every((req) => req.test(password));
-  };
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<UpdatePasswordData>({
+    resolver: zodResolver(updatePasswordSchema),
+    mode: "onChange",
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
+  const password = watch("password");
 
-    // Client-side validation
-    const newErrors: {
-      password?: string;
-      confirmPassword?: string;
-    } = {};
+  const onSubmit = async (data: UpdatePasswordData) => {
+    setGeneralError(undefined);
 
-    if (!password) {
-      newErrors.password = "Hasło jest wymagane";
-    } else if (!validatePassword(password)) {
-      newErrors.password = "Hasło musi spełniać wszystkie wymagania";
+    try {
+      const response = await fetch("/api/auth/update-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setGeneralError(result.message || "Wystąpił błąd podczas aktualizacji hasła");
+        return;
+      }
+
+      redirectToLogin();
+    } catch {
+      setGeneralError("Wystąpił błąd połączenia. Spróbuj ponownie.");
     }
-
-    if (!confirmPassword) {
-      newErrors.confirmPassword = "Potwierdzenie hasła jest wymagane";
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Hasła nie są identyczne";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setIsLoading(true);
-
-    // TODO: Replace with actual API call
-    console.log("Password update attempt:", { password });
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // For now, just log success
-      console.log("Password updated successfully (placeholder)");
-      // TODO: Redirect to dashboard after successful update
-    }, 1000);
   };
 
   return (
@@ -80,11 +60,11 @@ export function UpdatePasswordForm() {
         <CardTitle>Ustaw nowe hasło</CardTitle>
         <CardDescription>Wprowadź nowe hasło dla swojego konta</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
-          {errors.general && (
+          {generalError && (
             <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive rounded-md">
-              {errors.general}
+              {generalError}
             </div>
           )}
 
@@ -95,9 +75,8 @@ export function UpdatePasswordForm() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
+                {...register("password")}
+                disabled={isSubmitting}
                 aria-invalid={!!errors.password}
               />
               <Button
@@ -119,10 +98,10 @@ export function UpdatePasswordForm() {
             {/* Password Requirements */}
             {password && (
               <div className="space-y-1 pt-2">
-                {passwordRequirements.map((req, index) => {
+                {passwordRequirements.map((req) => {
                   const isValid = req.test(password);
                   return (
-                    <div key={index} className="flex items-center gap-2 text-sm">
+                    <div key={req.label} className="flex items-center gap-2 text-sm">
                       {isValid ? (
                         <Check className="h-4 w-4 text-primary" />
                       ) : (
@@ -135,7 +114,7 @@ export function UpdatePasswordForm() {
               </div>
             )}
 
-            {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+            {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
           </div>
 
           <div className="space-y-2">
@@ -145,9 +124,8 @@ export function UpdatePasswordForm() {
                 id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={isLoading}
+                {...register("confirmPassword")}
+                disabled={isSubmitting}
                 aria-invalid={!!errors.confirmPassword}
               />
               <Button
@@ -165,13 +143,13 @@ export function UpdatePasswordForm() {
                 )}
               </Button>
             </div>
-            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
+            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
           </div>
         </CardContent>
 
         <CardFooter>
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Aktualizacja...
@@ -185,4 +163,3 @@ export function UpdatePasswordForm() {
     </Card>
   );
 }
-
