@@ -1,6 +1,9 @@
 import { Skeleton } from "../ui/skeleton";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
-import type { RecipeListSkeletonProps } from "../../types";
+
+interface RecipeListSkeletonProps {
+  count?: number;
+}
 
 export function RecipeListSkeleton({ count = 5 }: Readonly<RecipeListSkeletonProps>) {
   return (

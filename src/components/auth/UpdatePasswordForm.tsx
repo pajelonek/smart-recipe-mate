@@ -8,11 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { passwordRequirements, updatePasswordSchema, type UpdatePasswordData } from "@/lib/validation/auth.schemas";
 
+interface UpdatePasswordFormProps {
+  hasSession?: boolean;
+}
+
 const redirectToLogin = () => {
   globalThis.location.href = "/login?message=password_updated";
 };
 
-export function UpdatePasswordForm() {
+export function UpdatePasswordForm({ hasSession = false }: UpdatePasswordFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [generalError, setGeneralError] = useState<string>();
@@ -53,6 +57,27 @@ export function UpdatePasswordForm() {
       setGeneralError("Wystąpił błąd połączenia. Spróbuj ponownie.");
     }
   };
+
+  if (!hasSession) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Link resetujący wygasł</CardTitle>
+          <CardDescription>
+            Wygląda na to, że nie ma aktywnej sesji resetowania hasła. Kliknij w link z emaila lub poproś o nowy.
+          </CardDescription>
+        </CardHeader>
+        <CardFooter className="flex flex-col gap-2">
+          <Button asChild variant="default" className="w-full">
+            <a href="/reset-password">Poproś o nowy link resetujący</a>
+          </Button>
+          <Button asChild variant="outline" className="w-full">
+            <a href="/login">Powrót do logowania</a>
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -147,7 +172,7 @@ export function UpdatePasswordForm() {
           </div>
         </CardContent>
 
-        <CardFooter>
+        <CardFooter className="mt-4">
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? (
               <>

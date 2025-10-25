@@ -57,7 +57,6 @@ export const updatePasswordSchema = z
   });
 
 // Typy wywnioskowane ze schematów
-export type LoginData = z.infer<typeof loginSchema>;
 export type RegisterData = z.infer<typeof registerSchema>;
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
 export type UpdatePasswordData = z.infer<typeof updatePasswordSchema>;

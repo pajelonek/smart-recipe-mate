@@ -1,5 +1,12 @@
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
-import type { StatCardProps } from "../../../types";
+
+interface StatCardProps {
+  icon: React.ReactNode;
+  value: number;
+  label: string;
+  onClick?: () => void;
+}
 
 export function StatCard({ icon, value, label, onClick }: Readonly<StatCardProps>) {
   return (

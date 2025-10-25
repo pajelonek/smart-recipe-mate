@@ -1,21 +1,16 @@
-import { useEffect } from "react";
 import { WelcomeSection } from "./WelcomeSection";
 import { QuickActions } from "./QuickActions";
 import { RecentRecipesList } from "./RecentRecipesList";
 import { useDashboard } from "../../hooks/useDashboard";
-import type { DashboardContentProps } from "../../types";
+import type { Recipe, UserStats } from "@/types";
 
-export function DashboardContent({
-  initialRecipes,
-  initialStats,
-  userName,
-  sessionToken,
-}: Readonly<DashboardContentProps>) {
-  // TODO why is it here?
-  useEffect(() => {
-    globalThis.supabaseSession = { access_token: sessionToken };
-  }, [sessionToken]);
+interface DashboardContentProps {
+  initialRecipes: Recipe[];
+  initialStats: UserStats;
+  userName: string;
+}
 
+export function DashboardContent({ initialRecipes, initialStats, userName }: Readonly<DashboardContentProps>) {
   const { recipes, stats, isLoading, error, deleteRecipe } = useDashboard(initialRecipes, initialStats);
 
   if (error) {

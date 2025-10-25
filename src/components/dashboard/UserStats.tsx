@@ -1,6 +1,10 @@
 import { StatCard } from "./card/StatCard";
 import { ChefHat, Sparkles } from "lucide-react";
-import type { UserStatsProps } from "../../types";
+import type { UserStats } from "../../types";
+
+interface UserStatsProps {
+  stats: UserStats;
+}
 
 export function UserStats({ stats }: Readonly<UserStatsProps>) {
   const recipesCount = stats.recipesCount || 0;

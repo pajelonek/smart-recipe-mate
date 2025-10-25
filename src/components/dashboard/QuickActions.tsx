@@ -1,6 +1,10 @@
 import { Button } from "../ui/button";
 import { PlusCircle, Sparkles } from "lucide-react";
-import type { QuickActionsProps } from "../../types";
+
+interface QuickActionsProps {
+  onAddRecipe?: () => void;
+  onGenerateAI?: () => void;
+}
 
 export function QuickActions({ onAddRecipe, onGenerateAI }: Readonly<QuickActionsProps>) {
   const handleAddRecipe = () => {

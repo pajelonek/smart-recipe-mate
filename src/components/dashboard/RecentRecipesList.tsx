@@ -3,13 +3,19 @@ import { Button } from "../ui/button";
 import { RecipeCard } from "./card/RecipeCard";
 import { RecipeListSkeleton } from "./RecipeListSkeleton";
 import { EmptyState } from "./utils/EmptyState";
-import type { RecentRecipesListProps, Recipe } from "../../types";
+import type { Recipe } from "../../types";
+
+interface RecentRecipesListProps {
+  recipes: Recipe[];
+  isLoading?: boolean;
+  onDelete?: (recipeId: string) => Promise<void>;
+}
+
+const handleViewAll = () => {
+  window.location.href = "/recipes";
+};
 
 export function RecentRecipesList({ recipes, isLoading = false, onDelete }: Readonly<RecentRecipesListProps>) {
-  const handleViewAll = () => {
-    window.location.href = "/recipes";
-  };
-
   const handleDelete = async (recipeId: string) => {
     if (onDelete) {
       await onDelete(recipeId);

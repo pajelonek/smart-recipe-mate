@@ -141,59 +141,6 @@ export interface UserStats {
   generationsCount: number;
 }
 
-// Props for components
-
-export interface DashboardContentProps {
-  initialRecipes: Recipe[];
-  initialStats: UserStats;
-  userName: string;
-  sessionToken: string;
-}
-
-export interface WelcomeSectionProps {
-  userName: string;
-  stats: UserStats;
-}
-
-export interface UserStatsProps {
-  stats: UserStats;
-}
-
-export interface QuickActionsProps {
-  onAddRecipe?: () => void;
-  onGenerateAI?: () => void;
-}
-
-export interface RecentRecipesListProps {
-  recipes: Recipe[];
-  isLoading?: boolean;
-  onDelete?: (recipeId: string) => Promise<void>;
-}
-
-export interface RecipeCardProps {
-  recipe: Recipe;
-  onDelete?: (recipeId: string) => Promise<void>;
-  onEdit?: (recipeId: string) => void;
-  onView?: (recipeId: string) => void;
-}
-
-export interface EmptyStateProps {
-  title: string;
-  description: string;
-  action?: React.ReactNode;
-}
-
-export interface RecipeListSkeletonProps {
-  count?: number;
-}
-
-export interface StatCardProps {
-  icon: React.ReactNode;
-  value: number;
-  label: string;
-  onClick?: () => void;
-}
-
 // Helper types
 export interface DateFormatOptions {
   format?: "relative" | "absolute";

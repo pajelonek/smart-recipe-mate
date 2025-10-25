@@ -1,6 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { UserStats } from "./UserStats";
-import type { WelcomeSectionProps } from "../../types";
+import type { UserStats } from "../../types";
+
+interface WelcomeSectionProps {
+  userName: string;
+  stats: UserStats;
+}
 
 export function WelcomeSection({ userName, stats }: Readonly<WelcomeSectionProps>) {
   return (

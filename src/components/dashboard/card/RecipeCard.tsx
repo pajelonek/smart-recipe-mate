@@ -10,8 +10,15 @@ import {
 } from "../../ui/dropdown-menu";
 import { Button } from "../../ui/button";
 import { MoreVertical } from "lucide-react";
-import type { RecipeCardProps } from "../../../types";
+import type { Recipe } from "../../../types";
 import { truncate } from "../../../lib/utils/text-formatter";
+
+interface RecipeCardProps {
+  recipe: Recipe;
+  onDelete?: (recipeId: string) => Promise<void>;
+  onEdit?: (recipeId: string) => void;
+  onView?: (recipeId: string) => void;
+}
 import { formatDate } from "../../../lib/utils/date-formatter";
 import {
   AlertDialog,
