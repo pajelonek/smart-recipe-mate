@@ -1,6 +1,6 @@
 ---
 import { ModeToggle } from "@/components/common/ModeToggle";
-import { Button } from "@/components/ui/button";
+import { LogoutButton } from "@/components/common/LogoutButton";
 import Layout from "../layouts/Layout.astro";
 
 interface Props {
@@ -24,9 +24,7 @@ const { pageTitle = "Smart Recipe Mate", userName = "User" } = Astro.props;
         <div class="flex items-center gap-4">
           <span class="text-sm text-muted-foreground">Witaj, {userName}</span>
           <ModeToggle client:idle />
-          <Button variant="outline" asChild>
-            <a href="/api/auth/logout">Wyloguj się</a>
-          </Button>
+          <LogoutButton client:idle />
         </div>
       </div>
     </header>

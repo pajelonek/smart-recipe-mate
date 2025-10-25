@@ -16,7 +16,7 @@ const redirectToLogin = () => {
   globalThis.location.href = "/login?message=password_updated";
 };
 
-export function UpdatePasswordForm({ hasSession = false }: UpdatePasswordFormProps) {
+export function UpdatePasswordForm({ hasSession = false }: Readonly<UpdatePasswordFormProps>) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [generalError, setGeneralError] = useState<string>();

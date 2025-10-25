@@ -1,10 +1,10 @@
+import type { UserStats as UserStatsType } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { UserStats } from "./UserStats";
-import type { UserStats } from "../../types";
 
 interface WelcomeSectionProps {
   userName: string;
-  stats: UserStats;
+  stats: UserStatsType;
 }
 
 export function WelcomeSection({ userName, stats }: Readonly<WelcomeSectionProps>) {
