@@ -2,8 +2,8 @@ import { useRecipesList } from "@/hooks/useRecipesList";
 import { RecipesSearchBar } from "./RecipesSearchBar";
 import { RecipesTable } from "./RecipesTable";
 import { PaginationControls } from "./PaginationControls";
-import { RecipeListSkeleton } from "../dashboard/RecipeListSkeleton";
-import { EmptyState } from "../dashboard/utils/EmptyState";
+import { RecipeListSkeleton } from "../../dashboard/RecipeListSkeleton";
+import { EmptyState } from "../../dashboard/utils/EmptyState";
 import { Button } from "@/components/ui/button";
 import type { Recipe } from "@/types";
 
@@ -29,15 +29,15 @@ export function RecipesListContent({ accessToken, initialRecipes = [] }: Readonl
   });
 
   const handleView = (recipeId: string) => {
-    window.location.href = `/recipes/${recipeId}`;
+    globalThis.location.href = `/recipes/${recipeId}`;
   };
 
   const handleAddRecipe = () => {
-    window.location.href = "/recipes/new";
+    globalThis.location.href = "/recipes/new";
   };
 
   const handleGenerateAI = () => {
-    window.location.href = "/ai/generate";
+    globalThis.location.href = "/ai/generate";
   };
 
   // Loading state
@@ -61,7 +61,7 @@ export function RecipesListContent({ accessToken, initialRecipes = [] }: Readonl
         </div>
         <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
           <p className="text-sm font-medium text-destructive">{error}</p>
-          <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+          <Button variant="outline" className="mt-4" onClick={() => globalThis.location.reload()}>
             Retry
           </Button>
         </div>
@@ -75,9 +75,11 @@ export function RecipesListContent({ accessToken, initialRecipes = [] }: Readonl
 
     return (
       <div className="space-y-4">
-        <div className="flex justify-end">
-          <RecipesSearchBar value={searchQuery} onChange={setSearchQuery} />
-        </div>
+        {isEmptyFromSearch && (
+          <div className="flex justify-end">
+            <RecipesSearchBar value={searchQuery} onChange={setSearchQuery} />
+          </div>
+        )}
         {isEmptyFromSearch ? (
           <EmptyState
             title="No recipes found"

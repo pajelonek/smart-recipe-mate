@@ -32,7 +32,7 @@ AlertDialogOverlay.displayName = Dialog.Overlay.displayName;
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof Dialog.Content>,
   React.ComponentPropsWithoutRef<typeof Dialog.Content>
->(({ className, children, title, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <Dialog.Portal>
     <AlertDialogOverlay />
     <Dialog.Content
@@ -43,12 +43,7 @@ const AlertDialogContent = React.forwardRef<
       )}
       {...props}
     >
-      <Dialog.Title className="text-lg font-semibold">{title}</Dialog.Title>
-      <Dialog.Description className="text-sm text-muted-foreground">{children}</Dialog.Description>
-      <div className="flex justify-end space-x-2">
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
-        <AlertDialogAction>Continue</AlertDialogAction>
-      </div>
+      {children}
       <Dialog.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
@@ -84,34 +79,34 @@ const AlertDialogDescription = React.forwardRef<
 ));
 AlertDialogDescription.displayName = Dialog.Description.displayName;
 
-const AlertDialogAction = React.forwardRef<
-  React.ElementRef<typeof Dialog.Close>,
-  React.ComponentPropsWithoutRef<typeof Dialog.Close>
->(({ className, ...props }, ref) => (
-  <Dialog.Close
-    ref={ref}
-    className={cn(
-      "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-      className
-    )}
-    {...props}
-  />
-));
+const AlertDialogAction = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
+  ({ className, ...props }, ref) => (
+    <button
+      ref={ref}
+      type="button"
+      className={cn(
+        "inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        className
+      )}
+      {...props}
+    />
+  )
+);
 AlertDialogAction.displayName = "AlertDialogAction";
 
-const AlertDialogCancel = React.forwardRef<
-  React.ElementRef<typeof Dialog.Close>,
-  React.ComponentPropsWithoutRef<typeof Dialog.Close>
->(({ className, ...props }, ref) => (
-  <Dialog.Close
-    ref={ref}
-    className={cn(
-      "px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-      className
-    )}
-    {...props}
-  />
-));
+const AlertDialogCancel = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
+  ({ className, ...props }, ref) => (
+    <button
+      ref={ref}
+      type="button"
+      className={cn(
+        "inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-semibold ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        className
+      )}
+      {...props}
+    />
+  )
+);
 AlertDialogCancel.displayName = "AlertDialogCancel";
 
 export {
