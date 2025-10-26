@@ -1,16 +1,6 @@
 import { z } from "zod";
 
 /**
- * Tag name validation helper
- * Validates individual tag names: non-empty, max 50 chars, trimmed
- */
-const tagNameSchema = z
-  .string()
-  .min(1, "Tag name cannot be empty")
-  .max(50, "Tag name must be at most 50 characters")
-  .transform((s) => s.trim());
-
-/**
  * UUID validation helper
  * Validates recipe IDs in path parameters
  */
@@ -19,7 +9,7 @@ export const uuidSchema = z.string().uuid("Invalid recipe ID format");
 /**
  * Validation schema for recipe creation (POST request)
  * Requires title, ingredients, and preparation
- * Optional: summary and tag_names (max 10 tags)
+ * Optional: summary
  */
 export const RecipeCreateInputSchema = z.object({
   title: z.string().min(1, "title is required").max(200, "title must be at most 200 characters"),
@@ -32,7 +22,6 @@ export const RecipeCreateInputSchema = z.object({
     .string()
     .min(10, "preparation must be at least 10 characters")
     .max(10000, "preparation must be at most 10000 characters"),
-  tag_names: z.array(tagNameSchema).max(10, "Maximum 10 tags allowed per recipe").optional().default([]),
 });
 
 /**
@@ -59,7 +48,6 @@ export const RecipePartialUpdateInputSchema = z
       .min(10, "preparation must be at least 10 characters")
       .max(10000, "preparation must be at most 10000 characters")
       .optional(),
-    tag_names: z.array(tagNameSchema).max(10, "Maximum 10 tags allowed per recipe").optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided",

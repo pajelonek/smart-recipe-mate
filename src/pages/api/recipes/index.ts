@@ -9,7 +9,7 @@ export const prerender = false;
 /**
  * GET /api/recipes
  * List all recipes for authenticated user
- * Returns recipes with expanded tags, sorted by creation date (newest first)
+ * Returns recipes sorted by creation date (newest first)
  */
 export const GET: APIRoute = async ({ locals }) => {
   const userId = locals.user.id;
@@ -38,8 +38,7 @@ export const GET: APIRoute = async ({ locals }) => {
 
 /**
  * POST /api/recipes
- * Create a new recipe with optional tags
- * Automatically creates new tags if they don't exist for the user
+ * Create a new recipe
  */
 export const POST: APIRoute = async ({ request, locals }) => {
   const userId = locals.user.id;

@@ -13,7 +13,7 @@ export const prerender = false;
 /**
  * GET /api/recipes/:id
  * Get a single recipe by ID
- * Returns recipe with expanded tags or 404 if not found/deleted
+ * Returns recipe or 404 if not found/deleted
  */
 export const GET: APIRoute = async ({ params, locals }) => {
   const userId = locals.user.id;

@@ -11,7 +11,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "supabase:start": "supabase start",
-    "supabase:migrate": "supabase migration up",
+    "supabase:migrate": "supabase migration up --include-all",
     "supabase:reset": "supabase db reset",
     "supabase:generate-types": "supabase gen types typescript --local > src/db/database.types.ts",
     "supabase:status": "supabase status -o env"

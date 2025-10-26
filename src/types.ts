@@ -6,8 +6,6 @@ type PublicSchema = Database["public"]["Tables"];
 // Base entity types from database
 export type UserPreferencesEntity = PublicSchema["user_preferences"]["Row"];
 export type RecipeEntity = PublicSchema["recipes"]["Row"];
-export type TagEntity = PublicSchema["tags"]["Row"];
-export type RecipeTagEntity = PublicSchema["recipe_tags"]["Row"];
 export type AIGenerationEntity = PublicSchema["ai_generations"]["Row"];
 
 // =============================================================================
@@ -31,11 +29,7 @@ export {
 // 2. RECIPES DTOs
 // =============================================================================
 
-export type Tag = Pick<TagEntity, "id" | "name" | "created_at">;
-
-export type Recipe = Omit<RecipeEntity, "deleted_at"> & {
-  tags: Tag[];
-};
+export type Recipe = Omit<RecipeEntity, "deleted_at">;
 
 export interface RecipeListResponse {
   recipes: Recipe[];
@@ -46,7 +40,6 @@ export interface RecipeCreateInput {
   summary?: string;
   ingredients: string;
   preparation: string;
-  tag_names?: string[];
 }
 
 export type RecipeUpdateInput = RecipeCreateInput;
@@ -54,30 +47,7 @@ export type RecipeUpdateInput = RecipeCreateInput;
 export type RecipePartialUpdateInput = Partial<RecipeCreateInput>;
 
 // =============================================================================
-// 3. TAGS DTOs
-// =============================================================================
-
-export type TagWithCount = Tag & {
-  owner_id: string;
-  recipe_count: number;
-};
-
-export interface TagListResponse {
-  tags: TagWithCount[];
-}
-
-export interface AddTagsInput {
-  tag_names: string[];
-}
-
-export interface AddTagsResponse {
-  recipe_id: string;
-  tags: Tag[];
-  message: string;
-}
-
-// =============================================================================
-// 4. AI GENERATION DTOs
+// 3. AI GENERATION DTOs
 // =============================================================================
 
 export interface AIGeneratedRecipe {
@@ -118,7 +88,7 @@ export interface AIGenerationListResponse {
 }
 
 // =============================================================================
-// 5. COMMON DTOs
+// 4. COMMON DTOs
 // =============================================================================
 export interface ApiError {
   error: string;
@@ -153,7 +123,7 @@ export interface TruncateOptions {
 }
 
 // =============================================================================
-// 6. OPENROUTER SERVICE TYPES
+// 5. OPENROUTER SERVICE TYPES
 // =============================================================================
 
 export interface OpenRouterConfig {

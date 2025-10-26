@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../ui/card";
-import { Badge } from "../../ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,21 +74,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onView }: Readonly<Recipe
           <CardDescription className="text-sm">{truncate(recipe.summary, { length: 100 })}</CardDescription>
         )}
       </CardHeader>
-      <CardContent className="pb-4">
-        <div className="recipe-tags flex flex-wrap gap-1">
-          {recipe.tags.slice(0, 3).map((tag) => (
-            <Badge key={tag.id} variant="secondary" className="text-xs">
-              {tag.name}
-            </Badge>
-          ))}
-          {recipe.tags.length > 3 && (
-            <Badge variant="outline" className="text-xs">
-              +{recipe.tags.length - 3}
-            </Badge>
-          )}
-          {recipe.tags.length === 0 && <span className="text-xs text-muted-foreground">No tags</span>}
-        </div>
-      </CardContent>
+      <CardContent className="pb-4">{/* Content removed - tags no longer displayed */}</CardContent>
       <CardFooter className="pt-0 pb-3">
         <span className="text-xs text-muted-foreground">
           Updated {formatDate(recipe.updated_at, { format: "relative" })}

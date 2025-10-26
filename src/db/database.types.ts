@@ -47,39 +47,6 @@ export interface Database {
         };
         Relationships: [];
       };
-      recipe_tags: {
-        Row: {
-          created_at: string;
-          recipe_id: string;
-          tag_id: string;
-        };
-        Insert: {
-          created_at?: string;
-          recipe_id: string;
-          tag_id: string;
-        };
-        Update: {
-          created_at?: string;
-          recipe_id?: string;
-          tag_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "recipe_tags_recipe_id_fkey";
-            columns: ["recipe_id"];
-            isOneToOne: false;
-            referencedRelation: "recipes";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "recipe_tags_tag_id_fkey";
-            columns: ["tag_id"];
-            isOneToOne: false;
-            referencedRelation: "tags";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       recipes: {
         Row: {
           created_at: string;
@@ -113,27 +80,6 @@ export interface Database {
           summary?: string | null;
           title?: string;
           updated_at?: string;
-        };
-        Relationships: [];
-      };
-      tags: {
-        Row: {
-          created_at: string;
-          id: string;
-          name: string;
-          owner_id: string;
-        };
-        Insert: {
-          created_at?: string;
-          id?: string;
-          name: string;
-          owner_id: string;
-        };
-        Update: {
-          created_at?: string;
-          id?: string;
-          name?: string;
-          owner_id?: string;
         };
         Relationships: [];
       };
