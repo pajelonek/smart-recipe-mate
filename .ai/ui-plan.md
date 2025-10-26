@@ -7,6 +7,7 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 ## 2. Lista widoków
 
 ### Widok: Dashboard (Strona główna)
+
 - **Ścieżka widoku**: /
 - **Główny cel**: Przedstawienie podsumowania zasobów użytkownika po zalogowaniu, z szybkimi akcjami do tworzenia nowych przepisów lub generowania AI.
 - **Kluczowe informacje do wyświetlenia**: Ostatnio dodane/edytowane przepisy (lista 5-10), szybkie akcje (przyciski "Dodaj przepis", "Generuj AI"), statystyki (liczba przepisów, generacji).
@@ -14,6 +15,7 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 - **UX, dostępność i względy bezpieczeństwa**: Prosty onboarding post-login (jeśli brak preferencji, redirect do /onboarding); loading skeletons dla list; snackbar dla potwierdzeń; walidacja auth via middleware; ukrycie wrażliwych danych bez autoryzacji.
 
 ### Widok: Onboarding (Kreator preferencji)
+
 - **Ścieżka widoku**: /onboarding
 - **Główny cel**: Obowiązkowe zebranie preferencji żywieniowych po pierwszym logowaniu.
 - **Kluczowe informacje do wyświetlenia**: Formularz wieloetapowy (typ diety, preferowane składniki, kuchnie, alergeny, notatki); progres bar.
@@ -21,6 +23,7 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 - **UX, dostępność i względy bezpieczeństwa**: Automatyczny redirect po logowaniu jeśli brak preferencji (sprawdzane via GET /api/preferences); przerwanie resetuje stan (localStorage cache); walidacja zgodna z API (diet_type required); ochrona przed duplikacją (409 z API).
 
 ### Widok: Profil
+
 - **Ścieżka widoku**: /profile
 - **Główny cel**: Wyświetlenie i edycja preferencji użytkownika.
 - **Kluczowe informacje do wyświetlenia**: Aktualne preferencje (Card z polami), data ostatniej modyfikacji, przycisk edycji.
@@ -28,6 +31,7 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 - **UX, dostępność i względy bezpieczeństwa**: Edycja w modalu dla minimalnego zakłócenia; optimistic update z rollback na błąd; RLS w API zapewnia prywatność; snackbar dla błędów walidacji.
 
 ### Widok: Lista przepisów
+
 - **Ścieżka widoku**: /recipes
 - **Główny cel**: Przegląd i wyszukiwanie przepisów użytkownika.
 - **Kluczowe informacje do wyświetlenia**: Tabela z tytułami, datami; pole wyszukiwania (tytuł).
@@ -35,6 +39,7 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 - **UX, dostępność i względy bezpieczeństwa**: Debounce na search (300ms), URL params dla search (persistencja); tylko własne przepisy (owner_id via auth); 404 empty state dla usuniętych.
 
 ### Widok: Szczegóły przepisu
+
 - **Ścieżka widoku**: /recipes/[id]
 - **Główny cel**: Wyświetlenie pełnych detali przepisu z opcjami edycji.
 - **Kluczowe informacje do wyświetlenia**: Tytuł, summary, składniki, przygotowanie (Accordion), przyciski edycji/usuwania.
@@ -42,6 +47,7 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 - **UX, dostępność i względy bezpieczeństwa**: Ładowanie via GET /api/recipes/:id; 403 jeśli nie własny; modal potwierdzenia dla delete (soft delete).
 
 ### Widok: Nowy przepis
+
 - **Ścieżka widoku**: /recipes/new
 - **Główny cel**: Dodanie nowego przepisu ręcznie.
 - **Kluczowe informacje do wyświetlenia**: Formularz z sekcjami (tytuł, summary, składniki, przygotowanie).
@@ -49,6 +55,7 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 - **UX, dostępność i względy bezpieczeństwa**: Walidacja required fields (tytuł, składniki, przygotowanie); POST /api/recipes; snackbar sukces/błąd; ochrona przed pustymi sekcjami.
 
 ### Widok: Generowanie AI
+
 - **Ścieżka widoku**: /generate
 - **Główny cel**: Wprowadzenie składników i generowanie przepisu via AI.
 - **Kluczowe informacje do wyświetlenia**: Formularz (składniki lista, cele dietetyczne, kontekst), preview Card po generacji, przyciski Accept/Reject.
@@ -56,6 +63,7 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 - **UX, dostępność i względy bezpieczeństwa**: POST /api/ai/generate-recipe z preferencjami z cache; blokada równoległych requestów; 429 countdown w snackbarze; logi błędów w API.
 
 ### Widok: Historia generacji AI
+
 - **Ścieżka widoku**: /ai/generations
 - **Główny cel**: Przegląd historii generacji AI z filtrami.
 - **Kluczowe informacje do wyświetlenia**: Tabela z datami, statusem (success/error), input summary; filtr statusu.
@@ -63,6 +71,7 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 - **UX, dostępność i względy bezpieczeństwa**: GET /api/ai/generations z ?status; pagination; tylko własne generacje; error state z retry.
 
 ### Widok: Szczegóły generacji AI
+
 - **Ścieżka widoku**: /ai/generations/[id]
 - **Główny cel**: Szczegółowy przegląd input/output generacji.
 - **Kluczowe informacje do wyświetlenia**: Tabs (Input, Output, Error jeśli jest), sformatowany JSON/tekst.
@@ -70,6 +79,7 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 - **UX, dostępność i względy bezpieczeństwa**: GET /api/ai/generations/:id; 403 jeśli nie własny; fallback na error message.
 
 ### Widoki autentykacji
+
 - **Ścieżka widoku**: /login, /register, /reset-password
 - **Główny cel**: Obsługa rejestracji, logowania, resetu hasła.
 - **Kluczowe informacje do wyświetlenia**: Formularze z email/hasło, linki do alternatyw.

@@ -167,4 +167,3 @@ export function EditPreferencesForm({ initialValues, onSubmit, onCancel }: Reado
     </form>
   );
 }
-

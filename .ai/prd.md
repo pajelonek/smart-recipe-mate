@@ -55,7 +55,6 @@ Użytkownicy z wymaganiami dietetycznymi muszą ręcznie dostosowywać przepisy 
 - Błędy podczas generowania przepisów są przechowywane w tabeli generacji AI wraz z pełnym kontekstem żądania (input_payload) oraz komunikatem błędu.
 - Interfejs prezentuje użytkownikowi czytelny komunikat o błędzie z możliwością ponowienia próby.
 
-
 ## 4. Granice produktu
 
 - Poza zakresem MVP: import przepisów z adresów URL, obsługa multimediów (obrazy, wideo, pliki), udostępnianie przepisów innym użytkownikom, funkcje społecznościowe, dodatkowe powiadomienia e-mail poza rejestracją i resetem, eksport przepisów oraz dashboard KPI.

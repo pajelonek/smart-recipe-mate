@@ -26,11 +26,7 @@ export function ProfileInfo({ preferences }: Readonly<ProfileInfoProps>) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <PreferenceCard
-        label="Typ diety"
-        value={dietTypeLabel}
-        icon={<Apple className="h-5 w-5" />}
-      />
+      <PreferenceCard label="Typ diety" value={dietTypeLabel} icon={<Apple className="h-5 w-5" />} />
       <PreferenceCard
         label="Ulubione składniki"
         value={preferences.preferred_ingredients || undefined}
@@ -54,4 +50,3 @@ export function ProfileInfo({ preferences }: Readonly<ProfileInfoProps>) {
     </div>
   );
 }
-

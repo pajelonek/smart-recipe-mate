@@ -108,7 +108,6 @@ Obecnie brak zdefiniowanych zasad Row Level Security w migracji. Należy je doda
   - ENABLE ROW LEVEL SECURITY.
   - SELECT/INSERT/UPDATE policy: `user_id = auth.uid()`.
 
-
 - `smart_recipe_mate.tags`
   - ENABLE ROW LEVEL SECURITY.
   - SELECT/INSERT/UPDATE/DELETE policy: `owner_id = auth.uid()`.

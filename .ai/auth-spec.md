@@ -5,6 +5,7 @@
 ### 1.1 Struktura Nawigacji i Layoutów
 
 #### Tryb Niezalogowany (Public Layout)
+
 - **Layout publiczny**: `src/layouts/PublicLayout.astro`
   - Dziedziczy podstawowe style z `Layout.astro`
   - Nie zawiera elementów nawigacji użytkownika
@@ -13,6 +14,7 @@
   - Design zoptymalizowany dla przeglądarek desktopowych
 
 #### Tryb Zalogowany (Authenticated Layout)
+
 - **Rozszerzony Layout główny**: `src/layouts/Layout.astro`
   - Dodanie komponentu nawigacyjnego w prawym górnym rogu
   - Implementacja dropdown menu z opcjami:
@@ -23,6 +25,7 @@
 ### 1.2 Strony Autentykacji
 
 #### Strona Główna (Landing Page / Dashboard) - `src/pages/index.astro`
+
 - **Dla niezalogowanych użytkowników** (Landing Page):
   - Minimalistyczna strona marketingowa ("pusta reklamowa strona" z PRD)
   - Hero section z opisem aplikacji i jej głównych funkcjonalności
@@ -36,6 +39,7 @@
   - Wymagane sprawdzenie ukończenia onboardingu przed wyświetleniem dashboardu
 
 #### Strona Logowania - `src/pages/login.astro`
+
 - **Komponent główny**: `AuthLayout` (Astro)
 - **Formularz logowania**: `LoginForm` (React, client-side)
 - **Elementy**:
@@ -47,6 +51,7 @@
 - **Layout**: Formularz wyśrodkowany, maksymalna szerokość 400px
 
 #### Strona Rejestracji - `src/pages/register.astro`
+
 - **Komponent główny**: `AuthLayout` (Astro)
 - **Formularz rejestracji**: `RegisterForm` (React, client-side)
 - **Elementy**:
@@ -58,6 +63,7 @@
 - **Layout**: Formularz wyśrodkowany, maksymalna szerokość 400px
 
 #### Strona Odzyskiwania Hasła - `src/pages/reset-password.astro`
+
 - **Komponent główny**: `AuthLayout` (Astro)
 - **Formularz resetowania**: `ResetPasswordForm` (React, client-side)
 - **Elementy**:
@@ -67,6 +73,7 @@
 - **Layout**: Formularz wyśrodkowany, maksymalna szerokość 400px
 
 #### Strona Aktualizacji Hasła - `src/pages/auth/update-password.astro`
+
 - **Komponent główny**: `AuthLayout` (Astro)
 - **Formularz aktualizacji**: `UpdatePasswordForm` (React, client-side)
 - **Elementy**:
@@ -77,6 +84,7 @@
 - **Obsługa tokenu**: Token z URL jest automatycznie przechwytywany przez Supabase
 
 #### Strona Callback - `src/pages/auth/callback.astro`
+
 - **Funkcja**: Obsługa callback z Supabase po weryfikacji email
 - **Logika**:
   - Przetworzenie tokenu z URL
@@ -88,6 +96,7 @@
 ### 1.3 Komponenty React (Client-Side)
 
 #### LoginForm (`src/components/auth/LoginForm.tsx`)
+
 - **Stan komponentu**: email, password, isLoading, errors
 - **Walidacja**:
   - Email: format email, wymagane pole
@@ -102,6 +111,7 @@
   - onError: wyświetlenie komunikatu błędu
 
 #### RegisterForm (`src/components/auth/RegisterForm.tsx`)
+
 - **Stan komponentu**: email, password, confirmPassword, isLoading, errors
 - **Walidacja**:
   - Email: format email, unikalność, wymagane
@@ -121,6 +131,7 @@
   - Użytkownik może zalogować się natychmiast po rejestracji
 
 #### ResetPasswordForm (`src/components/auth/ResetPasswordForm.tsx`)
+
 - **Stan komponentu**: email, isLoading, errors, isSuccess
 - **Walidacja**:
   - Email: format email, wymagane
@@ -133,6 +144,7 @@
   - onError: wyświetlenie komunikatu błędu
 
 #### UpdatePasswordForm (`src/components/auth/UpdatePasswordForm.tsx`)
+
 - **Stan komponentu**: password, confirmPassword, isLoading, errors
 - **Walidacja**:
   - Password: min. 8 znaków, wielkie/małe litery, cyfry, wymagane
@@ -148,6 +160,7 @@
   - onError: wyświetlenie komunikatu błędu
 
 #### AuthLayout (`src/components/auth/AuthLayout.astro`)
+
 - **Statyczny komponent Astro**: `src/components/auth/AuthLayout.astro`
 - **Elementy**:
   - Logo aplikacji
@@ -158,6 +171,7 @@
 ### 1.4 Obsługa Scenariuszy
 
 #### Scenariusz: Pierwszy dostęp użytkownika
+
 1. Użytkownik wchodzi na stronę główną `/`
 2. Middleware wykrywa brak sesji
 3. Przekierowanie na Landing Page dla niezalogowanych
@@ -167,12 +181,14 @@
 7. Jeśli preferencje istnieją → dashboard
 
 #### Scenariusz: Próba dostępu do API bez logowania
+
 1. Użytkownik (lub kod klienta) próbuje wywołać chroniony endpoint API (np. `/api/recipes`)
 2. Middleware wykrywa brak sesji
 3. Zwrot statusu HTTP 401 Unauthorized
 4. Frontend przekierowuje na `/login` z odpowiednim komunikatem
 
 #### Scenariusz: Rejestracja nowego użytkownika
+
 1. Użytkownik wypełnia formularz rejestracji
 2. Walidacja po stronie klienta i serwera
 3. Utworzenie konta w Supabase Auth
@@ -181,6 +197,7 @@
 6. Użytkownik może zalogować się natychmiast bez weryfikacji email
 
 #### Scenariusz: Odzyskiwanie hasła
+
 1. Użytkownik wprowadza email na stronie `/reset-password`
 2. Supabase wysyła link resetujący na email
 3. Użytkownik klika link z emaila → przekierowanie do `/auth/update-password`
@@ -192,7 +209,9 @@
 ### 2.1 Endpointy API
 
 #### Endpointy Autentykacji (Publiczne)
+
 Endpointy autentykacji są obsługiwane przez server-side API calls do Supabase Auth dla bezpieczeństwa:
+
 - **POST `/api/auth/login`**: logowanie użytkownika (publiczny)
 - **POST `/api/auth/register`**: rejestracja nowego użytkownika (publiczny)
 - **POST `/api/auth/logout`**: wylogowanie użytkownika (wymaga autentykacji)
@@ -200,6 +219,7 @@ Endpointy autentykacji są obsługiwane przez server-side API calls do Supabase 
 - **POST `/api/auth/update-password`**: aktualizacja hasła po kliknięciu linku (wymaga tokenu z emaila)
 
 #### Middleware Autentykacji - `src/middleware/index.ts`
+
 - **PUBLIC_ROUTES**: `["/", "/login", "/register", "/reset-password", "/auth/callback", "/auth/update-password"]`
 - **PUBLIC_API_ROUTES**: `["/api/auth/login", "/api/auth/register", "/api/auth/reset-password"]`
 - **ONBOARDING_ROUTE**: `"/onboarding"`
@@ -210,6 +230,7 @@ Endpointy autentykacji są obsługiwane przez server-side API calls do Supabase 
   - Dla wszystkich `/api/*` (oprócz publicznych): wymagana sesja, zwrot 401 przy braku autentykacji
 
 #### Endpointy API Aplikacji (Wymagają Autentykacji)
+
 - **GET/POST `/api/preferences`**: zarządzanie preferencjami użytkownika
 - **GET/POST/PUT/DELETE `/api/recipes`**: zarządzanie przepisami
 - **POST `/api/ai/generate-recipe`**: generowanie przepisów przez AI
@@ -218,43 +239,51 @@ Endpointy autentykacji są obsługiwane przez server-side API calls do Supabase 
 ### 2.2 Modele Danych i Walidacja
 
 #### Schematy Zod - `src/lib/validation/auth.schemas.ts`
+
 ```typescript
 // Schemat logowania
 export const loginSchema = z.object({
   email: z.string().email("Nieprawidłowy format adresu email"),
-  password: z.string().min(1, "Hasło jest wymagane")
+  password: z.string().min(1, "Hasło jest wymagane"),
 });
 
 // Schemat rejestracji
-export const registerSchema = z.object({
-  email: z.string().email("Nieprawidłowy format adresu email"),
-  password: z.string()
-    .min(8, "Hasło musi mieć co najmniej 8 znaków")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Hasło musi zawierać wielkie i małe litery oraz cyfry"),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Hasła nie są identyczne",
-  path: ["confirmPassword"]
-});
+export const registerSchema = z
+  .object({
+    email: z.string().email("Nieprawidłowy format adresu email"),
+    password: z
+      .string()
+      .min(8, "Hasło musi mieć co najmniej 8 znaków")
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Hasło musi zawierać wielkie i małe litery oraz cyfry"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Hasła nie są identyczne",
+    path: ["confirmPassword"],
+  });
 
 // Schemat resetowania hasła
 export const resetPasswordSchema = z.object({
-  email: z.string().email("Nieprawidłowy format adresu email")
+  email: z.string().email("Nieprawidłowy format adresu email"),
 });
 
 // Schemat aktualizacji hasła
-export const updatePasswordSchema = z.object({
-  password: z.string()
-    .min(8, "Hasło musi mieć co najmniej 8 znaków")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Hasło musi zawierać wielkie i małe litery oraz cyfry"),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Hasła nie są identyczne",
-  path: ["confirmPassword"]
-});
+export const updatePasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Hasło musi mieć co najmniej 8 znaków")
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Hasło musi zawierać wielkie i małe litery oraz cyfry"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Hasła nie są identyczne",
+    path: ["confirmPassword"],
+  });
 ```
 
 #### Modele Typów TypeScript - `src/types/auth.ts`
+
 ```typescript
 export interface AuthUser {
   id: string;
@@ -279,30 +308,41 @@ export interface AuthError {
 ### 2.3 Obsługa Wyjątków
 
 #### Klasy Błędów - `src/lib/errors/auth.errors.ts`
+
 ```typescript
 export class AuthenticationError extends Error {
-  constructor(message: string, public statusCode: number = 401) {
+  constructor(
+    message: string,
+    public statusCode: number = 401
+  ) {
     super(message);
-    this.name = 'AuthenticationError';
+    this.name = "AuthenticationError";
   }
 }
 
 export class ValidationError extends Error {
-  constructor(message: string, public field?: string) {
+  constructor(
+    message: string,
+    public field?: string
+  ) {
     super(message);
-    this.name = 'ValidationError';
+    this.name = "ValidationError";
   }
 }
 
 export class RegistrationError extends Error {
-  constructor(message: string, public statusCode: number = 400) {
+  constructor(
+    message: string,
+    public statusCode: number = 400
+  ) {
     super(message);
-    this.name = 'RegistrationError';
+    this.name = "RegistrationError";
   }
 }
 ```
 
 #### Middleware do obsługi błędów - rozszerzenie `src/middleware/index.ts`
+
 - Przechwytywanie błędów autentykacji Supabase
 - Mapowanie błędów na przyjazne komunikaty
 - Logowanie błędów do systemu monitorowania
@@ -311,11 +351,13 @@ export class RegistrationError extends Error {
 ### 2.4 Server-Side Rendering
 
 #### Konfiguracja Astro - `astro.config.mjs`
+
 - **Output**: `"server"` - utrzymanie SSR dla bezpieczeństwa sesji
 - **Adapter**: `node({ mode: "standalone" })` - utrzymanie obecnej konfiguracji
 - **Port**: `3000` - utrzymanie obecnego portu
 
 #### Strategia Renderowania
+
 - **Strony publiczne** (`/login`, `/register`, `/reset-password`): SSR dla optymalizacji SEO i wydajności
 - **Strony chronione** (`/`, `/onboarding`): SSR z kontrolą dostępu przez middleware
 - **API endpoints**: Brak prerenderingu (`export const prerender = false`)
@@ -325,11 +367,13 @@ export class RegistrationError extends Error {
 ### 3.1 Integracja z Supabase Auth
 
 #### Konfiguracja Klienta - `src/db/supabase.client.ts`
+
 - **Utrzymanie obecnej konfiguracji** z PKCE flow dla bezpieczeństwa
 - **Auto-refresh token**: włączony dla utrzymania sesji
 - **Persist session**: włączony dla utrzymania logowania między sesjami przeglądarki
 
 #### Serwis Autentykacji - `src/lib/services/auth.service.ts`
+
 ```typescript
 export class AuthService {
   // Metody instancyjne z dostępem do kontekstu Astro
@@ -337,7 +381,7 @@ export class AuthService {
     const supabase = createServerSupabaseClient(context);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
-      password
+      password,
     });
     return { data, error };
   }
@@ -348,8 +392,8 @@ export class AuthService {
       email,
       password,
       options: {
-        emailRedirectTo: `${context.url.origin}/auth/callback`
-      }
+        emailRedirectTo: `${context.url.origin}/auth/callback`,
+      },
     });
     return { data, error };
   }
@@ -363,7 +407,7 @@ export class AuthService {
   static async resetPassword(email: string, context: APIContext) {
     const supabase = createServerSupabaseClient(context);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${context.url.origin}/auth/update-password`
+      redirectTo: `${context.url.origin}/auth/update-password`,
     });
     return { error };
   }
@@ -371,20 +415,26 @@ export class AuthService {
   static async updatePassword(newPassword: string, context: APIContext) {
     const supabase = createServerSupabaseClient(context);
     const { error } = await supabase.auth.updateUser({
-      password: newPassword
+      password: newPassword,
     });
     return { error };
   }
 
   static async getUser(context: APIContext) {
     const supabase = createServerSupabaseClient(context);
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
     return { user, error };
   }
 
   static async getSession(context: APIContext) {
     const supabase = createServerSupabaseClient(context);
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
     return { session, error };
   }
 }
@@ -393,6 +443,7 @@ export class AuthService {
 ### 3.2 Zarządzanie Sesją
 
 #### Callback Endpoint - `src/pages/auth/callback.astro`
+
 - **Przetwarzanie callback** z Supabase po weryfikacji email (opcjonalne)
 - **Ustanawianie sesji** po kliknięciu linku weryfikacyjnego
 - **Przekierowanie**:
@@ -401,6 +452,7 @@ export class AuthService {
   - Preferencje istnieją → `/` (dashboard)
 
 #### Strona Aktualizacji Hasła - `src/pages/auth/update-password.astro`
+
 - **Przetwarzanie tokenu** z linku resetowania hasła
 - **Formularz nowego hasła** (`UpdatePasswordForm` React component):
   - Pole nowego hasła z walidacją siły
@@ -413,12 +465,14 @@ export class AuthService {
 ### 3.3 Bezpieczeństwo
 
 #### Middleware Bezpieczeństwa
+
 - **Sprawdzanie sesji** dla wszystkich chronionych tras
 - **CSRF protection** przez Supabase Auth
 - **Rate limiting** dla endpointów autentykacji (do implementacji w przyszłości)
 - **Logowanie podejrzanych aktywności** (nieprawidłowe próby logowania)
 
 #### Polityka Haseł
+
 - **Minimum 8 znaków**
 - **Wymagane wielkie i małe litery**
 - **Wymagane cyfry**
@@ -427,6 +481,7 @@ export class AuthService {
 ### 3.4 Integracja z Onboardingiem
 
 #### Przepływ Po Zalogowaniu
+
 1. **Sprawdzenie sesji** w middleware
 2. **Pobranie preferencji** z tabeli `user_preferences`
 3. **Warunkowe przekierowanie**:
@@ -434,6 +489,7 @@ export class AuthService {
    - Preferencje istnieją → `/` (dashboard z repozytorium przepisów)
 
 #### Wymuszony Onboarding (US-005)
+
 - **Blokada dostępu** do całej aplikacji bez ukończenia onboardingu
 - **Użytkownik nie może wyłączyć kreatora** - brak możliwości ominięcia
 - **Po zapisaniu preferencji**:
@@ -444,12 +500,14 @@ export class AuthService {
 ### 3.5 Obsługa Błędów i Monitoring
 
 #### Strategia Logowania
+
 - **Błędy autentykacji**: logowanie do konsoli z poziomem WARN
 - **Błędy rejestracji**: logowanie z poziomem INFO (normalne przypadki)
 - **Podejrzane aktywności**: logowanie z poziomem ERROR
 - **Statystyki**: zbieranie metryk o próbach logowania/rejestracji
 
 #### Komunikaty Błędów dla Użytkownika
+
 - **Ogólne podejście**: przyjazne komunikaty bez ujawniania szczegółów technicznych
 - **Specyficzne przypadki**:
   - "Nieprawidłowy email lub hasło" - ogólny komunikat dla błędów logowania
@@ -462,6 +520,7 @@ export class AuthService {
 ## Podsumowanie Implementacyjne
 
 ### Kolejność Implementacji
+
 1. **Faza 1**: Utworzenie schematów walidacji i modeli typów
 2. **Faza 2**: Implementacja serwisów autentykacji
 3. **Faza 3**: Utworzenie stron i komponentów UI
@@ -470,6 +529,7 @@ export class AuthService {
 6. **Faza 6**: Testowanie integracji z onboardingiem
 
 ### Zależności Techniczne
+
 - **Supabase Auth**: podstawowa funkcjonalność autentykacji
 - **Zod**: walidacja danych
 - **Tailwind CSS + shadcn/ui**: komponenty UI
@@ -477,6 +537,7 @@ export class AuthService {
 - **Astro middleware**: kontrola dostępu
 
 ### Punkty Integracyjne
+
 - **Z onboardingiem**: sprawdzenie preferencji po logowaniu
 - **Z dashboardem**: wyświetlanie danych użytkownika i repozytorium przepisów
 - **Z profilem/kontem**: dostęp do edycji preferencji przez dropdown "Konto" → strona `/account` lub `/profile`
@@ -486,6 +547,7 @@ export class AuthService {
 ### Wyjaśnienie Sprzeczności z PRD
 
 #### Dashboard vs Repozytorium Przepisów
+
 - **PRD sekcja 3.1** wskazuje przekierowanie do "strony dashboardu"
 - **PRD US-005** wskazuje przekierowanie do "repozytorium przepisów"
 - **Rozwiązanie**: Dashboard (`/`) zawiera komponent `DashboardContent`, który wyświetla:
@@ -495,6 +557,7 @@ export class AuthService {
 - Dashboard = główna strona aplikacji zawierająca repozytorium przepisów
 
 #### Weryfikacja Email
+
 - **PRD** wspomina o "dostawcy usług e-mail dla weryfikacji"
 - **Implementacja**: Email weryfikacyjny jest wysyłany, ale:
   - NIE jest wymagany do logowania
@@ -502,6 +565,7 @@ export class AuthService {
   - Weryfikacja email jest opcjonalna dla użytkownika
 
 #### Desktop-only
+
 - Aplikacja jest zaprojektowana dla przeglądarek desktopowych
 - Responsywność została zastąpiona przez "design zoptymalizowany dla desktop"
 - Wszystkie wzmianki o responsywności zostały usunięte z tej specyfikacji

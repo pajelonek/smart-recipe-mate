@@ -11,6 +11,7 @@ Dashboard jest główną stroną aplikacji po zalogowaniu użytkownika. Jego cel
 **Plik**: `src/pages/index.astro`
 
 **Wymagania autoryzacji**:
+
 - Widok wymaga aktywnej sesji użytkownika (JWT token)
 - Middleware weryfikuje token i pobiera dane użytkownika
 - Jeśli użytkownik nie ma zapisanych preferencji (brak rekordu w `user_preferences`), następuje redirect do `/onboarding`
@@ -45,26 +46,31 @@ DashboardPage (Astro)
 **Opis**: Główny komponent strony Dashboard odpowiedzialny za server-side rendering, pobieranie danych użytkownika i przepisów, walidację autoryzacji oraz przekazanie danych do interaktywnych komponentów React.
 
 **Główne elementy**:
+
 - Weryfikacja sesji użytkownika (middleware)
 - Sprawdzenie statusu onboardingu (czy użytkownik ma preferencje)
 - Pobranie listy przepisów za pomocą `getUserRecipes()`
 - Pobranie statystyk użytkownika (liczba przepisów, liczba generacji AI)
 - Renderowanie Layout z zagnieżdżonym DashboardContent
 
-**Obsługiwane interakcje**: 
+**Obsługiwane interakcje**:
+
 - N/A (server-side component)
 
 **Obsługiwana walidacja**:
+
 - Weryfikacja tokenu JWT w middleware
 - Sprawdzenie istnienia user_preferences (redirect do /onboarding jeśli brak)
 - Weryfikacja uprawnień użytkownika do zasobów
 
 **Typy**:
+
 - `User` (z Supabase Auth)
 - `Recipe[]` (z types.ts)
 - `DashboardData` (ViewModel)
 
-**Propsy**: 
+**Propsy**:
+
 - N/A (root Astro page)
 
 ### 4.2 DashboardContent (React Component)
@@ -72,6 +78,7 @@ DashboardPage (Astro)
 **Opis**: Główny kontener dla treści dashboardu. Zarządza layoutem i organizuje wszystkie sekcje widoku (powitanie, statystyki, quick actions, lista przepisów). Odpowiada za zarządzanie stanem ładowania i błędów.
 
 **Główne elementy**:
+
 ```tsx
 <div className="dashboard-content">
   <WelcomeSection user={user} stats={stats} />
@@ -81,17 +88,21 @@ DashboardPage (Astro)
 ```
 
 **Obsługiwane interakcje**:
+
 - Odświeżanie listy przepisów po akcjach (dodanie, edycja, usunięcie)
 
 **Obsługiwana walidacja**:
+
 - N/A (delegowana do komponentów dzieci)
 
 **Typy**:
+
 - `DashboardContentProps`
 - `Recipe[]`
 - `UserStats`
 
 **Propsy**:
+
 ```typescript
 interface DashboardContentProps {
   initialRecipes: Recipe[];
@@ -105,6 +116,7 @@ interface DashboardContentProps {
 **Opis**: Sekcja powitalna wyświetlająca spersonalizowaną wiadomość dla użytkownika oraz karty z podstawowymi statystykami (liczba przepisów, liczba generacji AI). Komponent wykorzystuje Card z Shadcn/ui.
 
 **Główne elementy**:
+
 ```tsx
 <section className="welcome-section">
   <Card>
@@ -120,16 +132,20 @@ interface DashboardContentProps {
 ```
 
 **Obsługiwane interakcje**:
+
 - N/A (komponent prezentacyjny)
 
 **Obsługiwana walidacja**:
+
 - N/A
 
 **Typy**:
+
 - `WelcomeSectionProps`
 - `UserStats`
 
 **Propsy**:
+
 ```typescript
 interface WelcomeSectionProps {
   userName: string;
@@ -142,32 +158,29 @@ interface WelcomeSectionProps {
 **Opis**: Komponent wyświetlający karty ze statystykami użytkownika w formacie grid (liczba przepisów, liczba generacji AI). Każda statystyka wyświetlana jest w osobnej karcie z ikoną, wartością liczbową i opisem.
 
 **Główne elementy**:
+
 ```tsx
 <div className="stats-grid">
-  <StatCard 
-    icon={<ChefHat />} 
-    value={stats.recipesCount} 
-    label="Total Recipes" 
-  />
-  <StatCard 
-    icon={<Sparkles />} 
-    value={stats.generationsCount} 
-    label="AI Generations" 
-  />
+  <StatCard icon={<ChefHat />} value={stats.recipesCount} label="Total Recipes" />
+  <StatCard icon={<Sparkles />} value={stats.generationsCount} label="AI Generations" />
 </div>
 ```
 
 **Obsługiwane interakcje**:
+
 - Możliwy klik na karcie do przejścia do odpowiedniej sekcji (opcjonalne enhancement)
 
 **Obsługiwana walidacja**:
+
 - Walidacja czy stats są zdefiniowane (fallback do 0)
 
 **Typy**:
+
 - `UserStatsProps`
 - `UserStats`
 
 **Propsy**:
+
 ```typescript
 interface UserStatsProps {
   stats: UserStats;
@@ -179,21 +192,14 @@ interface UserStatsProps {
 **Opis**: Sekcja z głównymi przyciskami akcji (CTA) umożliwiającymi szybkie dodanie nowego przepisu ręcznie lub wygenerowanie przepisu przez AI. Wykorzystuje Button z Shadcn/ui.
 
 **Główne elementy**:
+
 ```tsx
 <div className="quick-actions">
-  <Button 
-    onClick={handleAddRecipe} 
-    size="lg" 
-    variant="default"
-  >
+  <Button onClick={handleAddRecipe} size="lg" variant="default">
     <PlusCircle className="mr-2" />
     Add Recipe
   </Button>
-  <Button 
-    onClick={handleGenerateAI} 
-    size="lg" 
-    variant="secondary"
-  >
+  <Button onClick={handleGenerateAI} size="lg" variant="secondary">
     <Sparkles className="mr-2" />
     Generate with AI
   </Button>
@@ -201,16 +207,20 @@ interface UserStatsProps {
 ```
 
 **Obsługiwane interakcje**:
+
 - Klik na "Add Recipe" → przekierowanie do `/recipes/new`
 - Klik na "Generate with AI" → przekierowanie do `/ai/generate`
 
 **Obsługiwana walidacja**:
+
 - N/A (przyciski zawsze aktywne dla zalogowanego użytkownika)
 
 **Typy**:
+
 - Brak specyficznych typów (komponent bezstanowy)
 
 **Propsy**:
+
 ```typescript
 interface QuickActionsProps {
   // Opcjonalnie można przekazać custom handlers
@@ -224,6 +234,7 @@ interface QuickActionsProps {
 **Opis**: Lista ostatnio dodanych lub edytowanych przepisów (maksymalnie 10). Komponent wyświetla przepisy w formacie kart (RecipeCard) lub tabelarycznym w zależności od preferencji designu. Obsługuje stan ładowania (loading skeletons) oraz stan pusty (EmptyState) gdy użytkownik nie ma jeszcze przepisów.
 
 **Główne elementy**:
+
 ```tsx
 <section className="recent-recipes">
   <div className="section-header">
@@ -232,18 +243,18 @@ interface QuickActionsProps {
       View All →
     </Button>
   </div>
-  
+
   {isLoading ? (
     <RecipeListSkeleton count={5} />
   ) : recipes.length === 0 ? (
-    <EmptyState 
+    <EmptyState
       title="No recipes yet"
       description="Start by adding your first recipe or generate one with AI"
       action={<QuickActions />}
     />
   ) : (
     <div className="recipes-grid">
-      {recipes.map(recipe => (
+      {recipes.map((recipe) => (
         <RecipeCard key={recipe.id} recipe={recipe} onDelete={handleDelete} />
       ))}
     </div>
@@ -252,19 +263,23 @@ interface QuickActionsProps {
 ```
 
 **Obsługiwane interakcje**:
+
 - Klik na RecipeCard → przekierowanie do `/recipes/{id}`
 - Klik na "View All" → przekierowanie do `/recipes`
 - Klik na delete w RecipeCard → wywołanie handleDelete
 
 **Obsługiwana walidacja**:
+
 - Sprawdzenie czy recipes jest zdefiniowane i jest tablicą
 - Walidacja czy recipe.id istnieje dla każdego elementu (key prop)
 
 **Typy**:
+
 - `RecentRecipesListProps`
 - `Recipe[]`
 
 **Propsy**:
+
 ```typescript
 interface RecentRecipesListProps {
   recipes: Recipe[];
@@ -278,6 +293,7 @@ interface RecentRecipesListProps {
 **Opis**: Pojedyncza karta przepisu wyświetlająca podstawowe informacje: tytuł, streszczenie (jeśli istnieje), tagi, datę ostatniej edycji oraz akcje (zobacz, edytuj, usuń). Wykorzystuje Card z Shadcn/ui.
 
 **Główne elementy**:
+
 ```tsx
 <Card className="recipe-card">
   <CardHeader>
@@ -297,44 +313,44 @@ interface RecentRecipesListProps {
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-    {recipe.summary && (
-      <CardDescription>{truncate(recipe.summary, 100)}</CardDescription>
-    )}
+    {recipe.summary && <CardDescription>{truncate(recipe.summary, 100)}</CardDescription>}
   </CardHeader>
   <CardContent>
     <div className="recipe-tags">
-      {recipe.tags.slice(0, 3).map(tag => (
-        <Badge key={tag.id} variant="secondary">{tag.name}</Badge>
+      {recipe.tags.slice(0, 3).map((tag) => (
+        <Badge key={tag.id} variant="secondary">
+          {tag.name}
+        </Badge>
       ))}
-      {recipe.tags.length > 3 && (
-        <Badge variant="outline">+{recipe.tags.length - 3}</Badge>
-      )}
+      {recipe.tags.length > 3 && <Badge variant="outline">+{recipe.tags.length - 3}</Badge>}
     </div>
   </CardContent>
   <CardFooter>
-    <span className="text-sm text-muted-foreground">
-      Updated {formatDate(recipe.updated_at)}
-    </span>
+    <span className="text-sm text-muted-foreground">Updated {formatDate(recipe.updated_at)}</span>
   </CardFooter>
 </Card>
 ```
 
 **Obsługiwane interakcje**:
+
 - Klik na kartę → przekierowanie do `/recipes/{id}`
 - Klik na "View" w menu → przekierowanie do `/recipes/{id}`
 - Klik na "Edit" w menu → przekierowanie do `/recipes/{id}/edit`
 - Klik na "Delete" w menu → wywołanie onDelete z potwierdzeniem (dialog)
 
 **Obsługiwana walidacja**:
+
 - Sprawdzenie czy recipe.title nie jest pusty (wymagane)
 - Walidacja istnienia recipe.id przed nawigacją
 - Sprawdzenie uprawnień użytkownika przed operacjami (edycja, usunięcie)
 
 **Typy**:
+
 - `RecipeCardProps`
 - `Recipe`
 
 **Propsy**:
+
 ```typescript
 interface RecipeCardProps {
   recipe: Recipe;
@@ -349,6 +365,7 @@ interface RecipeCardProps {
 **Opis**: Komponent wyświetlany gdy użytkownik nie ma jeszcze żadnych przepisów. Zawiera ilustrację, tytuł, opis oraz przyciski akcji zachęcające do dodania pierwszego przepisu.
 
 **Główne elementy**:
+
 ```tsx
 <div className="empty-state">
   <div className="empty-state-icon">
@@ -361,15 +378,19 @@ interface RecipeCardProps {
 ```
 
 **Obsługiwane interakcje**:
+
 - N/A (delegowane do komponentów przekazanych w action)
 
 **Obsługiwana walidacja**:
+
 - N/A
 
 **Typy**:
+
 - `EmptyStateProps`
 
 **Propsy**:
+
 ```typescript
 interface EmptyStateProps {
   title: string;
@@ -383,6 +404,7 @@ interface EmptyStateProps {
 **Opis**: Komponent wyświetlający animowane szkielety (skeletons) podczas ładowania listy przepisów. Poprawia UX przez pokazanie struktury treści zanim dane zostaną załadowane.
 
 **Główne elementy**:
+
 ```tsx
 <div className="recipes-grid">
   {Array.from({ length: count }).map((_, i) => (
@@ -406,15 +428,19 @@ interface EmptyStateProps {
 ```
 
 **Obsługiwane interakcje**:
+
 - N/A (komponent prezentacyjny)
 
 **Obsługiwana walidacja**:
+
 - N/A
 
 **Typy**:
+
 - `RecipeListSkeletonProps`
 
 **Propsy**:
+
 ```typescript
 interface RecipeListSkeletonProps {
   count?: number; // domyślnie 5
@@ -520,7 +546,7 @@ export interface StatCardProps {
 ```typescript
 // Typy dla utility functions
 export type DateFormatOptions = {
-  format?: 'relative' | 'absolute';
+  format?: "relative" | "absolute";
   locale?: string;
 };
 
@@ -534,12 +560,14 @@ export type TruncateOptions = {
 
 ### 6.1 Server-side state (Astro)
 
-**Źródło danych**: 
+**Źródło danych**:
+
 - Dane pobierane podczas Server-Side Rendering w `src/pages/index.astro`
 - Użycie `getUserRecipes()` z `recipes.service.ts`
 - Pobranie statystyk użytkownika (count queries)
 
 **Implementacja**:
+
 ```typescript
 // W src/pages/index.astro
 ---
@@ -602,21 +630,20 @@ const dashboardData: DashboardData = {
 **Custom Hook: `useDashboard`**
 
 Zarządzanie stanem po stronie klienta będzie ograniczone, gdyż większość danych pochodzi z SSR. Hook będzie obsługiwał:
+
 - Odświeżanie listy przepisów po akcjach
 - Stan ładowania dla operacji async
 - Obsługę błędów
 - Optymistyczne aktualizacje UI
 
 **Implementacja**:
+
 ```typescript
 // src/hooks/useDashboard.ts
-import { useState, useCallback } from 'react';
-import type { Recipe, UserStats } from '../types';
+import { useState, useCallback } from "react";
+import type { Recipe, UserStats } from "../types";
 
-export function useDashboard(
-  initialRecipes: Recipe[],
-  initialStats: UserStats
-) {
+export function useDashboard(initialRecipes: Recipe[], initialStats: UserStats) {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [stats, setStats] = useState<UserStats>(initialStats);
   const [isLoading, setIsLoading] = useState(false);
@@ -625,54 +652,57 @@ export function useDashboard(
   const refreshRecipes = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      const response = await fetch('/api/recipes');
+      const response = await fetch("/api/recipes");
       if (!response.ok) {
-        throw new Error('Failed to fetch recipes');
+        throw new Error("Failed to fetch recipes");
       }
       const data: RecipeListResponse = await response.json();
       setRecipes(data.recipes.slice(0, 10));
-      
+
       // Aktualizuj statystyki
-      setStats(prev => ({
+      setStats((prev) => ({
         ...prev,
         recipesCount: data.recipes.length,
       }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const deleteRecipe = useCallback(async (recipeId: string) => {
-    // Optymistyczna aktualizacja
-    const previousRecipes = recipes;
-    setRecipes(prev => prev.filter(r => r.id !== recipeId));
-    setStats(prev => ({
-      ...prev,
-      recipesCount: Math.max(0, prev.recipesCount - 1),
-    }));
-
-    try {
-      const response = await fetch(`/api/recipes/${recipeId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete recipe');
-      }
-    } catch (err) {
-      // Rollback przy błędzie
-      setRecipes(previousRecipes);
-      setStats(prev => ({
+  const deleteRecipe = useCallback(
+    async (recipeId: string) => {
+      // Optymistyczna aktualizacja
+      const previousRecipes = recipes;
+      setRecipes((prev) => prev.filter((r) => r.id !== recipeId));
+      setStats((prev) => ({
         ...prev,
-        recipesCount: prev.recipesCount + 1,
+        recipesCount: Math.max(0, prev.recipesCount - 1),
       }));
-      throw err;
-    }
-  }, [recipes]);
+
+      try {
+        const response = await fetch(`/api/recipes/${recipeId}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to delete recipe");
+        }
+      } catch (err) {
+        // Rollback przy błędzie
+        setRecipes(previousRecipes);
+        setStats((prev) => ({
+          ...prev,
+          recipesCount: prev.recipesCount + 1,
+        }));
+        throw err;
+      }
+    },
+    [recipes]
+  );
 
   return {
     recipes,
@@ -692,11 +722,13 @@ export function useDashboard(
 **Użycie**: Pobranie listy przepisów użytkownika (używane w SSR i opcjonalnie do odświeżania)
 
 **Request**:
+
 - Metoda: `GET`
 - Headers: `Authorization: Bearer {jwt_token}` (automatycznie przez Supabase client)
 - Query params: Brak (dla dashboardu pobieramy wszystkie, filtrujemy po stronie klienta do 10)
 
 **Response**:
+
 ```typescript
 // Success 200
 {
@@ -717,14 +749,15 @@ export function useDashboard(
 ```
 
 **Implementacja wywołania**:
+
 ```typescript
 // Server-side (Astro)
 const recipes = await getUserRecipes(user.id, supabase);
 
 // Client-side (React)
-const response = await fetch('/api/recipes', {
+const response = await fetch("/api/recipes", {
   headers: {
-    'Authorization': `Bearer ${session.access_token}`,
+    Authorization: `Bearer ${session.access_token}`,
   },
 });
 const data: RecipeListResponse = await response.json();
@@ -735,11 +768,13 @@ const data: RecipeListResponse = await response.json();
 **Użycie**: Soft delete przepisu (opcjonalna akcja dostępna z RecipeCard)
 
 **Request**:
+
 - Metoda: `DELETE`
 - Headers: `Authorization: Bearer {jwt_token}`
 - Path params: `id` (string, UUID)
 
 **Response**:
+
 ```typescript
 // Success 204
 // Brak body
@@ -758,12 +793,13 @@ const data: RecipeListResponse = await response.json();
 ```
 
 **Implementacja wywołania**:
+
 ```typescript
 // Client-side (React)
 const response = await fetch(`/api/recipes/${recipeId}`, {
-  method: 'DELETE',
+  method: "DELETE",
   headers: {
-    'Authorization': `Bearer ${session.access_token}`,
+    Authorization: `Bearer ${session.access_token}`,
   },
 });
 
@@ -778,18 +814,19 @@ if (!response.ok) {
 **Użycie**: Pobranie liczby przepisów i generacji AI (tylko SSR)
 
 **Implementacja**:
+
 ```typescript
 // Server-side (Astro)
 const { count: recipesCount } = await supabase
-  .from('recipes')
-  .select('*', { count: 'exact', head: true })
-  .eq('owner_id', user.id)
-  .is('deleted_at', null);
+  .from("recipes")
+  .select("*", { count: "exact", head: true })
+  .eq("owner_id", user.id)
+  .is("deleted_at", null);
 
 const { count: generationsCount } = await supabase
-  .from('ai_generations')
-  .select('*', { count: 'exact', head: true })
-  .eq('user_id', user.id);
+  .from("ai_generations")
+  .select("*", { count: "exact", head: true })
+  .eq("user_id", user.id);
 ```
 
 ## 8. Interakcje użytkownika
@@ -799,14 +836,16 @@ const { count: generationsCount } = await supabase
 **Trigger**: Klik na przycisk "Add Recipe" w QuickActions
 
 **Flow**:
+
 1. Użytkownik klika przycisk "Add Recipe"
 2. Następuje nawigacja do `/recipes/new` (Astro.navigate lub link)
 3. Użytkownik widzi formularz dodawania nowego przepisu
 
 **Implementacja**:
+
 ```typescript
 const handleAddRecipe = () => {
-  window.location.href = '/recipes/new';
+  window.location.href = "/recipes/new";
 };
 ```
 
@@ -815,14 +854,16 @@ const handleAddRecipe = () => {
 **Trigger**: Klik na przycisk "Generate with AI" w QuickActions
 
 **Flow**:
+
 1. Użytkownik klika przycisk "Generate with AI"
 2. Następuje nawigacja do `/ai/generate`
 3. Użytkownik widzi formularz generowania przepisu AI
 
 **Implementacja**:
+
 ```typescript
 const handleGenerateAI = () => {
-  window.location.href = '/ai/generate';
+  window.location.href = "/ai/generate";
 };
 ```
 
@@ -831,11 +872,13 @@ const handleGenerateAI = () => {
 **Trigger**: Klik na RecipeCard lub opcję "View" w menu
 
 **Flow**:
+
 1. Użytkownik klika na kartę przepisu lub wybiera "View" z menu
 2. Następuje nawigacja do `/recipes/{id}`
 3. Użytkownik widzi pełne szczegóły przepisu
 
 **Implementacja**:
+
 ```typescript
 const handleViewRecipe = (recipeId: string) => {
   window.location.href = `/recipes/${recipeId}`;
@@ -847,11 +890,13 @@ const handleViewRecipe = (recipeId: string) => {
 **Trigger**: Klik na opcję "Edit" w menu RecipeCard
 
 **Flow**:
+
 1. Użytkownik wybiera "Edit" z menu dropdown
 2. Następuje nawigacja do `/recipes/{id}/edit`
 3. Użytkownik widzi formularz edycji przepisu
 
 **Implementacja**:
+
 ```typescript
 const handleEditRecipe = (recipeId: string) => {
   window.location.href = `/recipes/${recipeId}/edit`;
@@ -863,6 +908,7 @@ const handleEditRecipe = (recipeId: string) => {
 **Trigger**: Klik na opcję "Delete" w menu RecipeCard
 
 **Flow**:
+
 1. Użytkownik wybiera "Delete" z menu dropdown
 2. System wyświetla dialog potwierdzenia (AlertDialog z Shadcn)
    - Tytuł: "Delete Recipe?"
@@ -877,24 +923,25 @@ const handleEditRecipe = (recipeId: string) => {
    - Wyświetlenie toast error: "Failed to delete recipe: {error message}"
 
 **Implementacja**:
+
 ```typescript
 const handleDeleteRecipe = async (recipeId: string) => {
   const confirmed = await showDeleteDialog(recipe.title);
-  
+
   if (!confirmed) return;
-  
+
   try {
     await deleteRecipe(recipeId);
     showToast({
-      title: 'Recipe deleted',
-      description: 'Recipe deleted successfully',
-      variant: 'success',
+      title: "Recipe deleted",
+      description: "Recipe deleted successfully",
+      variant: "success",
     });
   } catch (err) {
     showToast({
-      title: 'Error',
-      description: err instanceof Error ? err.message : 'Failed to delete recipe',
-      variant: 'destructive',
+      title: "Error",
+      description: err instanceof Error ? err.message : "Failed to delete recipe",
+      variant: "destructive",
     });
   }
 };
@@ -905,6 +952,7 @@ const handleDeleteRecipe = async (recipeId: string) => {
 **Trigger**: Powrót do dashboardu po dodaniu/edycji przepisu
 
 **Flow**:
+
 1. Użytkownik wraca do dashboardu po akcji na przepisie
 2. System automatycznie odświeża stronę (standard Astro navigation)
 3. SSR pobiera zaktualizowaną listę przepisów
@@ -917,14 +965,16 @@ const handleDeleteRecipe = async (recipeId: string) => {
 **Trigger**: Klik na przycisk "View All" w sekcji RecentRecipesList
 
 **Flow**:
+
 1. Użytkownik klika "View All →"
 2. Następuje nawigacja do `/recipes`
 3. Użytkownik widzi pełną listę przepisów z wyszukiwaniem i filtrowaniem
 
 **Implementacja**:
+
 ```typescript
 const handleViewAll = () => {
-  window.location.href = '/recipes';
+  window.location.href = "/recipes";
 };
 ```
 
@@ -933,30 +983,31 @@ const handleViewAll = () => {
 ### 9.1 Warunki na poziomie strony (Astro middleware/page)
 
 **Walidacja autoryzacji**:
+
 ```typescript
 // Middleware: src/middleware/index.ts
-const { data: { user } } = await supabase.auth.getUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 
 if (!user && !isPublicRoute(pathname)) {
-  return context.redirect('/login');
+  return context.redirect("/login");
 }
 ```
 
 **Walidacja onboardingu**:
+
 ```typescript
 // src/pages/index.astro
-const { data: preferences } = await supabase
-  .from('user_preferences')
-  .select('user_id')
-  .eq('user_id', user.id)
-  .single();
+const { data: preferences } = await supabase.from("user_preferences").select("user_id").eq("user_id", user.id).single();
 
-if (!preferences && pathname === '/') {
-  return Astro.redirect('/onboarding');
+if (!preferences && pathname === "/") {
+  return Astro.redirect("/onboarding");
 }
 ```
 
 **Warunki wyświetlania**:
+
 - Dashboard jest dostępny tylko dla zalogowanych użytkowników z ukończonym onboardingiem
 - Jeśli użytkownik nie ma preferencji → redirect do `/onboarding`
 - Jeśli użytkownik nie jest zalogowany → redirect do `/login`
@@ -964,59 +1015,62 @@ if (!preferences && pathname === '/') {
 ### 9.2 Warunki na poziomie komponentów
 
 **RecentRecipesList**:
+
 - **Warunek**: `recipes.length === 0`
   - **Akcja**: Wyświetl EmptyState z komunikatem i przyciskami CTA
   - **Komponenty**: EmptyState
-  
 - **Warunek**: `isLoading === true`
   - **Akcja**: Wyświetl RecipeListSkeleton
   - **Komponenty**: RecipeListSkeleton
-  
 - **Warunek**: `recipes.length > 0`
   - **Akcja**: Wyświetl grid z RecipeCard dla każdego przepisu (max 10)
   - **Komponenty**: RecipeCard
 
 **RecipeCard**:
+
 - **Warunek**: `recipe.summary` istnieje
   - **Akcja**: Wyświetl CardDescription z skróconym tekstem (max 100 znaków)
-  
 - **Warunek**: `recipe.tags.length > 3`
   - **Akcja**: Wyświetl pierwsze 3 tagi + badge "+X" z pozostałymi
-  
 - **Warunek**: `recipe.tags.length === 0`
   - **Akcja**: Nie wyświetlaj sekcji tagów lub wyświetl "No tags"
 
 **UserStats**:
+
 - **Warunek**: `stats.recipesCount === undefined || stats.recipesCount === null`
   - **Akcja**: Wyświetl 0 jako fallback
-  
 - **Warunek**: `stats.generationsCount === undefined || stats.generationsCount === null`
   - **Akcja**: Wyświetl 0 jako fallback
 
 ### 9.3 Walidacja uprawnień
 
 **Usuwanie przepisu**:
+
 - **Warunek**: API sprawdza `recipe.owner_id === user.id` przed usunięciem
 - **Frontend**: Powinien wyświetlać opcję delete tylko dla przepisów użytkownika (już gwarantowane przez API, które zwraca tylko przepisy użytkownika)
 
 **Edycja przepisu**:
+
 - **Warunek**: API sprawdza `recipe.owner_id === user.id` przed edycją
 - **Frontend**: Opcja edit dostępna tylko dla przepisów użytkownika
 
 ### 9.4 Walidacja danych
 
 **Recipe.title**:
+
 - **Wymagane**: Tak
 - **Min length**: 1
 - **Max length**: 200
 - **Warunek**: Zawsze wyświetlany, brak szczególnej walidacji na dashboardzie
 
 **Recipe.updated_at**:
+
 - **Wymagane**: Tak (generowane przez bazę)
 - **Format**: ISO 8601 timestamp
 - **Walidacja**: Formatowanie przy wyświetlaniu (`formatDate()` utility)
 
 **Recipe.tags**:
+
 - **Wymagane**: Nie
 - **Max items**: 10
 - **Walidacja**: Wyświetl max 3 tagi, resztę jako "+X"
@@ -1028,11 +1082,13 @@ if (!preferences && pathname === '/') {
 **Scenariusz**: Token JWT wygasł lub jest nieprawidłowy
 
 **Obsługa**:
+
 - Middleware wykrywa brak sesji
 - Przekierowanie do `/login`
 - Zapisanie intended route w session storage dla powrotu po zalogowaniu
 
 **Implementacja**:
+
 ```typescript
 // Middleware
 if (!user) {
@@ -1048,22 +1104,24 @@ if (!user) {
 **Scenariusz**: Błąd połączenia z bazą danych lub Supabase
 
 **Obsługa**:
+
 - Wyświetlenie error boundary lub error page
 - Komunikat: "Failed to load dashboard. Please try again."
 - Przycisk "Retry" do przeładowania strony
 
 **Implementacja**:
+
 ```typescript
 // W src/pages/index.astro
 try {
   const recipes = await getUserRecipes(user.id, supabase);
   // ... pozostałe dane
 } catch (error) {
-  console.error('Dashboard load error:', error);
+  console.error("Dashboard load error:", error);
   // Renderuj error state
-  return Astro.render('error', {
-    message: 'Failed to load dashboard',
-    action: 'retry',
+  return Astro.render("error", {
+    message: "Failed to load dashboard",
+    action: "retry",
   });
 }
 ```
@@ -1073,6 +1131,7 @@ try {
 **Scenariusz 1**: Przepis nie istnieje lub został już usunięty (404)
 
 **Obsługa**:
+
 - Rollback optymistycznej aktualizacji (przywróć kartę)
 - Toast notification: "Recipe not found. It may have been already deleted."
 - Opcjonalnie: automatyczne odświeżenie listy
@@ -1080,6 +1139,7 @@ try {
 **Scenariusz 2**: Brak uprawnień (403)
 
 **Obsługa**:
+
 - Rollback optymistycznej aktualizacji
 - Toast notification: "You don't have permission to delete this recipe."
 - Odświeżenie listy (przepis nie powinien być widoczny)
@@ -1087,35 +1147,37 @@ try {
 **Scenariusz 3**: Błąd serwera (500)
 
 **Obsługa**:
+
 - Rollback optymistycznej aktualizacji
 - Toast notification: "Failed to delete recipe. Please try again."
 - Przycisk "Retry" w toast (opcjonalnie)
 
 **Implementacja**:
+
 ```typescript
 const handleDeleteRecipe = async (recipeId: string) => {
   try {
     await deleteRecipe(recipeId);
     showToast({
-      title: 'Success',
-      description: 'Recipe deleted successfully',
-      variant: 'success',
+      title: "Success",
+      description: "Recipe deleted successfully",
+      variant: "success",
     });
   } catch (err) {
-    let message = 'Failed to delete recipe';
-    
+    let message = "Failed to delete recipe";
+
     if (err instanceof Response) {
       if (err.status === 404) {
-        message = 'Recipe not found. It may have been already deleted.';
+        message = "Recipe not found. It may have been already deleted.";
       } else if (err.status === 403) {
         message = "You don't have permission to delete this recipe.";
       }
     }
-    
+
     showToast({
-      title: 'Error',
+      title: "Error",
       description: message,
-      variant: 'destructive',
+      variant: "destructive",
     });
   }
 };
@@ -1126,6 +1188,7 @@ const handleDeleteRecipe = async (recipeId: string) => {
 **Scenariusz**: Użytkownik nie ma jeszcze żadnych przepisów
 
 **Obsługa**:
+
 - Wyświetlenie EmptyState z przyjaznym komunikatem
 - Przyciski CTA do dodania pierwszego przepisu
 - Brak traktowania jako błędu (normalny stan dla nowych użytkowników)
@@ -1137,22 +1200,24 @@ const handleDeleteRecipe = async (recipeId: string) => {
 **Scenariusz**: Błąd podczas pobierania count queries
 
 **Obsługa**:
+
 - Fallback do wartości 0 dla wszystkich statystyk
 - Logowanie błędu (console.error)
 - Dashboard nadal się wyświetla, tylko statystyki pokazują 0
 
 **Implementacja**:
+
 ```typescript
 try {
   const { count: recipesCount } = await supabase
-    .from('recipes')
-    .select('*', { count: 'exact', head: true })
-    .eq('owner_id', user.id)
-    .is('deleted_at', null);
-  
+    .from("recipes")
+    .select("*", { count: "exact", head: true })
+    .eq("owner_id", user.id)
+    .is("deleted_at", null);
+
   stats.recipesCount = recipesCount || 0;
 } catch (error) {
-  console.error('Failed to load recipes count:', error);
+  console.error("Failed to load recipes count:", error);
   stats.recipesCount = 0;
 }
 ```
@@ -1162,21 +1227,23 @@ try {
 **Scenariusz**: Użytkownik traci połączenie internetowe podczas operacji
 
 **Obsługa**:
+
 - Wykrycie błędu network (catch block)
 - Toast notification: "Network error. Please check your connection."
 - Zachowanie stanu przed operacją (rollback)
 - Możliwość ponowienia po przywróceniu połączenia
 
 **Implementacja**:
+
 ```typescript
 try {
   await deleteRecipe(recipeId);
 } catch (err) {
-  if (err instanceof TypeError && err.message.includes('fetch')) {
+  if (err instanceof TypeError && err.message.includes("fetch")) {
     showToast({
-      title: 'Network Error',
-      description: 'Please check your internet connection and try again.',
-      variant: 'destructive',
+      title: "Network Error",
+      description: "Please check your internet connection and try again.",
+      variant: "destructive",
     });
   } else {
     // Inne błędy
@@ -1189,6 +1256,7 @@ try {
 ### Krok 1: Przygotowanie typów i struktur danych
 
 **Działania**:
+
 1. Dodaj nowe typy do `src/types.ts`:
    - `DashboardData`
    - `UserStats`
@@ -1198,6 +1266,7 @@ try {
 4. Utworzenie pliku `src/lib/utils/text-formatter.ts` dla truncate funkcji
 
 **Pliki do utworzenia/modyfikacji**:
+
 - `src/types.ts` (modyfikacja)
 - `src/lib/utils/date-formatter.ts` (nowy)
 - `src/lib/utils/text-formatter.ts` (nowy)
@@ -1205,33 +1274,32 @@ try {
 ### Krok 2: Implementacja utility functions
 
 **Działania**:
+
 1. Zaimplementuj `formatDate()` do formatowania dat (relative: "2 days ago", absolute: "Oct 12, 2025")
 2. Zaimplementuj `truncate()` do skracania tekstu z ellipsis
 3. Dodaj testy jednostkowe dla utility functions (opcjonalnie)
 
 **Przykład implementacji**:
+
 ```typescript
 // src/lib/utils/date-formatter.ts
-export function formatDate(
-  dateString: string, 
-  options: DateFormatOptions = {}
-): string {
+export function formatDate(dateString: string, options: DateFormatOptions = {}): string {
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
-  if (options.format === 'relative' || !options.format) {
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
+
+  if (options.format === "relative" || !options.format) {
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
   }
-  
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 }
 ```
@@ -1239,12 +1307,14 @@ export function formatDate(
 ### Krok 3: Stworzenie podstawowych komponentów prezentacyjnych
 
 **Działania**:
+
 1. Utworzenie `src/components/dashboard/EmptyState.tsx`
 2. Utworzenie `src/components/dashboard/RecipeListSkeleton.tsx`
 3. Utworzenie `src/components/dashboard/StatCard.tsx`
 4. Instalacja wymaganych ikon: `lucide-react` (jeśli nie zainstalowane)
 
 **Pliki do utworzenia**:
+
 - `src/components/dashboard/EmptyState.tsx`
 - `src/components/dashboard/RecipeListSkeleton.tsx`
 - `src/components/dashboard/StatCard.tsx`
@@ -1252,6 +1322,7 @@ export function formatDate(
 ### Krok 4: Implementacja komponentów UI dla przepisów
 
 **Działania**:
+
 1. Utworzenie `src/components/dashboard/RecipeCard.tsx`
    - Implementacja layoutu karty z Card z Shadcn
    - Dodanie DropdownMenu dla akcji (view, edit, delete)
@@ -1264,6 +1335,7 @@ export function formatDate(
    - Skeleton
 
 **Komendy**:
+
 ```bash
 npx shadcn@latest add card
 npx shadcn@latest add dropdown-menu
@@ -1273,11 +1345,13 @@ npx shadcn@latest add alert-dialog
 ```
 
 **Pliki do utworzenia**:
+
 - `src/components/dashboard/RecipeCard.tsx`
 
 ### Krok 5: Implementacja komponentu listy przepisów
 
 **Działania**:
+
 1. Utworzenie `src/components/dashboard/RecentRecipesList.tsx`
 2. Implementacja logiki warunkowego renderowania:
    - Loading state → RecipeListSkeleton
@@ -1287,11 +1361,13 @@ npx shadcn@latest add alert-dialog
 4. Dodanie nagłówka sekcji z przyciskiem "View All"
 
 **Pliki do utworzenia**:
+
 - `src/components/dashboard/RecentRecipesList.tsx`
 
 ### Krok 6: Implementacja sekcji statystyk i powitalnej
 
 **Działania**:
+
 1. Utworzenie `src/components/dashboard/UserStats.tsx`
    - Grid layout dla StatCard
    - Przekazanie danych stats do StatCard
@@ -1301,23 +1377,27 @@ npx shadcn@latest add alert-dialog
    - Personalizacja z userName
 
 **Pliki do utworzenia**:
+
 - `src/components/dashboard/UserStats.tsx`
 - `src/components/dashboard/WelcomeSection.tsx`
 
 ### Krok 7: Implementacja Quick Actions
 
 **Działania**:
+
 1. Utworzenie `src/components/dashboard/QuickActions.tsx`
 2. Dodanie dwóch Button z Shadcn
 3. Implementacja nawigacji do `/recipes/new` i `/ai/generate`
 4. Dodanie ikon z lucide-react
 
 **Pliki do utworzenia**:
+
 - `src/components/dashboard/QuickActions.tsx`
 
 ### Krok 8: Implementacja głównego kontenera Dashboard
 
 **Działania**:
+
 1. Utworzenie `src/components/dashboard/DashboardContent.tsx`
 2. Kompozycja wszystkich sekcji:
    - WelcomeSection
@@ -1327,12 +1407,14 @@ npx shadcn@latest add alert-dialog
 4. Przekazanie handlers do komponentów dzieci
 
 **Pliki do utworzenia**:
+
 - `src/components/dashboard/DashboardContent.tsx`
 - `src/hooks/useDashboard.ts`
 
 ### Krok 9: Implementacja custom hooka useDashboard
 
 **Działania**:
+
 1. Utworzenie `src/hooks/useDashboard.ts`
 2. Implementacja state management:
    - `recipes` state
@@ -1345,16 +1427,19 @@ npx shadcn@latest add alert-dialog
 4. Error handling i rollback logic
 
 **Pliki do utworzenia**:
+
 - `src/hooks/useDashboard.ts`
 
 ### Krok 10: Dodanie komponentów Shadcn dla dialogs i toasts
 
 **Działania**:
+
 1. Instalacja AlertDialog dla potwierdzenia usunięcia
 2. Instalacja Toast/Sonner dla notyfikacji
 3. Dodanie ToastProvider do layoutu (jeśli nie istnieje)
 
 **Komendy**:
+
 ```bash
 npx shadcn@latest add alert-dialog
 npx shadcn@latest add toast
@@ -1363,11 +1448,13 @@ npm install sonner
 ```
 
 **Pliki do modyfikacji**:
+
 - `src/layouts/Layout.astro` (dodanie Toaster)
 
 ### Krok 11: Implementacja strony Astro (SSR)
 
 **Działania**:
+
 1. Modyfikacja `src/pages/index.astro`
 2. Implementacja server-side logic:
    - Weryfikacja użytkownika (auth)
@@ -1379,31 +1466,35 @@ npm install sonner
 4. Renderowanie w Layout
 
 **Przykład implementacji**:
+
 ```astro
 ---
 // src/pages/index.astro
-import Layout from '../layouts/Layout.astro';
-import DashboardContent from '../components/dashboard/DashboardContent';
-import { createServerSupabaseClient } from '../db/supabase.client';
-import { getUserRecipes } from '../lib/services/recipes.service';
-import type { UserStats } from '../types';
+import Layout from "../layouts/Layout.astro";
+import DashboardContent from "../components/dashboard/DashboardContent";
+import { createServerSupabaseClient } from "../db/supabase.client";
+import { getUserRecipes } from "../lib/services/recipes.service";
+import type { UserStats } from "../types";
 
 const supabase = createServerSupabaseClient(Astro);
-const { data: { user }, error: authError } = await supabase.auth.getUser();
+const {
+  data: { user },
+  error: authError,
+} = await supabase.auth.getUser();
 
 if (!user) {
-  return Astro.redirect('/login');
+  return Astro.redirect("/login");
 }
 
 // Check onboarding
 const { data: preferences } = await supabase
-  .from('user_preferences')
-  .select('user_id')
-  .eq('user_id', user.id)
+  .from("user_preferences")
+  .select("user_id")
+  .eq("user_id", user.id)
   .maybeSingle();
 
 if (!preferences) {
-  return Astro.redirect('/onboarding');
+  return Astro.redirect("/onboarding");
 }
 
 // Fetch recipes
@@ -1412,82 +1503,84 @@ const recentRecipes = recipes.slice(0, 10);
 
 // Fetch stats
 const { count: recipesCount } = await supabase
-  .from('recipes')
-  .select('*', { count: 'exact', head: true })
-  .eq('owner_id', user.id)
-  .is('deleted_at', null);
+  .from("recipes")
+  .select("*", { count: "exact", head: true })
+  .eq("owner_id", user.id)
+  .is("deleted_at", null);
 
 const { count: generationsCount } = await supabase
-  .from('ai_generations')
-  .select('*', { count: 'exact', head: true })
-  .eq('user_id', user.id);
+  .from("ai_generations")
+  .select("*", { count: "exact", head: true })
+  .eq("user_id", user.id);
 
 const stats: UserStats = {
   recipesCount: recipesCount || 0,
   generationsCount: generationsCount || 0,
 };
 
-const userName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User';
+const userName = user.user_metadata?.display_name || user.email?.split("@")[0] || "User";
 ---
 
 <Layout title="Dashboard - HealthyMeal">
-  <DashboardContent 
-    client:load
-    initialRecipes={recentRecipes}
-    initialStats={stats}
-    userName={userName}
-  />
+  <DashboardContent client:load initialRecipes={recentRecipes} initialStats={stats} userName={userName} />
 </Layout>
 ```
 
 **Pliki do modyfikacji**:
+
 - `src/pages/index.astro`
 
 ### Krok 12: Implementacja middleware dla ochrony route
 
 **Działania**:
+
 1. Weryfikacja czy `src/middleware/index.ts` istnieje
 2. Dodanie logiki sprawdzania autoryzacji dla `/` route
 3. Redirect do login jeśli brak sesji
 4. Sprawdzenie onboarding dla dashboardu
 
 **Przykład middleware**:
+
 ```typescript
 // src/middleware/index.ts
-import { defineMiddleware } from 'astro:middleware';
-import { createServerSupabaseClient } from '../db/supabase.client';
+import { defineMiddleware } from "astro:middleware";
+import { createServerSupabaseClient } from "../db/supabase.client";
 
-const PUBLIC_ROUTES = ['/login', '/register', '/reset-password'];
+const PUBLIC_ROUTES = ["/login", "/register", "/reset-password"];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = new URL(context.request.url);
-  
+
   // Skip auth for public routes
   if (PUBLIC_ROUTES.includes(pathname)) {
     return next();
   }
-  
+
   const supabase = createServerSupabaseClient(context);
-  const { data: { user } } = await supabase.auth.getUser();
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (!user) {
     return context.redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   }
-  
+
   // Store user in locals for access in pages
   context.locals.user = user;
   context.locals.supabase = supabase;
-  
+
   return next();
 });
 ```
 
 **Pliki do modyfikacji**:
+
 - `src/middleware/index.ts`
 
 ### Krok 13: Stylowanie i responsywność
 
 **Działania**:
+
 1. Dodanie custom styles w `src/styles/global.css` jeśli potrzebne
 2. Weryfikacja responsywności wszystkich komponentów
 3. Testowanie na różnych rozmiarach ekranu:
@@ -1497,15 +1590,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
 4. Dodanie Tailwind breakpoints gdzie potrzeba
 
 **Przykład responsive grid**:
+
 ```tsx
-<div className="recipes-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-  {/* Recipe cards */}
-</div>
+<div className="recipes-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{/* Recipe cards */}</div>
 ```
 
 ### Krok 14: Testowanie integracji
 
 **Działania**:
+
 1. Test flow autoryzacji:
    - Niezalogowany użytkownik → redirect do login
    - Zalogowany bez onboarding → redirect do onboarding
@@ -1527,6 +1620,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 ### Krok 15: Optymalizacje i poprawki
 
 **Działania**:
+
 1. Dodanie loading states dla wszystkich async operacji
 2. Implementacja proper error boundaries (opcjonalnie)
 3. Optymalizacja zapytań do bazy (już zoptymalizowane w service)
@@ -1543,6 +1637,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 ### Krok 16: Dokumentacja i code review
 
 **Działania**:
+
 1. Dodanie JSDoc komentarzy do wszystkich komponentów
 2. Dokumentacja Props interfaces
 3. Aktualizacja README jeśli potrzebne
@@ -1556,6 +1651,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 ### Krok 17: Deploy i monitoring
 
 **Działania**:
+
 1. Merge do głównej gałęzi
 2. Deploy na środowisko produkcyjne
 3. Monitorowanie błędów (Sentry, LogRocket, etc.)
@@ -1567,6 +1663,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 ## Podsumowanie
 
 Plan implementacji widoku Dashboard obejmuje:
+
 - **17 kroków** systematycznej implementacji od typów do deploymentu
 - **13 komponentów React** (prezentacyjne i kontenerowe)
 - **1 custom hook** do zarządzania stanem
@@ -1578,4 +1675,3 @@ Plan implementacji widoku Dashboard obejmuje:
 - **Accessibility** zgodnie z best practices
 
 Dashboard jest punktem wejścia do aplikacji po zalogowaniu i stanowi centrum nawigacyjne dla wszystkich głównych funkcji systemu.
-

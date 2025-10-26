@@ -5,6 +5,7 @@
 Widok Profil (`/profile`) umożliwia przegląd i edycję preferencji żywieniowych użytkownika. Zgodnie z PRD, dostęp do widoku odbywa się przez kliknięcie ikony avatara w prawym górnym rogu nawigacji i wybranie opcji "Konto" z rozwijanego menu. Widok prezentuje aktualne preferencje w trybie read-only oraz umożliwia ich edycję w dedykowanym modalu edycyjnym.
 
 Kluczowe funkcjonalności:
+
 - Wyświetlanie aktualnych preferencji w formie kart
 - Pokazanie daty ostatniej modyfikacji
 - Edycja preferencji w modalu dialogowym
@@ -48,6 +49,7 @@ ProfileView
 ```
 
 **Hierarchia**:
+
 - Komponent główny: `ProfileView` (renderowany w `src/pages/profile.astro`)
 - Komponent kontenerowy: `ProfileContent` (przyjmuje preferencje i token)
 - Komponenty prezentacyjne: `ProfileHeader`, `ProfileInfo` (z kartami)
@@ -61,6 +63,7 @@ ProfileView
 **Opis**: Główny komponent widoku profilu, zarządza stanem preferencji i otwieraniem modala edycji. Wyświetla preferencje w trybie read-only oraz obsługuje edycję.
 
 **Główne elementy**:
+
 - Div kontener z `max-w-4xl mx-auto p-6`
 - ProfileHeader
 - ProfileInfo z kartami preferencji
@@ -71,6 +74,7 @@ ProfileView
 - Empty state (brak preferencji → redirect do /onboarding lub komunikat)
 
 **Obsługiwane interakcje**:
+
 1. Przed aktualizacja danych → Pobiera preferencje z API przy montowaniu komponentu
 2. Kliknięcie "Edytuj" → Otwiera modal dialogowy
 3. Zapisz w modalu → PATCH do API → Zamknięcie modala → Odświeżenie danych
@@ -80,10 +84,12 @@ ProfileView
 **Obsługiwana walidacja**: Brak bezpośredniej walidacji w tym komponencie (logika w EditPreferencesDialog)
 
 **Typy**:
+
 - `UserPreferences` - typ preferencji z API
 - Props: `initialPreferences?: UserPreferences | null`, `accessToken: string`, `userName: string`
 
 **Props**:
+
 ```typescript
 interface ProfileContentProps {
   readonly initialPreferences: UserPreferences | null;
@@ -97,11 +103,13 @@ interface ProfileContentProps {
 **Opis**: Nagłówek widoku z tytułem i przyciskiem edycji.
 
 **Główne elementy**:
+
 - Tytuł: "Profil użytkownika" lub "Moje preferencje"
 - Przycisk "Edytuj" (Button) z ikoną Edit (lucide-react)
 - Opcjonalnie: Podtytuł z imieniem użytkownika
 
 **Obsługiwane interakcje**:
+
 1. Kliknięcie "Edytuj" → Wywołuje callback `onEdit` przekazany przez parenta
 
 **Obsługiwana walidacja**: Brak
@@ -109,6 +117,7 @@ interface ProfileContentProps {
 **Typy**: Brak
 
 **Props**:
+
 ```typescript
 interface ProfileHeaderProps {
   onEdit: () => void;
@@ -121,6 +130,7 @@ interface ProfileHeaderProps {
 **Opis**: Sekcja z kartami preferencji wyświetlanych w trybie read-only.
 
 **Główne elementy**:
+
 - Grid layout (grid-cols-1 md:grid-cols-2 gap-4)
 - Karty preferencji dla każdej kategorii:
   - DietTypeCard
@@ -135,9 +145,11 @@ interface ProfileHeaderProps {
 **Obsługiwana walidacja**: Brak
 
 **Typy**:
+
 - Wykorzystuje `UserPreferences` do wyświetlenia danych
 
 **Props**:
+
 ```typescript
 interface ProfileInfoProps {
   preferences: UserPreferences;
@@ -149,6 +161,7 @@ interface ProfileInfoProps {
 **Opis**: Karty wyświetlające poszczególne kategorie preferencji.
 
 **Główne elementy** (dla każdej karty):
+
 - Shadcn Card komponent
 - Tytuł karty (np. "Typ diety")
 - Wartość lub fallback text ("Nie podano")
@@ -161,6 +174,7 @@ interface ProfileInfoProps {
 **Typy**: Wykorzystują pola z `UserPreferences`
 
 **Props** (dla każdej karty):
+
 ```typescript
 interface PreferenceCardProps {
   label: string;
@@ -174,6 +188,7 @@ interface PreferenceCardProps {
 **Opis**: Komponent wyświetlający datę ostatniej modyfikacji preferencji.
 
 **Główne elementy**:
+
 - Text z ikoną Calendar (lucide-react)
 - Sformatowana data (np. "Ostatnia modyfikacja: 12 stycznia 2025")
 
@@ -184,6 +199,7 @@ interface PreferenceCardProps {
 **Typy**: Wykorzystuje `updated_at` z `UserPreferences`
 
 **Props**:
+
 ```typescript
 interface LastModifiedDateProps {
   updatedAt: string;
@@ -195,12 +211,14 @@ interface LastModifiedDateProps {
 **Opis**: Modal dialogowy do edycji preferencji z pełnym formularzem.
 
 **Główne elementy**:
+
 - Shadcn Dialog z overlay
 - DialogHeader (tytuł i opis)
 - EditPreferencesForm w środku
 - DialogFooter z przyciskami akcji
 
 **Obsługiwane interakcje**:
+
 1. Zamknięcie przez backdrop → Wywołuje `onOpenChange(false)`
 2. Zamknięcie przez Esc → Wywołuje `onOpenChange(false)`
 3. Kliknięcie "Zapisz" → Walidacja → PUT/PATCH do API → Zamknięcie przy sukcesie
@@ -209,10 +227,12 @@ interface LastModifiedDateProps {
 **Obsługiwana walidacja**: Pełna walidacja zgodnie z `PreferencesInputSchema` lub `PreferencesPartialInputSchema`
 
 **Typy**:
+
 - `PreferencesInput` dla pełnej edycji (PUT)
 - `PreferencesPartialUpdateInput` dla częściowej edycji (PATCH)
 
 **Props**:
+
 ```typescript
 interface EditPreferencesDialogProps {
   open: boolean;
@@ -227,6 +247,7 @@ interface EditPreferencesDialogProps {
 **Opis**: Formularz edycji preferencji z polami dla wszystkich kategorii.
 
 **Główne elementy**:
+
 - react-hook-form z walidacją Zod
 - DietTypeField (Select z opcjami)
 - PreferredIngredientsField (Textarea, opcjonalne)
@@ -237,6 +258,7 @@ interface EditPreferencesDialogProps {
 - Przycisk "Anuluj"
 
 **Obsługiwane interakcje**:
+
 1. Zmiana wartości pól → Walidacja w czasie rzeczywistym
 2. Wysłanie formularza → PUT/PATCH request do API
 3. Sukces → Wywołanie `onSuccess`, wyświetlenie toast
@@ -244,6 +266,7 @@ interface EditPreferencesDialogProps {
 5. Anulowanie → Reset formularza i zamknięcie
 
 **Obsługiwana walidacja**:
+
 - **diet_type**: Wymagane, min 1 znak, max 50 znaków
 - **preferred_ingredients**: Opcjonalne, max 1000 znaków
 - **preferred_cuisines**: Opcjonalne, max 500 znaków
@@ -252,6 +275,7 @@ interface EditPreferencesDialogProps {
 - Dla PATCH: przynajmniej jedno pole musi być wypełnione
 
 **Typy**:
+
 - `PreferencesInput` - dla pełnej edycji
 - `PreferencesPartialUpdateInput` - dla częściowej edycji
 - Wykorzystuje `UseFormReturn<PreferencesInput | PreferencesPartialUpdateInput>`
@@ -263,6 +287,7 @@ interface EditPreferencesDialogProps {
 ### Istniejące typy (z `src/types.ts`):
 
 **UserPreferences** (z database.types):
+
 ```typescript
 {
   user_id: string;
@@ -277,6 +302,7 @@ interface EditPreferencesDialogProps {
 ```
 
 **PreferencesInput** (z `src/components/onboarding/types.ts`):
+
 ```typescript
 {
   diet_type: string;
@@ -293,6 +319,7 @@ interface EditPreferencesDialogProps {
 ### Nowe typy (do utworzenia):
 
 **ProfileViewProps** (dla strony Astro):
+
 ```typescript
 interface ProfileViewProps {
   preferences: UserPreferences | null;
@@ -303,6 +330,7 @@ interface ProfileViewProps {
 ```
 
 **EditPreferencesDialogFormData**:
+
 ```typescript
 interface EditPreferencesDialogFormData {
   diet_type: string;
@@ -329,6 +357,7 @@ const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 ### Operacje stanu:
 
 1. **refreshPreferences()**: Funkcja do ponownego pobrania preferencji z API
+
 ```typescript
 const refreshPreferences = async () => {
   setIsLoading(true);
@@ -349,6 +378,7 @@ const refreshPreferences = async () => {
 ```
 
 2. **handleEditSuccess()**: Callback po sukcesie edycji, odświeża dane i zamyka modal
+
 ```typescript
 const handleEditSuccess = () => {
   refreshPreferences();
@@ -357,6 +387,7 @@ const handleEditSuccess = () => {
 ```
 
 3. **handleEdit()**: Otwiera modal edycji
+
 ```typescript
 const handleEdit = () => {
   setIsEditDialogOpen(true);
@@ -366,6 +397,7 @@ const handleEdit = () => {
 ### Niestandardowe hooki:
 
 **useProfile** (opcjonalnie, do abstrakcji logiki):
+
 ```typescript
 interface UseProfileReturn {
   preferences: UserPreferences | null;
@@ -388,6 +420,7 @@ Jeśli logika stanie się zbyt skomplikowana, można wyodrębnić ją do hooka `
 **Typ żądania**: GET (bez body)
 
 **Typ odpowiedzi**:
+
 - 200 OK: `UserPreferences`
 - 404 Not Found: `ApiError` (preferencje nie istnieją)
 - 500 Internal Server Error: `ApiError`
@@ -395,6 +428,7 @@ Jeśli logika stanie się zbyt skomplikowana, można wyodrębnić ją do hooka `
 **Wywołanie**: Przy montowaniu komponentu lub przy odświeżaniu (`refreshPreferences`)
 
 **Obsługa błędów**:
+
 - 404 → Pusta strona z komunikatem "Uzupełnij preferencje" + przycisk do `/onboarding`
 - 500 → Toast error + przycisk retry
 - Network error → Toast error + przycisk retry
@@ -406,6 +440,7 @@ Jeśli logika stanie się zbyt skomplikowana, można wyodrębnić ją do hooka `
 **Typ żądania**: PUT z JSON body (`PreferencesInput`)
 
 **Typ odpowiedzi**:
+
 - 200 OK: `UserPreferences` (zaktualizowane dane)
 - 400 Bad Request: `ApiError` (błąd walidacji)
 - 401 Unauthorized: `ApiError` (niezalogowany)
@@ -414,6 +449,7 @@ Jeśli logika stanie się zbyt skomplikowana, można wyodrębnić ją do hooka `
 **Wywołanie**: W `EditPreferencesForm` przy submit pełnej edycji
 
 **Obsługa błędów**:
+
 - 400 → Wyświetlenie błędów walidacji pod polami
 - 401 → Toast "Sesja wygasła" + redirect do `/login`
 - 500 → Toast "Błąd serwera" + możliwość retry
@@ -425,6 +461,7 @@ Jeśli logika stanie się zbyt skomplikowana, można wyodrębnić ją do hooka `
 **Typ żądania**: PATCH z JSON body (`PreferencesPartialUpdateInput`)
 
 **Typ odpowiedzi**:
+
 - 200 OK: `UserPreferences` (zaktualizowane dane)
 - 400 Bad Request: `ApiError` (błąd walidacji)
 - 404 Not Found: `ApiError` (preferencje nie istnieją)
@@ -545,6 +582,7 @@ API wykonuje dokładnie taką samą walidację co frontend (identyczne schematy 
 **Przyczyna**: Użytkownik nie uzupełnił onboardingu lub preferencje zostały usunięte.
 
 **Obsługa**:
+
 - Pusta strona z komunikatem: "Nie skonfigurowałeś jeszcze swoich preferencji"
 - Przycisk CTA: "Uzupełnij preferencje" (przekierowuje do `/onboarding`)
 
@@ -555,6 +593,7 @@ API wykonuje dokładnie taką samą walidację co frontend (identyczne schematy 
 **Przyczyna**: Brak połączenia z internetem lub serwer niedostępny.
 
 **Obsługa**:
+
 - Toast: "Nie można połączyć się z serwerem"
 - Przycisk "Spróbuj ponownie" w ProfileContent
 - Przycisk retry wywołuje `refreshPreferences()`
@@ -564,6 +603,7 @@ API wykonuje dokładnie taką samą walidację co frontend (identyczne schematy 
 **Przyczyna**: Dane nie spełniają warunków walidacji.
 
 **Obsługa**:
+
 - Błędy walidacji wyświetlane pod odpowiednimi polami
 - Toast z ogólnym komunikatem: "Sprawdź błędy w formularzu"
 - Stosujemy logic rollback (formularz pozostaje otwarty)
@@ -573,6 +613,7 @@ API wykonuje dokładnie taką samą walidację co frontend (identyczne schematy 
 **Przyczyna**: Token autentykacji wygasł.
 
 **Obsługa**:
+
 - Toast: "Twoja sesja wygasła"
 - Automatyczny redirect do `/login`
 
@@ -581,6 +622,7 @@ API wykonuje dokładnie taką samą walidację co frontend (identyczne schematy 
 **Przyczyna**: Błąd po stronie serwera.
 
 **Obsługa**:
+
 - Toast: "Błąd serwera. Spróbuj ponownie później"
 - Modal pozostaje otwarty z danymi użytkownika (brak rollback)
 - Możliwość retry
@@ -590,12 +632,14 @@ API wykonuje dokładnie taką samą walidację co frontend (identyczne schematy 
 **Przyczyna**: Użytkownik otworzył modal, ale nie wprowadził żadnych zmian lub cofnął zmiany.
 
 **Obsługa**:
+
 - Przycisk "Zapisz" może być disabled jeśli nie ma zmian
 - Lub po prostu nie wysyłamy requesta (nie ma zmian)
 
 ### Optymistyczne aktualizacje:
 
 **Strategia**: NIE stosujemy optymistycznych aktualizacji dla edycji preferencji, ponieważ:
+
 1. Zmiany są stosunkowo rzadkie
 2. Nie ma ryzyka konfliktów (tylko jeden użytkownik edytuje swoje preferencje)
 3. Preferencje są krytycznymi danymi (wpływają na generowanie przepisów)
@@ -611,6 +655,7 @@ W przyszłości można dodać Error Boundary dla nieoczekiwanych błędów React
 ### Krok 1: Przygotowanie struktury plików
 
 **Działania**:
+
 1. Utwórz folder `src/components/profile/` (jeśli nie istnieje)
 2. Utwórz następujące pliki:
    - `ProfileContent.tsx` (główny komponent)
@@ -628,6 +673,7 @@ W przyszłości można dodać Error Boundary dla nieoczekiwanych błędów React
 ### Krok 2: Implementacja komponentów kart (prezentacyjne)
 
 **Działania**:
+
 1. Zaimplementuj `DietTypeCard`, `PreferredIngredientsCard`, `PreferredCuisinesCard`, `AllergensCard`, `NotesCard`
 2. Każda karta to prosty komponent przyjmujący `label` i `value`
 3. Użyj Shadcn Card component
@@ -635,32 +681,38 @@ W przyszłości można dodać Error Boundary dla nieoczekiwanych błędów React
 5. Fallback text: "Nie podano" gdy wartość jest null/undefined/pusta
 
 **Pliki do utworzenia**:
+
 - `src/components/profile/DietTypeCard.tsx` i pozostałe karty
 
 ### Krok 3: Implementacja komponentów nagłówka i daty
 
 **Działania**:
+
 1. Zaimplementuj `ProfileHeader` z przyciskiem edycji
 2. Zaimplementuj `LastModifiedDate` z formatowaniem daty
 3. Użyj komponentów Button i lucide-react icons
 
 **Pliki do utworzenia**:
+
 - `src/components/profile/ProfileHeader.tsx`
 - `src/components/profile/LastModifiedDate.tsx`
 
 ### Krok 4: Implementacja ProfileInfo
 
 **Działania**:
+
 1. Stwórz grid layout dla kart preferencji
 2. Użyj mapowania preferencji do komponentów kart
 3. Layout responsywny (grid-cols-1 md:grid-cols-2)
 
 **Pliki do utworzenia**:
+
 - `src/components/profile/ProfileInfo.tsx`
 
 ### Krok 5: Implementacja EditPreferencesDialog
 
 **Działania**:
+
 1. Stwórz modal z Shadcn Dialog
 2. Dodaj DialogHeader, DialogContent, DialogFooter
 3. Implementuj logikę otwierania/zamykania
@@ -668,11 +720,13 @@ W przyszłości można dodać Error Boundary dla nieoczekiwanych błędów React
 5. Przygotuj miejsce dla formularza (następny krok)
 
 **Pliki do utworzenia**:
+
 - `src/components/profile/EditPreferencesDialog.tsx`
 
 ### Krok 6: Implementacja EditPreferencesForm
 
 **Działania**:
+
 1. Zainicjalizuj react-hook-form z `useForm`
 2. Dodaj resolver `zodResolver` z `PreferencesPartialInputSchema`
 3. Utwórz pola formularza:
@@ -687,11 +741,13 @@ W przyszłości można dodać Error Boundary dla nieoczekiwanych błędów React
 7. Dodaj toast dla sukcesu i błędów (sonner)
 
 **Pliki do utworzenia**:
+
 - `src/components/profile/EditPreferencesForm.tsx`
 
 ### Krok 7: Implementacja ProfileContent
 
 **Działania**:
+
 1. Stwórz komponent jako funkcję React
 2. Dodaj stan dla `preferences`, `isLoading`, `error`, `isEditDialogOpen`
 3. Zaimplementuj `refreshPreferences()` do pobierania danych
@@ -704,11 +760,13 @@ W przyszłości można dodać Error Boundary dla nieoczekiwanych błędów React
 10. Dodaj kondycyjne renderowanie EditPreferencesDialog
 
 **Pliki do utworzenia**:
+
 - `src/components/profile/ProfileContent.tsx`
 
 ### Krok 8: Stworzenie strony Astro /profile
 
 **Działania**:
+
 1. Utwórz `src/pages/profile.astro`
 2. Importuj AuthLayout
 3. Importuj ProfileContent
@@ -720,6 +778,7 @@ W przyszłości można dodać Error Boundary dla nieoczekiwanych błędów React
 9. Renderuj w AuthLayout
 
 **Przykładowa implementacja**:
+
 ```astro
 ---
 import AuthLayout from "../layouts/AuthLayout.astro";
@@ -728,7 +787,10 @@ import { createServerSupabaseClient } from "../db/supabase.client";
 import { getUserPreferences } from "../lib/services/preferences.service";
 
 const supabase = createServerSupabaseClient(Astro);
-const { data: { user }, error: authError } = await supabase.auth.getUser();
+const {
+  data: { user },
+  error: authError,
+} = await supabase.auth.getUser();
 
 if (!user) {
   return Astro.redirect("/login");
@@ -740,21 +802,18 @@ const accessToken = (await supabase.auth.getSession()).data.session?.access_toke
 ---
 
 <AuthLayout pageTitle="Profil" userName={userName}>
-  <ProfileContent 
-    initialPreferences={preferences} 
-    accessToken={accessToken} 
-    userName={userName}
-    client:idle 
-  />
+  <ProfileContent initialPreferences={preferences} accessToken={accessToken} userName={userName} client:idle />
 </AuthLayout>
 ```
 
 **Pliki do utworzenia**:
+
 - `src/pages/profile.astro`
 
 ### Krok 9: Dodanie nawigacji do profilu
 
 **Działania**:
+
 1. Zmodyfikuj `src/layouts/AuthLayout.astro`
 2. Dodaj dropdown menu dla użytkownika (Shadcn DropdownMenu)
 3. Dodaj ikonę avatara użytkownika (lub tylko imię jako trigger)
@@ -762,9 +821,15 @@ const accessToken = (await supabase.auth.getSession()).data.session?.access_toke
 5. Użyj lucide-react icon dla avatara (UserCircle lub User)
 
 **Przykładowa implementacja**:
+
 ```astro
 ---
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { UserCircle } from "lucide-react";
 ---
 
@@ -789,11 +854,13 @@ import { UserCircle } from "lucide-react";
 ```
 
 **Pliki do modyfikacji**:
+
 - `src/layouts/AuthLayout.astro`
 
 ### Krok 10: Testowanie i debugowanie
 
 **Działania**:
+
 1. Testuj pobieranie preferencji (czy wyświetlają się poprawnie)
 2. Testuj edycję preferencji (czy zapisują się poprawnie)
 3. Testuj walidację (czy błędy wyświetlają się pod polami)
@@ -803,6 +870,7 @@ import { UserCircle } from "lucide-react";
 7. Testuj dark mode
 
 **Narzędzia**:
+
 - DevTools network tab
 - React DevTools
 - Lighthouse (opcjonalnie)
@@ -810,14 +878,15 @@ import { UserCircle } from "lucide-react";
 ### Krok 11: Optymalizacja i poprawki
 
 **Działania**:
+
 1. Sprawdź linter errors
 2. Upewnij się, że wszystkie komponenty mają właściwe typy TypeScript
 3. Dodaj komentarze gdzie potrzebne
 4. Przeprowadź code review (self-review)
 
 **Komendy**:
+
 ```bash
 npm run lint
 npm run lint:fix
 ```
-

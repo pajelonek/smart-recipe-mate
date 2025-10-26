@@ -15,4 +15,3 @@ export function LastModifiedDate({ updatedAt }: Readonly<LastModifiedDateProps>)
     </div>
   );
 }
-
