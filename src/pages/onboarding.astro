@@ -1,0 +1,36 @@
+---
+import { createServerSupabaseClient } from "../db/supabase.client";
+
+const supabase = createServerSupabaseClient(Astro);
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+const user = session?.user || null;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+if (user) {
+  const userId: string = user.id;
+
+  const { data: preferences } = await supabase
+    .from("user_preferences")
+    .select("user_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (preferences) {
+    return Astro.redirect("/");
+  }
+}
+
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { OnboardingForm } from "../components/onboarding/OnboardingForm";
+
+const accessToken = session?.access_token || "";
+---
+
+<AuthLayout pageTitle="Preferencje żywieniowe" userName={user.email}>
+  <OnboardingForm client:load accessToken={accessToken} />
+</AuthLayout>

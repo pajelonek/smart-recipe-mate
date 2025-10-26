@@ -1,5 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
-import { createServerSupabaseClient } from "../db/supabase.client";
+import { createServerSupabaseClient, type SupabaseClient } from "../db/supabase.client";
 
 const PUBLIC_ROUTES = new Set([
   "/",
@@ -17,6 +17,16 @@ const PUBLIC_API_ROUTES = new Set([
 ]);
 const ONBOARDING_ROUTE = "/onboarding";
 const API_PREFIX = "/api/";
+
+async function checkUserHasPreferences(userId: string, supabase: SupabaseClient): Promise<boolean> {
+  const { data: preferences } = await supabase
+    .from("user_preferences")
+    .select("user_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  return !!preferences;
+}
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = new URL(context.request.url);
@@ -75,15 +85,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Store user in locals
   context.locals.user = user;
 
-  // For dashboard (/), check onboarding completion
-  if (pathname === "/") {
-    const { data: preferences } = await supabase
-      .from("user_preferences")
-      .select("user_id")
-      .eq("user_id", user.id)
-      .maybeSingle();
+  // Check onboarding status for protected routes
+  const hasPreferences = await checkUserHasPreferences(user.id, supabase);
 
-    if (!preferences) {
+  // For onboarding route, redirect to dashboard if already completed
+  if (pathname === ONBOARDING_ROUTE) {
+    if (hasPreferences) {
+      return context.redirect("/");
+    }
+    // Allow access to onboarding if not completed
+    return next();
+  }
+
+  // For dashboard (/), redirect to onboarding if not completed
+  if (pathname === "/") {
+    if (!hasPreferences) {
       return context.redirect(ONBOARDING_ROUTE);
     }
   }

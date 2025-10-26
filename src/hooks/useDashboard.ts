@@ -2,15 +2,7 @@ import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import type { Recipe, UserStats, RecipeListResponse } from "../types";
 
-interface SupabaseSession {
-  access_token: string;
-}
-
-declare global {
-  var supabaseSession: SupabaseSession | null;
-}
-
-export function useDashboard(initialRecipes: Recipe[], initialStats: UserStats) {
+export function useDashboard(initialRecipes: Recipe[], initialStats: UserStats, accessToken: string) {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [stats, setStats] = useState<UserStats>(initialStats);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,14 +13,9 @@ export function useDashboard(initialRecipes: Recipe[], initialStats: UserStats) 
     setError(null);
 
     try {
-      const session = globalThis.supabaseSession;
-      if (!session) {
-        throw new Error("No authentication session");
-      }
-
       const response = await fetch("/api/recipes", {
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -50,14 +37,10 @@ export function useDashboard(initialRecipes: Recipe[], initialStats: UserStats) 
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [accessToken]);
 
   const deleteRecipe = useCallback(
     async (recipeId: string) => {
-      if (!globalThis.supabaseSession) {
-        throw new Error("No authentication session");
-      }
-
       const previousRecipes = recipes;
       const previousStats = stats;
 
@@ -72,7 +55,7 @@ export function useDashboard(initialRecipes: Recipe[], initialStats: UserStats) 
         const response = await fetch(`/api/recipes/${recipeId}`, {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${globalThis.supabaseSession.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -92,7 +75,7 @@ export function useDashboard(initialRecipes: Recipe[], initialStats: UserStats) 
         throw err;
       }
     },
-    [recipes, stats]
+    [recipes, stats, accessToken]
   );
 
   return {

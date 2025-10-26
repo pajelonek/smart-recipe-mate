@@ -8,10 +8,16 @@ interface DashboardContentProps {
   initialRecipes: Recipe[];
   initialStats: UserStats;
   userName: string;
+  accessToken: string;
 }
 
-export function DashboardContent({ initialRecipes, initialStats, userName }: Readonly<DashboardContentProps>) {
-  const { recipes, stats, isLoading, error, deleteRecipe } = useDashboard(initialRecipes, initialStats);
+export function DashboardContent({
+  initialRecipes,
+  initialStats,
+  userName,
+  accessToken,
+}: Readonly<DashboardContentProps>) {
+  const { recipes, stats, isLoading, error, deleteRecipe } = useDashboard(initialRecipes, initialStats, accessToken);
 
   if (error) {
     return (
@@ -19,7 +25,7 @@ export function DashboardContent({ initialRecipes, initialStats, userName }: Rea
         <h2 className="text-xl font-semibold mb-2">Error Loading Dashboard</h2>
         <p className="text-muted-foreground mb-4">{error}</p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => globalThis.location.reload()}
           className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
         >
           Retry

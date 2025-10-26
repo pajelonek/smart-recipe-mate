@@ -1,4 +1,5 @@
 import type { Database } from "./db/database.types";
+import type { PreferencesInput } from "./components/onboarding/types";
 
 type PublicSchema = Database["public"]["Tables"];
 
@@ -13,19 +14,18 @@ export type AIGenerationEntity = PublicSchema["ai_generations"]["Row"];
 // 1. ONBOARDING / USER PREFERENCES DTOs
 // =============================================================================
 
-export interface PreferencesInput {
-  diet_type: string;
-  preferred_ingredients?: string;
-  preferred_cuisines?: string;
-  allergens?: string;
-  notes?: string;
-}
-
+/**
+ * User preferences entity type from database
+ * For input DTOs, see: src/components/onboarding/types.ts
+ */
 export type UserPreferences = UserPreferencesEntity;
 
-export type PreferencesUpdateInput = PreferencesInput;
-
-export type PreferencesPartialUpdateInput = Partial<PreferencesInput>;
+// Re-export onboarding types for backward compatibility with services
+export {
+  type PreferencesInput,
+  type PreferencesUpdateInput,
+  type PreferencesPartialUpdateInput,
+} from "./components/onboarding/types";
 
 // =============================================================================
 // 2. RECIPES DTOs

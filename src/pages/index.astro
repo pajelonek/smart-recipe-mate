@@ -64,9 +64,10 @@ if (user !== null) {
     generationsCount: generationsCount || 0,
   };
 
-   
   userName = user.user_metadata?.display_name || user.email?.split("@")[0] || "User";
 }
+
+const accessToken = session?.access_token || "";
 ---
 <>
 {!user && (
@@ -132,6 +133,7 @@ if (user !== null) {
       initialRecipes={recentRecipes}
       initialStats={stats}
       userName={userName}
+      accessToken={accessToken}
     />
   </AuthLayout>
 )}
