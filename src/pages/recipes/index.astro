@@ -1,0 +1,54 @@
+---
+import AuthLayout from "../../layouts/AuthLayout.astro";
+import { createServerSupabaseClient } from "../../db/supabase.client";
+import { getUserRecipes } from "../../lib/services/recipes.service";
+import { RecipesListContent } from "../../components/recipes/RecipesListContent";
+import type { Recipe } from "../../types";
+
+const supabase = createServerSupabaseClient(Astro);
+
+// Get authenticated user from session
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+const user = session?.user || null;
+
+// Redirect to login if not authenticated
+if (!user) {
+  return Astro.redirect("/login?redirect=" + encodeURIComponent(Astro.url.pathname));
+}
+
+const userId: string = user.id;
+
+// Check if user has completed onboarding (has preferences)
+const { data: preferences } = await supabase
+  .from("user_preferences")
+  .select("user_id")
+  .eq("user_id", userId)
+  .maybeSingle();
+
+if (!preferences) {
+  return Astro.redirect("/onboarding");
+}
+
+// Fetch initial recipes from SSR
+const recipes = await getUserRecipes(userId, supabase);
+
+// Get access token for client-side API calls
+const accessToken = session?.access_token || "";
+
+// Get user name for display
+const userName = user.user_metadata?.display_name || user.email?.split("@")[0] || "User";
+const pageTitle = "Przepisy - Smart Recipe Mate";
+---
+
+<AuthLayout pageTitle={pageTitle} userName={userName}>
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight">Moje przepisy</h1>
+      <p class="text-muted-foreground mt-2">Zarządzaj swoimi przepisami kulinarnymi</p>
+    </div>
+
+    <RecipesListContent client:load accessToken={accessToken} initialRecipes={recipes} />
+  </div>
+</AuthLayout>

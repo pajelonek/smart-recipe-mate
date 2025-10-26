@@ -112,21 +112,12 @@ Kryteria akceptacji:
 
 ### US-008 Wyszukiwanie i filtrowanie przepisów
 
-Opis: Jako użytkownik chcę wyszukiwać przepisy po tytule oraz filtrować je po tagach.
+Opis: Jako użytkownik chcę wyszukiwać przepisy po tytul.
 Kryteria akceptacji:
 
 - Pole wyszukiwania filtruje listę w czasie rzeczywistym po częściowym dopasowaniu tytułu.
 - Lista tagów umożliwia zaznaczenie jednego lub wielu tagów; wynik pokazuje przepisy spełniające wszystkie wybrane tagi.
 - Usunięcie filtrów przywraca pełną listę bez przeładowania strony.
-
-### US-009 Zarządzanie tagami przepisu
-
-Opis: Jako użytkownik chcę dodawać i usuwać tagi przy przepisie, aby lepiej organizować repozytorium.
-Kryteria akceptacji:
-
-- Formularz dodawania przepisu oferuje pole tagów z autouzupełnianiem istniejących wartości.
-- Użytkownik może tworzyć nowe tagi, o ile nie przekroczy limitu dziesięciu tagów na przepis.
-- Usuwanie tagu z przepisu natychmiast aktualizuje listę widoczną dla użytkownika.
 
 ### US-010 Dodanie przepisu tekstowego
 

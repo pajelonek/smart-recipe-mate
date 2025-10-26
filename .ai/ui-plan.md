@@ -29,24 +29,24 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 
 ### Widok: Lista przepisów
 - **Ścieżka widoku**: /recipes
-- **Główny cel**: Przegląd, wyszukiwanie i filtrowanie przepisów użytkownika.
-- **Kluczowe informacje do wyświetlenia**: Tabela z tytułami, datami, tagami; pole wyszukiwania (tytuł), filtry tagów (Combobox multi-select).
-- **Kluczowe komponenty widoku**: DataTable (Shadcn Table z debounce search), Filter Sidebar lub Dropdown, Pagination (jeśli >50), Empty State jeśli brak.
-- **UX, dostępność i względy bezpieczeństwa**: Debounce na search (300ms), URL params dla filtrów (persistencja); tylko własne przepisy (owner_id via auth); 404 empty state dla usuniętych.
+- **Główny cel**: Przegląd i wyszukiwanie przepisów użytkownika.
+- **Kluczowe informacje do wyświetlenia**: Tabela z tytułami, datami; pole wyszukiwania (tytuł).
+- **Kluczowe komponenty widoku**: DataTable (Shadcn Table z debounce search), Pagination (jeśli >50), Empty State jeśli brak.
+- **UX, dostępność i względy bezpieczeństwa**: Debounce na search (300ms), URL params dla search (persistencja); tylko własne przepisy (owner_id via auth); 404 empty state dla usuniętych.
 
 ### Widok: Szczegóły przepisu
 - **Ścieżka widoku**: /recipes/[id]
-- **Główny cel**: Wyświetlenie pełnych detali przepisu z opcjami edycji i zarządzania tagami.
-- **Kluczowe informacje do wyświetlenia**: Tytuł, summary, składniki, przygotowanie (Accordion), lista tagów, przyciski edycji/usuwania.
-- **Kluczowe komponenty widoku**: Accordion dla sekcji, Edit Modal (Form z PUT/PATCH), Delete Confirmation Dialog, Tags Combobox (POST/DELETE /api/recipes/:id/tags).
-- **UX, dostępność i względy bezpieczeństwa**: Ładowanie via GET /api/recipes/:id; 403 jeśli nie własny; modal potwierdzenia dla delete (soft delete); max 10 tagów z walidacją.
+- **Główny cel**: Wyświetlenie pełnych detali przepisu z opcjami edycji.
+- **Kluczowe informacje do wyświetlenia**: Tytuł, summary, składniki, przygotowanie (Accordion), przyciski edycji/usuwania.
+- **Kluczowe komponenty widoku**: Accordion dla sekcji, Edit Modal (Form z PUT/PATCH), Delete Confirmation Dialog.
+- **UX, dostępność i względy bezpieczeństwa**: Ładowanie via GET /api/recipes/:id; 403 jeśli nie własny; modal potwierdzenia dla delete (soft delete).
 
 ### Widok: Nowy przepis
 - **Ścieżka widoku**: /recipes/new
 - **Główny cel**: Dodanie nowego przepisu ręcznie.
-- **Kluczowe informacje do wyświetlenia**: Formularz z sekcjami (tytuł, summary, składniki, przygotowanie, tagi).
-- **Kluczowe komponenty widoku**: Form (Zod + react-hook-form), Textarea dla sekcji, Combobox dla tagów (autouzupełnianie z GET /api/tags), Submit Button.
-- **UX, dostępność i względy bezpieczeństwa**: Walidacja required fields (tytuł, składniki, przygotowanie); POST /api/recipes z tag_names; snackbar sukces/błąd; ochrona przed pustymi sekcjami.
+- **Kluczowe informacje do wyświetlenia**: Formularz z sekcjami (tytuł, summary, składniki, przygotowanie).
+- **Kluczowe komponenty widoku**: Form (Zod + react-hook-form), Textarea dla sekcji, Submit Button.
+- **UX, dostępność i względy bezpieczeństwa**: Walidacja required fields (tytuł, składniki, przygotowanie); POST /api/recipes; snackbar sukces/błąd; ochrona przed pustymi sekcjami.
 
 ### Widok: Generowanie AI
 - **Ścieżka widoku**: /generate
@@ -86,14 +86,14 @@ Architektura interfejsu użytkownika dla Smart Recipe Mate opiera się na framew
 6. **Wylogowanie**: Sidebar → Unieważnij sesję → Redirect do /login.
 7. **Edge flows**: Błąd API → Snackbar z message/retry; Brak przepisów → Empty state z CTA do generate/add; Rate limit → Snackbar z countdown.
 
-Główny przypadek użycia (dodanie przepisu via AI): Login → /generate → Input → Generate → Review → Save → /recipes (widoczny nowy) → Tagi via modal.
+Główny przypadek użycia (dodanie przepisu via AI): Login → /generate → Input → Generate → Review → Save → /recipes (widoczny nowy).
 
 ## 4. Układ i struktura nawigacji
 
 - **Persistent Sidebar**: Lewy panel z logo, linkami (Profile, Przepisy, Generuj AI, Historia generacji, Wyloguj); dynamiczny – ukryty pre-onboarding (tylko Login/Onboarding).
 - **Top Bar**: Opcjonalny search globalny lub user avatar z menu (profil, logout).
-- **Routing**: Astro pages z dynamicznymi routes (/recipes/[id], /ai/generations/[id]); nested routes dla /recipes/tags jeśli potrzebne; middleware redirect dla unauth/onboarding.
-- **Przejścia**: Smooth transitions via Astro; URL params dla filtrów/search (np. /recipes?search=pasta&tags=Italian).
+- **Routing**: Astro pages z dynamicznymi routes (/recipes/[id], /ai/generations/[id]); middleware redirect dla unauth/onboarding.
+- **Przejścia**: Smooth transitions via Astro; URL params dla search (np. /recipes?search=pasta).
 - **Quick Actions**: W dashboard – przyciski do /recipes/new i /generate.
 
 ## 5. Kluczowe komponenty
@@ -101,9 +101,9 @@ Główny przypadek użycia (dodanie przepisu via AI): Login → /generate → In
 - **Auth Components**: Login/Register Forms – integracja Supabase SDK, obsługa email verification i resetu.
 - **Forms**: Reusable Form z react-hook-form + Zod – walidacja mirroring API schemas, multi-step dla onboarding.
 - **Tables/DataTable**: Shadcn Table z sorting, filtering, pagination – dla list przepisów i generacji.
-- **Modals/Dialogs**: Shadcn Dialog – dla edycji, usuwania (potwierdzenie), zarządzania tagami.
+- **Modals/Dialogs**: Shadcn Dialog – dla edycji, usuwania (potwierdzenie).
 - **Cards/Accordion**: Wyświetlanie detali przepisów/generacji – collapsible sekcje.
-- **Combobox/Select**: Dla tagów (autouzupełnianie z API), diet_type (predefiniowane opcje).
+- **Combobox/Select**: Dla diet_type (predefiniowane opcje).
 - **Toasts/Snackbars**: Sonner – dla sukcesów, błędów, rate limits (z countdown).
 - **Loading States**: Skeleton loaders dla list/forms; Spinner dla API calls.
 - **Error Boundary**: React Error Boundary – fallback UI z retry.
