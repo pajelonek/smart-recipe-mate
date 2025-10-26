@@ -1,6 +1,6 @@
 ---
 import { ModeToggle } from "@/components/common/ModeToggle";
-import { LogoutButton } from "@/components/common/LogoutButton";
+import { UserMenu } from "@/components/common/UserMenu";
 import Layout from "../layouts/Layout.astro";
 
 interface Props {
@@ -22,9 +22,8 @@ const { pageTitle = "Smart Recipe Mate", userName = "User" } = Astro.props;
           </a>
         </div>
         <div class="flex items-center gap-4">
-          <span class="text-sm text-muted-foreground">Witaj, {userName}</span>
           <ModeToggle client:idle />
-          <LogoutButton client:idle />
+          <UserMenu userName={userName} client:idle />
         </div>
       </div>
     </header>

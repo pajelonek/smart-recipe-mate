@@ -1,0 +1,28 @@
+---
+import AuthLayout from "../layouts/AuthLayout.astro";
+import { ProfileContent } from "../components/profile/ProfileContent";
+import { createServerSupabaseClient } from "../db/supabase.client";
+import { getUserPreferences } from "../lib/services/preferences.service";
+
+const supabase = createServerSupabaseClient(Astro);
+
+// Get authenticated user
+const {
+  data: { user },
+  error: authError,
+} = await supabase.auth.getUser();
+
+if (!user || authError) {
+  return Astro.redirect("/login");
+}
+
+// Fetch user preferences
+const preferences = await getUserPreferences(user.id, supabase);
+const userName = user.user_metadata?.display_name || user.email?.split("@")[0] || "User";
+---
+
+<AuthLayout pageTitle="Profil" userName={userName}>
+  <div class="max-w-4xl mx-auto p-6">
+    <ProfileContent client:load initialPreferences={preferences} />
+  </div>
+</AuthLayout>
