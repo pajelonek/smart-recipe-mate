@@ -14,6 +14,10 @@ export function UserStats({ stats }: Readonly<UserStatsProps>) {
     globalThis.location.href = "/recipes";
   };
 
+  const onGenerationsClick = () => {
+    globalThis.location.href = "/ai/generate";
+  };
+
   return (
     <div className="stats-grid grid grid-cols-1 md:grid-cols-2 gap-4">
       <StatCard
@@ -26,6 +30,7 @@ export function UserStats({ stats }: Readonly<UserStatsProps>) {
         icon={<Sparkles className="h-4 w-4 text-muted-foreground" />}
         value={generationsCount}
         label="AI Generations"
+        onClick={onGenerationsClick}
       />
     </div>
   );

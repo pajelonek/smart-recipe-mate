@@ -236,10 +236,13 @@ export class OpenRouterService {
     // Build system message with user preferences
     let systemContent = `You are a culinary AI assistant for Smart Recipe Mate. You help users create personalized recipes based on their available ingredients and dietary preferences.
 
+IMPORTANT: Always respond in Polish language (polski).
+
 Always respond in JSON format as per the provided schema. Create recipes that are:
 - Practical and achievable with the given ingredients
 - Clear and easy to follow
-- Nutritionally balanced when possible`;
+- Nutritionally balanced when possible
+- All text content (title, summary, ingredients, preparation) must be in Polish language`;
 
     if (preferences) {
       systemContent += `\n\nUser preferences:`;
@@ -267,14 +270,14 @@ Always respond in JSON format as per the provided schema. Create recipes that ar
     };
 
     // Build user message
-    const userContent = `Generate a recipe using these available ingredients: ${ingredients.join(", ")}.
+    const userContent = `Wygeneruj przepis używając tych dostępnych składników: ${ingredients.join(", ")}.
 
-Please provide:
-1. A catchy recipe title
-2. A brief summary describing the dish
-3. A complete ingredients list with quantities (one ingredient per line)
-4. Step-by-step preparation instructions
-5. Estimated nutritional information (calories, protein, carbohydrates, fat in grams)`;
+Please provide in Polish (polski):
+1. A catchy recipe title (Tytuł przepisu)
+2. A brief summary describing the dish (Krótki opis dania)
+3. A complete ingredients list with quantities (Lista składników z ilościami, jeden składnik na linię)
+4. Step-by-step preparation instructions (Szczegółowe instrukcje przygotowania krok po kroku)
+5. Estimated nutritional information (Szacowane informacje o wartości odżywczej: kalorie, białko, węglowodany, tłuszcz w gramach)`;
 
     const user: ChatMessage = {
       role: "user",

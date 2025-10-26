@@ -35,14 +35,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (PUBLIC_ROUTES.has(pathname)) {
     const supabase = createServerSupabaseClient(context);
     context.locals.supabase = supabase;
-    return next();
+    return await next();
   }
 
   // Allow public API routes
   if (PUBLIC_API_ROUTES.has(pathname)) {
     const supabase = createServerSupabaseClient(context);
     context.locals.supabase = supabase;
-    return next();
+    return await next();
   }
 
   // Create Supabase client for protected routes
@@ -69,7 +69,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     context.locals.user = user;
-    return next();
+    return await next();
   }
 
   // For protected routes, check authentication
@@ -94,7 +94,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return context.redirect("/");
     }
     // Allow access to onboarding if not completed
-    return next();
+    return await next();
   }
 
   // For dashboard (/), redirect to onboarding if not completed
@@ -102,7 +102,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (!hasPreferences) {
       return context.redirect(ONBOARDING_ROUTE);
     }
+    return await next();
   }
 
-  return next();
+  return await next();
 });

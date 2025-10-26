@@ -1,0 +1,37 @@
+---
+import AuthLayout from "../../layouts/AuthLayout.astro";
+import { AIGenerateContent } from "../../components/ai/AIGenerateContent";
+import { createServerSupabaseClient } from "../../db/supabase.client";
+
+const supabase = createServerSupabaseClient(Astro);
+
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+const user = session?.user || null;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+const userId: string = user.id;
+const { data: preferences } = await supabase
+  .from("user_preferences")
+  .select("user_id")
+  .eq("user_id", userId)
+  .maybeSingle();
+
+if (!preferences) {
+  return Astro.redirect("/onboarding");
+}
+
+const userName = user.user_metadata?.display_name || user.email?.split("@")[0] || "User";
+const pageTitle = "Generuj przepis z AI - Smart Recipe Mate";
+const accessToken = session?.access_token || "";
+---
+
+<AuthLayout pageTitle={pageTitle} userName={userName}>
+  <div class="max-w-4xl mx-auto p-6">
+    <AIGenerateContent client:load accessToken={accessToken} />
+  </div>
+</AuthLayout>
