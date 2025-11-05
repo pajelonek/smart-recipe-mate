@@ -1,7 +1,18 @@
 import { defineConfig, devices } from "@playwright/test";
+import { config } from "dotenv";
+import { resolve } from "node:path";
+
+/**
+ * Load environment variables from .env file
+ * This ensures Playwright tests can access Supabase credentials
+ */
+config({ path: resolve(process.cwd(), ".env") });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
+ *
+ * This configuration uses local Supabase instance for E2E testing.
+ * Make sure to run `npm run supabase:start` before running E2E tests.
  */
 export default defineConfig({
   testDir: "./e2e",
@@ -21,13 +32,28 @@ export default defineConfig({
     baseURL: "http://localhost:3000",
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
+    /* Take screenshot on failure */
+    screenshot: "only-on-failure",
+    /* Record video on failure */
+    video: "retain-on-failure",
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers - Chromium/Desktop Chrome only per guidelines */
   projects: [
+    // Setup project - runs first to authenticate
+    {
+      name: "setup",
+      testMatch: /.*\.setup\.ts/,
+    },
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      testMatch: /.*\.spec\.ts/,
+      use: {
+        ...devices["Desktop Chrome"],
+        // Optionally use authenticated state for all tests
+        // storageState: "e2e/.auth/user.json",
+      },
+      dependencies: ["setup"],
     },
   ],
 

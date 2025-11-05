@@ -24,6 +24,14 @@ const baseConfig = tseslint.config({
   },
 });
 
+// Allow empty object patterns in Playwright fixtures (required by Playwright API)
+const playwrightConfig = tseslint.config({
+  files: ["**/e2e/**/*.{ts,js}"],
+  rules: {
+    "@typescript-eslint/no-empty-object-type": "off",
+  },
+});
+
 const jsxA11yConfig = tseslint.config({
   files: ["**/*.{js,jsx,ts,tsx}"],
   extends: [jsxA11y.flatConfigs.recommended],
@@ -60,6 +68,7 @@ const reactConfig = tseslint.config({
 export default tseslint.config(
   includeIgnoreFile(gitignorePath),
   baseConfig,
+  playwrightConfig,
   jsxA11yConfig,
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],
