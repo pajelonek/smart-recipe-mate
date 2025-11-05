@@ -32,7 +32,7 @@ export function AIGenerateContent({ accessToken }: AIGenerateContentProps) {
     acceptRecipe,
     rejectRecipe,
     resetError,
-  } = useAIGeneration();
+  } = useAIGen   eration();
 
   const handleGenerateRecipe = async () => {
     await generateRecipe(accessToken);

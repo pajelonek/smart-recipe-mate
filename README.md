@@ -56,6 +56,13 @@ For the full product requirements, refer to [`./.ai/prd.md`](./.ai/prd.md).
 - OpenRouter.ai for routing to multiple AI models (OpenAI, Anthropic, Google, etc.) with cost controls.
 - REST-based AI messaging with JSON payloads for prompts and responses.
 
+### Testing
+
+- **Vitest** for unit testing with fast execution and TypeScript support, integrated with Vite.
+- **React Testing Library** for testing React components with a user-centric approach.
+- **MSW (Mock Service Worker)** for mocking API calls in unit tests.
+- **Playwright** for end-to-end (E2E) testing across real browsers (Chrome, Firefox, WebKit).
+
 ### Tooling & Infrastructure
 
 - Node.js `22.14.0` (see `.nvmrc`) with npm for package management.
@@ -142,6 +149,10 @@ For a condensed overview of the technology choices, see [`./.ai/tech-stack.md`](
 | `npm run lint`           | Run ESLint across the project.                       |
 | `npm run lint:fix`       | Run ESLint with automatic fixes enabled.             |
 | `npm run format`         | Format files using Prettier.                         |
+| `npm run test`           | Run unit tests with Vitest.                          |
+| `npm run test:watch`     | Run unit tests in watch mode.                        |
+| `npm run test:coverage`  | Generate test coverage report.                       |
+| `npm run test:e2e`       | Run end-to-end tests with Playwright.                |
 | `npm run supabase:start` | Boot Supabase services locally via the Supabase CLI. |
 
 ## 6. Project Scope

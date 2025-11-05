@@ -1,0 +1,196 @@
+# Plan Testów - Smart Recipe Mate (MVP)
+
+## 1. Wprowadzenie i Cele Testowania
+
+Plan testów dla aplikacji Smart Recipe Mate MVP. Główne cele:
+- Weryfikacja zgodności funkcjonalności z wymaganiami MVP
+- Wykrywanie błędów przed wdrożeniem produkcyjnym
+
+## 2. Zakres Testów
+
+### 2.1 Funkcjonalności
+
+- **Autentykacja**: Rejestracja, logowanie, reset hasła, middleware
+- **Onboarding**: 5-krokowy wizard, preferencje użytkownika
+- **Przepisy**: CRUD, wyszukiwanie, wykrywanie alergenów
+- **AI Generowanie**: Generowanie przepisów przez OpenRouter.ai, obsługa błędów
+- **Dashboard**: Statystyki, lista ostatnich przepisów
+- **Profil**: Wyświetlanie i edycja preferencji
+
+## 3. Typy Testów
+
+### 3.1 Testy Jednostkowe
+
+**Narzędzie**: **Vitest**
+
+**Zakres**:
+- Komponenty React (formularze, komponenty przepisów, AI, dashboard)
+- Hooki niestandardowe (`useAIGeneration`, `useDashboard`, `useOnboardingForm`, `useRecipesList`)
+- Serwisy (`AuthService`, `PreferencesService`, `RecipesService`, `AIGenerationService`, `OpenRouterService`)
+- Funkcje pomocnicze (walidacja, formatowanie)
+
+**Priorytet**: Wysoki - pokrycie kodu minimum 70%
+
+### 3.2 Testy Integracyjne
+
+**Zakres**:
+- API endpoints (`/api/auth/*`, `/api/onboarding/*`, `/api/preferences`, `/api/recipes`, `/api/ai/*`)
+- Middleware autentykacji
+- Integracja z bazą danych (CRUD, RLS policies)
+- Integracja z Supabase Auth i OpenRouter.ai (z mockami)
+
+**Priorytet**: Wysoki
+
+### 3.3 Testy End-to-End (E2E)
+
+**Narzędzie**: **Playwright**
+
+**Scenariusze**:
+- Rejestracja → Logowanie → Onboarding → Generowanie przepisu
+- Logowanie → Przeglądanie przepisów → Edycja → Usunięcie
+- Reset hasła → Aktualizacja hasła → Logowanie
+- Edycja preferencji w profilu
+- Obsługa błędów AI generowania
+
+**Priorytet**: Wysoki - podstawowe ścieżki użytkownika
+
+### 3.4 Inne Typy Testów
+
+- **Testy wydajnościowe**: API response times (< 200ms), bundle size (< 500KB)
+- **Testy bezpieczeństwa**: OWASP Top 10, RLS policies, walidacja inputu
+- **Testy dostępności**: WCAG 2.1 Level AA, keyboard navigation
+- **Testy kompatybilności**: Chrome, Firefox, Edge, Safari (ostatnie 2 wersje)
+
+## 4. Główne Scenariusze Testowe (E2E)
+
+### 4.1 Autentykacja
+- Rejestracja nowego użytkownika
+- Logowanie (z/bez onboardingu)
+- Reset hasła → Aktualizacja hasła → Logowanie
+- Ochrona chronionych tras przed nieautoryzowanym dostępem
+
+### 4.2 Onboarding
+- Ukończenie 5-krokowego onboardingu
+- Walidacja wymaganych pól (diet_type)
+- Przekierowania po ukończeniu onboardingu
+- Edycja preferencji w profilu
+
+### 4.3 Przepisy
+- Tworzenie przepisu (z wykrywaniem alergenów)
+- Edycja przepisu (pełna i częściowa)
+- Usuwanie przepisu (soft delete)
+- Wyszukiwanie przepisów (case-insensitive)
+
+### 4.4 AI Generowanie
+- Generowanie przepisu z poprawnymi składnikami i preferencjami
+- Obsługa błędów (404, 422, 429, 500)
+- Wyświetlenie sugestii przy błędzie
+- Zapisywanie wygenerowanego przepisu
+
+### 4.5 Dashboard
+- Wyświetlanie statystyk i ostatnich przepisów
+- Szybkie akcje (utwórz przepis, generuj przepis)
+
+## 5. Środowisko Testowe
+
+### 5.1 Środowiska
+- **Development**: Supabase lokalny, mock OpenRouter.ai
+- **Staging**: Supabase testowy projekt z oddzielną bazą danych oraz konterem docker, mock OpenRouter.ai
+
+### 5.2 Dane Testowe
+- Użytkownicy testowi (z/bez onboardingu)
+- Preferencje testowe (różne typy diety, alergeny)
+- Przepisy testowe (różne kategorie)
+
+## 6. Narzędzia do Testowania
+
+### 6.1 Testy Jednostkowe
+- **Vitest** - framework testowy
+- **React Testing Library** - testowanie komponentów React
+- **MSW** - mockowanie API calls
+
+### 6.2 Testy End-to-End
+- **Playwright** - framework E2E (Chrome, Firefox, WebKit)
+
+### 6.3 Dodatkowe Narzędzia
+- **Lighthouse CI** - analiza wydajności i dostępności
+- **npm audit** / **Snyk** - skanowanie luk w zależnościach
+- **axe-core** - testy dostępności (integracja z Playwright)
+- **GitHub Actions** - CI/CD automation
+
+## 7. Harmonogram Testów
+
+### 7.1 Fazy Testowania
+1. **Tydzień 1-2**: Testy jednostkowe (Vitest) i integracyjne - setup, serwisy, komponenty, API
+2. **Tydzień 3**: Testy E2E (Playwright) - podstawowe scenariusze (autentykacja, onboarding, przepisy, AI)
+3. **Tydzień 4**: Testy E2E - zaawansowane scenariusze (błędy, edge cases, walidacja)
+4. **Tydzień 5**: Testy wydajnościowe i bezpieczeństwa
+5. **Tydzień 6**: Testy dostępności i kompatybilności
+6. **Tydzień 7**: Testy regresyjne i finalizacja przed wdrożeniem
+
+## 8. Kryteria Akceptacji
+
+### 8.1 Code Coverage
+- Minimum **70%** dla całego projektu
+- **85%+** dla kodu krytycznego (serwisy, middleware)
+
+### 8.2 Przechodzenie Testów
+- **100%** testów przechodzi przed wdrożeniem
+- Zero krytycznych (P0) i wysokich (P1) błędów przed wdrożeniem
+
+### 8.3 Wydajność
+- API response time < 200ms (95th percentile)
+- Bundle size < 500KB (gzipped)
+- Core Web Vitals: LCP < 2.5s, FCP < 1.8s, CLS < 0.1
+
+### 8.4 Bezpieczeństwo
+- Brak luk OWASP Top 10
+- RLS policies działają poprawnie
+- Walidacja inputu (Zod schemas)
+
+### 8.5 Dostępność
+- WCAG 2.1 Level AA compliance
+- Lighthouse accessibility score > 90
+- Keyboard navigation działa poprawnie
+
+### 8.6 Kompatybilność
+- Działanie na Chrome, Firefox, Edge, Safari (ostatnie 2 wersje)
+
+## 10. Raportowanie Błędów
+
+### 10.1 Priorytety
+- **P0 (Krytyczny)**: Blokuje główną funkcjonalność - naprawa w 24h
+- **P1 (Wysoki)**: Wpływa znacząco na funkcjonalność - naprawa w 3 dni
+- **P2 (Średni)**: Wpływa na funkcjonalność, istnieje workaround - naprawa w 1 tydzień
+- **P3 (Niski)**: Minimalny wpływ lub enhancement - planowane w przyszłości
+
+### 10.2 Narzędzia
+- **GitHub Issues** dla śledzenia błędów
+- Labels: `bug`, `critical`, `security`, `performance`, `ui/ux`, `backend`, `frontend`, `ai`, `auth`
+
+### 10.3 Workflow
+1. Zgłoszenie błędu przez QA/użytkownika
+2. Triage i przypisanie do developera
+3. Naprawa błędu
+4. Weryfikacja przez QA
+5. Zamknięcie błędu
+
+## 11. Metryki i Monitoring
+
+### 11.1 Metryki Testowe
+- **Code Coverage**: 70%+ (cały projekt), 85%+ (kod krytyczny) - codziennie w CI/CD
+- **Test Success Rate**: 100% przed wdrożeniem - po każdym buildzie
+- **Test Execution Time**: < 10 min (bez E2E), < 30 min (z E2E)
+
+### 11.2 Metryki Jakości
+- **Liczba błędów**: P0 = 0, P1 < 5, P2 < 10 przed wdrożeniem
+- **Czas rozwiązania**: P0 < 24h, P1 < 3 dni, P2 < 1 tydzień
+
+### 11.3 Monitoring Produkcyjny
+- Error tracking (Sentry)
+- Performance monitoring (Lighthouse CI, Web Vitals)
+
+---
+
+**Wersja**: 1.0  
+**Ostatnia aktualizacja**: [Data]
