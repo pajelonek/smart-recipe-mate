@@ -17,8 +17,11 @@ jobs:
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
     
     steps:
-      - name: Setup repository
-        uses: ./.github/actions/setup-repo
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-node-env
 
       - name: Run linter
         run: npm run lint
@@ -44,8 +47,11 @@ jobs:
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
     
     steps:
-      - name: Setup repository
-        uses: ./.github/actions/setup-repo
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-node-env
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
