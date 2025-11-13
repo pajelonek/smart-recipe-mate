@@ -52,10 +52,16 @@ export class RegisterPage {
   }
 
   async isEmailErrorVisible() {
-    return await this.page.locator("text=/.*email.*/i").isVisible();
+    // Look for error message paragraph with destructive class that contains email-related text
+    const errorMessage = this.page.locator('p.text-destructive').filter({ hasText: /email|Nieprawidłowy/i });
+    return await errorMessage.isVisible();
   }
 
   async isPasswordErrorVisible() {
-    return await this.page.locator("text=/.*hasło.*/i").isVisible();
+    // Look for error message paragraph with destructive class that contains password-related error text
+    const errorMessage = this.page.locator("p.text-destructive").filter({
+      hasText: /hasło musi spełniać|hasła nie są identyczne/i,
+    });
+    return await errorMessage.isVisible();
   }
 }

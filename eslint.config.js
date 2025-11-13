@@ -29,6 +29,7 @@ const playwrightConfig = tseslint.config({
   files: ["**/e2e/**/*.{ts,js}"],
   rules: {
     "@typescript-eslint/no-empty-object-type": "off",
+    "no-empty-pattern": "off",
   },
 });
 
@@ -68,9 +69,9 @@ const reactConfig = tseslint.config({
 export default tseslint.config(
   includeIgnoreFile(gitignorePath),
   baseConfig,
-  playwrightConfig,
   jsxA11yConfig,
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],
-  eslintPluginPrettier
+  eslintPluginPrettier,
+  playwrightConfig // Must be last to override other configs for e2e files
 );

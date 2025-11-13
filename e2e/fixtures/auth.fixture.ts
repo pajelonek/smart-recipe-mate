@@ -12,11 +12,13 @@ import { createClient } from "@supabase/supabase-js";
  * Test fixture for authentication helpers
  * Provides utilities for creating/deleting test users and managing sessions
  *
- * Uses local Supabase instance for E2E testing.
- * Environment variables should be set via:
- * - SUPABASE_URL (default: http://127.0.0.1:54321)
- * - SUPABASE_KEY or SUPABASE_ANON_KEY (from `supabase status -o env`)
- * - SUPABASE_SERVICE_ROLE_KEY (from `supabase status -o env`)
+ * Uses cloud Supabase project for E2E testing.
+ * Environment variables should be set in .env.test file:
+ * - SUPABASE_URL (your cloud project URL, e.g., https://xxxxx.supabase.co)
+ * - SUPABASE_SERVICE_ROLE_KEY (service role key from Supabase dashboard - keep secret!)
+ *
+ * Note: We use service role key for all operations in tests (including database operations)
+ * to avoid RLS restrictions and simplify test setup.
  */
 interface AuthFixtures {
   supabase: SupabaseClient;
@@ -25,33 +27,31 @@ interface AuthFixtures {
   cleanupTestUsers: () => Promise<void>;
 }
 
-// Use local Supabase for E2E testing
-const supabaseUrl = process.env.SUPABASE_URL || process.env.PUBLIC_SUPABASE_URL || "http://127.0.0.1:54321";
-const supabaseAnonKey =
-  process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY || "";
+// Use cloud Supabase for E2E testing
+const supabaseUrl = process.env.SUPABASE_URL || process.env.PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
 // Validate required environment variables
-if (!supabaseAnonKey) {
+if (!supabaseUrl) {
   throw new Error(
-    "SUPABASE_KEY or SUPABASE_ANON_KEY is required for E2E tests. " +
-      "Please add it to your .env file. " +
-      "You can get it by running: supabase status -o env"
+    "SUPABASE_URL is required for E2E tests. " +
+      "Please add it to your .env.test file with your cloud Supabase project URL."
   );
 }
 
 if (!supabaseServiceKey) {
   throw new Error(
-    "SUPABASE_SERVICE_ROLE_KEY is required for E2E tests to create/delete test users. " +
-      "Please add it to your .env file. " +
-      "You can get it by running: supabase status -o env"
+    "SUPABASE_SERVICE_ROLE_KEY is required for E2E tests. " +
+      "Please add it to your .env.test file. " +
+      "You can find it in your Supabase project dashboard under Settings > API. " +
+      "⚠️ Keep this key secret - never commit it to version control!"
   );
 }
 
 export const test = base.extend<AuthFixtures>({
-  // @ts-expect-error - Playwright requires empty object pattern for fixtures without dependencies
   supabase: async ({}, use) => {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // Use service role key for database operations in tests (bypasses RLS)
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     await use(supabase);
   },
 

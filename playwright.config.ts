@@ -3,21 +3,23 @@ import { config } from "dotenv";
 import { resolve } from "node:path";
 
 /**
- * Load environment variables from .env file
- * This ensures Playwright tests can access Supabase credentials
+ * Load environment variables from .env.test file
+ * This ensures Playwright tests can access Supabase credentials from cloud Supabase
  */
-config({ path: resolve(process.cwd(), ".env") });
+config({ path: resolve(process.cwd(), ".env.test") });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  *
- * This configuration uses local Supabase instance for E2E testing.
- * Make sure to run `npm run supabase:start` before running E2E tests.
+ * This configuration uses cloud Supabase project for E2E testing.
+ * Make sure to set the following environment variables in your .env.test file:
+ * - SUPABASE_URL (your cloud project URL)
+ * - SUPABASE_SERVICE_ROLE_KEY (service role key - keep secret!)
  */
 export default defineConfig({
   testDir: "./e2e",
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
