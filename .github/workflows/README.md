@@ -13,22 +13,60 @@ Pipeline składa się z dwóch równoległych jobów:
 
 ## Konfiguracja GitHub Secrets
 
-Aby pipeline działał poprawnie, musisz skonfigurować następujące secrets w repozytorium GitHub:
+Aby pipeline działał poprawnie, musisz skonfigurować następujące secrets w repozytorium GitHub. **Ważne**: Sekrety są rozdzielone na testowe i produkcyjne, aby umożliwić testowanie na osobnym środowisku bez wpływu na produkcję.
 
-### Wymagane Secrets
+### Sekrety Produkcyjne (używane do budowania aplikacji)
 
-1. **SUPABASE_URL** - URL Twojego projektu Supabase
+Te sekrety są używane w jobie `test-and-build` do budowania aplikacji produkcyjnej:
+
+1. **SUPABASE_URL_PROD** - URL Twojego produkcyjnego projektu Supabase
+   - Znajdziesz w: Supabase Dashboard → Settings → API → Project URL
+   - ⚠️ Używany do budowania aplikacji produkcyjnej
+
+2. **SUPABASE_KEY_PROD** - Anon/Public key z produkcyjnego Supabase
+   - Znajdziesz w: Supabase Dashboard → Settings → API → Project API keys → `anon` `public`
+   - ⚠️ Używany do budowania aplikacji produkcyjnej
+
+3. **OPENROUTER_API_KEY_PROD** - Klucz API z OpenRouter.ai (produkcyjny)
+   - Wymagany do budowania aplikacji (może być używany przez niektóre komponenty)
+
+### Sekrety Testowe (używane tylko w testach E2E)
+
+Te sekrety są używane w jobie `test-e2e` do testowania na osobnym środowisku:
+
+1. **SUPABASE_URL_TEST** - URL Twojego testowego projektu Supabase
+   - Może być ten sam co produkcyjny lub osobny projekt testowy
    - Znajdziesz w: Supabase Dashboard → Settings → API → Project URL
 
-2. **SUPABASE_KEY** - Anon/Public key z Supabase
+2. **SUPABASE_KEY_TEST** - Anon/Public key z testowego Supabase
    - Znajdziesz w: Supabase Dashboard → Settings → API → Project API keys → `anon` `public`
 
-3. **SUPABASE_SERVICE_ROLE_KEY** - Service Role Key (używany tylko w testach E2E)
+3. **SUPABASE_SERVICE_ROLE_KEY_TEST** - Service Role Key dla środowiska testowego
    - ⚠️ **UWAGA**: Ten klucz ma pełne uprawnienia administracyjne - nigdy nie udostępniaj go publicznie!
    - Znajdziesz w: Supabase Dashboard → Settings → API → Project API keys → `service_role` `secret`
+   - Używany tylko w testach E2E do czyszczenia danych testowych
 
-4. **OPENROUTER_API_KEY** - Klucz API z OpenRouter.ai
-   - Wymagany do budowania aplikacji (może być używany przez niektóre komponenty)
+4. **OPENROUTER_API_KEY_TEST** - Klucz API z OpenRouter.ai (testowy, opcjonalny)
+   - Może być ten sam co produkcyjny lub osobny klucz testowy
+
+### Strategia rozdzielenia sekretów
+
+**Dlaczego rozdzielamy sekrety?**
+
+- **Bezpieczeństwo**: Testy E2E mogą modyfikować dane (tworzenie/usuwanie użytkowników), więc lepiej używać osobnego środowiska testowego
+- **Izolacja**: Testy nie wpływają na dane produkcyjne
+- **Elastyczność**: Możesz używać różnych konfiguracji dla testów i produkcji
+
+**Co jeśli nie masz osobnego środowiska testowego?**
+
+Jeśli nie masz jeszcze osobnego projektu Supabase do testów, możesz tymczasowo użyć tych samych wartości dla sekretów testowych i produkcyjnych:
+
+- `SUPABASE_URL_TEST` = `SUPABASE_URL_PROD` (ten sam projekt)
+- `SUPABASE_KEY_TEST` = `SUPABASE_KEY_PROD` (ten sam klucz)
+- `SUPABASE_SERVICE_ROLE_KEY_TEST` = Service Role Key z tego samego projektu
+- `OPENROUTER_API_KEY_TEST` = `OPENROUTER_API_KEY_PROD` (ten sam klucz)
+
+⚠️ **Uwaga**: W takim przypadku testy E2E będą działać na danych produkcyjnych. Rozważ utworzenie osobnego projektu Supabase dla testów.
 
 ### Jak dodać Secrets w GitHub
 
@@ -78,14 +116,17 @@ Po zakończeniu testów E2E, raport Playwright jest automatycznie zapisywany jak
 
 ### Build nie przechodzi
 
-- Sprawdź czy wszystkie wymagane secrets są poprawnie skonfigurowane
+- Sprawdź czy wszystkie wymagane sekrety produkcyjne (`*_PROD`) są poprawnie skonfigurowane
 - Sprawdź logi w GitHub Actions, aby zobaczyć szczegółowe błędy
+- Upewnij się, że używasz poprawnych wartości dla środowiska produkcyjnego
 
 ### Testy E2E nie przechodzą
 
-- Upewnij się, że `SUPABASE_SERVICE_ROLE_KEY` jest poprawnie skonfigurowany
-- Sprawdź czy Twój projekt Supabase jest dostępny z internetu
+- Upewnij się, że wszystkie sekrety testowe (`*_TEST`) są poprawnie skonfigurowane
+- Sprawdź czy `SUPABASE_SERVICE_ROLE_KEY_TEST` jest poprawnie skonfigurowany
+- Sprawdź czy Twój testowy projekt Supabase jest dostępny z internetu
 - Sprawdź logi Playwright w artifacts
+- **Uwaga**: Testy E2E używają osobnych sekretów testowych, więc nie wpływają na środowisko produkcyjne
 
 ### Problem z Node.js version
 
