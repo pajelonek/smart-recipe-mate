@@ -23,8 +23,12 @@ import { createClient } from "@supabase/supabase-js";
 interface AuthFixtures {
   supabase: SupabaseClient;
   createTestUser: (email: string, password: string) => Promise<{ userId: string; email: string }>;
+  createTestUserWithPreferences: (
+    email: string,
+    password: string,
+    preferences?: { diet_type?: string }
+  ) => Promise<{ userId: string; email: string }>;
   deleteTestUser: (email: string) => Promise<void>;
-  cleanupTestUsers: () => Promise<void>;
 }
 
 // Use cloud Supabase for E2E testing
@@ -48,21 +52,19 @@ if (!supabaseServiceKey) {
   );
 }
 
+// Create a single admin Supabase client for all test operations
+const adminSupabase = createClient(supabaseUrl, supabaseServiceKey);
+
 export const test = base.extend<AuthFixtures>({
   supabase: async ({}, use) => {
     // Use service role key for database operations in tests (bypasses RLS)
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    await use(supabase);
+    await use(adminSupabase);
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  createTestUser: async ({ supabase: _supabase }, use) => {
+  createTestUser: async ({}, use) => {
     const createdUsers: string[] = [];
 
     await use(async (email: string, password: string) => {
-      // Use service role key for admin operations
-      const adminSupabase = createClient(supabaseUrl, supabaseServiceKey);
-
       const { data, error } = await adminSupabase.auth.admin.createUser({
         email,
         password,
@@ -84,24 +86,65 @@ export const test = base.extend<AuthFixtures>({
     });
 
     // Cleanup after test
-    if (createdUsers.length > 0) {
-      const adminSupabase = createClient(supabaseUrl, supabaseServiceKey);
-
-      for (const userId of createdUsers) {
-        try {
-          await adminSupabase.auth.admin.deleteUser(userId);
-        } catch (error) {
-          console.warn(`Failed to delete test user ${userId}:`, error);
-        }
+    for (const userId of createdUsers) {
+      try {
+        await adminSupabase.auth.admin.deleteUser(userId);
+      } catch (error) {
+        console.warn(`Failed to delete test user ${userId}:`, error);
       }
     }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  deleteTestUser: async ({ supabase: _supabase }, use) => {
-    await use(async (email: string) => {
-      const adminSupabase = createClient(supabaseUrl, supabaseServiceKey);
+  createTestUserWithPreferences: async ({}, use) => {
+    const createdUsers: string[] = [];
 
+    await use(async (email: string, password: string, preferences?: { diet_type?: string }) => {
+      // Create user
+      const { data, error } = await adminSupabase.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true, // Auto-confirm email for testing
+      });
+
+      if (error) {
+        throw new Error(`Failed to create test user: ${error.message}`);
+      }
+
+      if (!data.user) {
+        throw new Error("User creation succeeded but no user data returned");
+      }
+
+      createdUsers.push(data.user.id);
+
+      // Create preferences (default to omnivore if not specified)
+      const userPreferences = preferences || { diet_type: "omnivore" };
+      const { error: prefError } = await adminSupabase.from("user_preferences").insert({
+        user_id: data.user.id,
+        ...userPreferences,
+      });
+
+      if (prefError) {
+        throw new Error(`Failed to create preferences: ${prefError.message}`);
+      }
+
+      return {
+        userId: data.user.id,
+        email: data.user.email || email,
+      };
+    });
+
+    // Cleanup after test
+    for (const userId of createdUsers) {
+      try {
+        await adminSupabase.auth.admin.deleteUser(userId);
+      } catch (error) {
+        console.warn(`Failed to delete test user ${userId}:`, error);
+      }
+    }
+  },
+
+  deleteTestUser: async ({}, use) => {
+    await use(async (email: string) => {
       // Find user by email
       const { data: users, error: listError } = await adminSupabase.auth.admin.listUsers();
       if (listError) {
@@ -113,27 +156,6 @@ export const test = base.extend<AuthFixtures>({
         const { error } = await adminSupabase.auth.admin.deleteUser(user.id);
         if (error) {
           throw new Error(`Failed to delete user: ${error.message}`);
-        }
-      }
-    });
-  },
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  cleanupTestUsers: async ({ supabase: _supabase }, use) => {
-    await use(async () => {
-      const adminSupabase = createClient(supabaseUrl, supabaseServiceKey);
-
-      const { data: users } = await adminSupabase.auth.admin.listUsers();
-      if (users) {
-        for (const user of users.users) {
-          // Clean up test users (those with email matching test pattern)
-          if (user.email && (user.email.includes("test@") || user.email.includes("e2e@"))) {
-            try {
-              await adminSupabase.auth.admin.deleteUser(user.id);
-            } catch (error) {
-              console.warn(`Failed to delete test user ${user.id}:`, error);
-            }
-          }
         }
       }
     });

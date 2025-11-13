@@ -69,12 +69,12 @@ test.describe("Authentication", () => {
   });
 
   test.describe("Login", () => {
-    test("should login user with valid credentials", async ({ page, createTestUser, deleteTestUser }) => {
+    test("should login user with valid credentials", async ({ page, createTestUser }) => {
       const loginPage = new LoginPage(page);
       const testEmail = `e2e-login-${Date.now()}@test.com`;
       const testPassword = "TestPassword123!";
 
-      // Create user first
+      // Create user first (automatic cleanup after test)
       await createTestUser(testEmail, testPassword);
 
       // Login
@@ -83,9 +83,6 @@ test.describe("Authentication", () => {
 
       // Should redirect to dashboard or onboarding (if no preferences)
       await expect(page).toHaveURL(/.*\/|.*onboarding/);
-
-      // Cleanup
-      await deleteTestUser(testEmail);
     });
 
     test("should display error for invalid login credentials", async ({ page }) => {
@@ -101,13 +98,13 @@ test.describe("Authentication", () => {
       await expect(errorMessage).toBeVisible();
     });
 
-    test("should redirect to requested page after login", async ({ page, createTestUser, deleteTestUser }) => {
+    test("should redirect to requested page after login", async ({ page, createTestUser }) => {
       const loginPage = new LoginPage(page);
       const testEmail = `e2e-redirect-${Date.now()}@test.com`;
       const testPassword = "TestPassword123!";
       const protectedRoute = "/profile";
 
-      // Create user first
+      // Create user first (automatic cleanup after test)
       await createTestUser(testEmail, testPassword);
 
       // Try to access protected route - should redirect to login
@@ -119,21 +116,15 @@ test.describe("Authentication", () => {
 
       // Should redirect to the originally requested page or onboarding
       await expect(page).toHaveURL(/.*profile|.*onboarding/);
-
-      // Cleanup
-      await deleteTestUser(testEmail);
     });
 
-    test("should redirect to onboarding for user without preferences", async ({
-      page,
-      createTestUser,
-      deleteTestUser,
-    }) => {
+    test("should redirect to onboarding for user without preferences", async ({ page, createTestUser }) => {
       const loginPage = new LoginPage(page);
       const testEmail = `e2e-onboarding-${Date.now()}@test.com`;
       const testPassword = "TestPassword123!";
 
       // Create user without preferences (by not completing onboarding)
+      // Automatic cleanup after test
       await createTestUser(testEmail, testPassword);
 
       // Login
@@ -142,33 +133,15 @@ test.describe("Authentication", () => {
 
       // Should redirect to onboarding
       await expect(page).toHaveURL(/.*onboarding/);
-
-      // Cleanup
-      await deleteTestUser(testEmail);
     });
 
-    test("should redirect to dashboard for user with preferences", async ({
-      page,
-      createTestUser,
-      deleteTestUser,
-      supabase,
-    }) => {
+    test("should redirect to dashboard for user with preferences", async ({ page, createTestUserWithPreferences }) => {
       const loginPage = new LoginPage(page);
       const testEmail = `e2e-dashboard-${Date.now()}@test.com`;
       const testPassword = "TestPassword123!";
 
-      // Create user
-      const { userId } = await createTestUser(testEmail, testPassword);
-
-      // Create preferences for user (simulating completed onboarding)
-      const { error: prefError } = await supabase.from("user_preferences").insert({
-        user_id: userId,
-        diet_type: "omnivore",
-      });
-
-      if (prefError) {
-        throw new Error(`Failed to create preferences: ${prefError.message}`);
-      }
+      // Create user with preferences (automatic cleanup after test)
+      await createTestUserWithPreferences(testEmail, testPassword);
 
       // Login
       await loginPage.goto();
@@ -176,9 +149,6 @@ test.describe("Authentication", () => {
 
       // Should redirect to dashboard (home page)
       await expect(page).toHaveURL(/.*\/$/);
-
-      // Cleanup
-      await deleteTestUser(testEmail);
     });
   });
 });

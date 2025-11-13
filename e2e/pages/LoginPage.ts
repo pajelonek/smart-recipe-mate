@@ -11,7 +11,6 @@ export class LoginPage {
   readonly registerLink: Locator;
   readonly resetPasswordLink: Locator;
   readonly errorMessage: Locator;
-  readonly successMessage: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -21,7 +20,6 @@ export class LoginPage {
     this.registerLink = page.locator('a[href="/register"]');
     this.resetPasswordLink = page.locator('a[href="/reset-password"]');
     this.errorMessage = page.locator('[class*="destructive"]');
-    this.successMessage = page.locator('[class*="success"], [role="status"]');
   }
 
   async goto(redirect?: string) {
@@ -45,13 +43,5 @@ export class LoginPage {
     await this.fillEmail(email);
     await this.fillPassword(password);
     await this.submit();
-  }
-
-  async isErrorVisible() {
-    return await this.errorMessage.isVisible();
-  }
-
-  async getErrorMessage() {
-    return await this.errorMessage.textContent();
   }
 }

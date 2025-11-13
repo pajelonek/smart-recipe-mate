@@ -3,10 +3,15 @@ import { config } from "dotenv";
 import { resolve } from "node:path";
 
 /**
- * Load environment variables from .env.test file
+ * Load environment variables from .env.test file (if exists)
+ * In CI, environment variables are provided via GitHub Actions secrets
  * This ensures Playwright tests can access Supabase credentials from cloud Supabase
  */
-config({ path: resolve(process.cwd(), ".env.test") });
+try {
+  config({ path: resolve(process.cwd(), ".env.test") });
+} catch {
+  // .env.test file doesn't exist (e.g., in CI), use environment variables directly
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -42,20 +47,12 @@ export default defineConfig({
 
   /* Configure projects for major browsers - Chromium/Desktop Chrome only per guidelines */
   projects: [
-    // Setup project - runs first to authenticate
-    {
-      name: "setup",
-      testMatch: /.*\.setup\.ts/,
-    },
     {
       name: "chromium",
       testMatch: /.*\.spec\.ts/,
       use: {
         ...devices["Desktop Chrome"],
-        // Optionally use authenticated state for all tests
-        // storageState: "e2e/.auth/user.json",
       },
-      dependencies: ["setup"],
     },
   ],
 

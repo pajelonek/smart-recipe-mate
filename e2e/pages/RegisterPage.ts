@@ -10,8 +10,6 @@ export class RegisterPage {
   readonly confirmPasswordInput: Locator;
   readonly submitButton: Locator;
   readonly loginLink: Locator;
-  readonly errorMessage: Locator;
-  readonly successMessage: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -20,8 +18,6 @@ export class RegisterPage {
     this.confirmPasswordInput = page.locator('input[type="password"]').nth(1);
     this.submitButton = page.locator('button[type="submit"]');
     this.loginLink = page.locator('a[href="/login"]');
-    this.errorMessage = page.locator('[class*="destructive"]');
-    this.successMessage = page.locator('[class*="success"], [role="status"]');
   }
 
   async goto() {
@@ -49,19 +45,5 @@ export class RegisterPage {
     await this.fillPassword(password);
     await this.fillConfirmPassword(confirmPassword || password);
     await this.submit();
-  }
-
-  async isEmailErrorVisible() {
-    // Look for error message paragraph with destructive class that contains email-related text
-    const errorMessage = this.page.locator('p.text-destructive').filter({ hasText: /email|Nieprawidłowy/i });
-    return await errorMessage.isVisible();
-  }
-
-  async isPasswordErrorVisible() {
-    // Look for error message paragraph with destructive class that contains password-related error text
-    const errorMessage = this.page.locator("p.text-destructive").filter({
-      hasText: /hasło musi spełniać|hasła nie są identyczne/i,
-    });
-    return await errorMessage.isVisible();
   }
 }
