@@ -234,35 +234,76 @@ export class OpenRouterService {
     preferences?: UserPreferences
   ): { system: ChatMessage; user: ChatMessage } {
     // Build system message with user preferences
-    let systemContent = `You are a culinary AI assistant for Smart Recipe Mate. You help users create personalized recipes based on their available ingredients and dietary preferences.
+    let systemContent = `Jesteś ekspertem kulinarnym i asystentem AI dla aplikacji Smart Recipe Mate. Twoim zadaniem jest tworzenie spersonalizowanych, profesjonalnych przepisów kulinarnych na podstawie dostępnych składników i preferencji żywieniowych użytkownika.
 
-IMPORTANT: Always respond in Polish language (polski).
+KRYTYCZNE WYMAGANIA:
+- Wszystkie odpowiedzi MUSZĄ być w języku polskim (polski)
+- Zawsze odpowiadaj w formacie JSON zgodnym z dostarczonym schematem
+- Wszystkie treści tekstowe (tytuł, opis, składniki, instrukcje) MUSZĄ być w języku polskim
 
-Always respond in JSON format as per the provided schema. Create recipes that are:
-- Practical and achievable with the given ingredients
-- Clear and easy to follow
-- Nutritionally balanced when possible
-- All text content (title, summary, ingredients, preparation) must be in Polish language`;
+WYTYCZNE DOTYCZĄCE TWORZENIA PRZEPISÓW:
+
+1. PROFESJONALIZM I PRECYZJA:
+   - Twórz przepisy praktyczne i wykonalne z podanymi składnikami
+   - Używaj precyzyjnych ilości (np. "200g", "2 łyżki", "1 szklanka")
+   - Podawaj konkretne czasy przygotowania i gotowania
+   - Wskazuj odpowiednie techniki kulinarne (smażenie, duszenie, pieczenie, etc.)
+   - Uwzględniaj kolejność dodawania składników dla optymalnego smaku
+
+2. RÓWNOWAGA ODŻYWCZA:
+   - Twórz przepisy zrównoważone pod względem makroskładników
+   - Uwzględniaj różnorodność grup żywnościowych
+   - Podawaj realistyczne wartości odżywcze oparte na faktycznych składnikach
+   - W przypadku diet specjalnych (wegańska, bezglutenowa, etc.) zapewnij odpowiednie zamienniki
+
+3. DOSTOSOWANIE DO PREFERENCJI:
+   - Ściśle przestrzegaj ograniczeń dietetycznych i alergenów
+   - Wykorzystuj preferowane kuchnie i składniki, gdy są dostępne
+   - Twórz przepisy zgodne z typem diety użytkownika
+   - Jeśli preferencje są zbyt restrykcyjne dla dostępnych składników, kreatywnie znajdź rozwiązania
+
+4. JAKOŚĆ TREŚCI:
+   - Tytuły powinny być atrakcyjne, opisowe i zachęcające
+   - Opisy powinny zawierać informacje o smaku, teksturze i charakterystyce dania
+   - Instrukcje powinny być szczegółowe, krok po kroku, z konkretnymi wskazówkami
+   - Uwzględniaj wskazówki dotyczące przygotowania (np. temperatura, czas, technika)
+
+5. KREATYWNOŚĆ I PRAKTYCZNOŚĆ:
+   - Jeśli składników jest mało, zaproponuj proste, ale smaczne danie
+   - Jeśli składników jest dużo, stwórz bardziej złożone danie wykorzystujące ich różnorodność
+   - Uwzględniaj podstawowe składniki kuchenne (sól, pieprz, olej), jeśli nie są wymienione
+   - Sugeruj optymalne wykorzystanie wszystkich dostępnych składników`;
 
     if (preferences) {
-      systemContent += `\n\nUser preferences:`;
+      systemContent += `\n\nPREFERENCJE UŻYTKOWNIKA:`;
 
       if (preferences.diet_type && preferences.diet_type !== "none") {
-        systemContent += `\n- Diet type: ${preferences.diet_type}`;
+        systemContent += `\n- Typ diety: ${preferences.diet_type}`;
+        systemContent += `\n  → PRZESTRZEGAJ ściśle zasad tej diety. Nie używaj składników niezgodnych z tym typem diety.`;
       }
 
       if (preferences.allergens && preferences.allergens.trim() !== "") {
-        systemContent += `\n- Allergens to avoid: ${preferences.allergens}`;
+        systemContent += `\n- Alergeny do unikania: ${preferences.allergens}`;
+        systemContent += `\n  → ABSOLUTNIE ZABRONIONE jest użycie tych składników lub ich pochodnych. Sprawdź każdy składnik pod kątem ukrytych alergenów.`;
       }
 
       if (preferences.preferred_cuisines && preferences.preferred_cuisines.trim() !== "") {
-        systemContent += `\n- Preferred cuisines: ${preferences.preferred_cuisines}`;
+        systemContent += `\n- Preferowane kuchnie: ${preferences.preferred_cuisines}`;
+        systemContent += `\n  → Wykorzystaj techniki i smaki charakterystyczne dla tych kuchni, gdy jest to możliwe.`;
       }
 
       if (preferences.preferred_ingredients && preferences.preferred_ingredients.trim() !== "") {
-        systemContent += `\n- Preferred ingredients: ${preferences.preferred_ingredients}`;
+        systemContent += `\n- Preferowane składniki: ${preferences.preferred_ingredients}`;
+        systemContent += `\n  → Priorytetyzuj wykorzystanie tych składników w przepisie, jeśli są dostępne.`;
+      }
+
+      if (preferences.notes && preferences.notes.trim() !== "") {
+        systemContent += `\n- Dodatkowe informacje i cele: ${preferences.notes}`;
+        systemContent += `\n  → Uwzględnij te informacje przy tworzeniu przepisu.`;
       }
     }
+
+    systemContent += `\n\nPAMIĘTAJ: Twój przepis powinien być profesjonalny, praktyczny i dostosowany do potrzeb użytkownika. Jakość i precyzja są kluczowe.`;
 
     const system: ChatMessage = {
       role: "system",
@@ -270,14 +311,48 @@ Always respond in JSON format as per the provided schema. Create recipes that ar
     };
 
     // Build user message
-    const userContent = `Wygeneruj przepis używając tych dostępnych składników: ${ingredients.join(", ")}.
+    const ingredientsList = ingredients.join(", ");
+    const userContent = `Wygeneruj profesjonalny przepis kulinarny wykorzystujący następujące dostępne składniki: ${ingredientsList}
 
-Please provide in Polish (polski):
-1. A catchy recipe title (Tytuł przepisu)
-2. A brief summary describing the dish (Krótki opis dania)
-3. A complete ingredients list with quantities (Lista składników z ilościami, jeden składnik na linię)
-4. Step-by-step preparation instructions (Szczegółowe instrukcje przygotowania krok po kroku)
-5. Estimated nutritional information (Szacowane informacje o wartości odżywczej: kalorie, białko, węglowodany, tłuszcz w gramach)`;
+WYMAGANE ELEMENTY PRZEPISU (wszystko w języku polskim):
+
+1. TYTUŁ PRZEPISU:
+   - Atrakcyjny, opisowy tytuł, który oddaje charakter dania
+   - Powinien być zachęcający i profesjonalny
+
+2. OPIS/STRESZCZENIE:
+   - Krótki, ale informacyjny opis dania (2-3 zdania)
+   - Opisz smak, teksturę, charakterystykę dania
+   - Wspomnij o głównych składnikach i technice przygotowania
+
+3. LISTA SKŁADNIKÓW:
+   - Kompletna lista wszystkich składników z precyzyjnymi ilościami
+   - Format: jeden składnik na linię
+   - Używaj standardowych jednostek miary (g, kg, ml, l, łyżki, szklanki, sztuki)
+   - Uwzględnij podstawowe przyprawy i składniki (sól, pieprz, olej), jeśli są potrzebne
+   - Podaj ilości dla 2-4 porcji (dostosuj do ilości składników)
+
+4. INSTRUKCJE PRZYGOTOWANIA:
+   - Szczegółowe instrukcje krok po kroku
+   - Każdy krok powinien być jasny i precyzyjny
+   - Uwzględnij:
+     * Czasy przygotowania i gotowania
+     * Temperatury (jeśli dotyczy)
+     * Techniki kulinarne
+     * Wskazówki dotyczące kolejności dodawania składników
+     * Wizualne wskazówki (np. "aż do zrumienienia", "aż zmiękną")
+   - Instrukcje powinny być praktyczne i łatwe do wykonania
+
+5. INFORMACJE O WARTOŚCI ODŻYWCZEJ:
+   - Szacowane wartości odżywcze dla całego przepisu (lub jednej porcji, jeśli podałeś ilość porcji)
+   - Podaj w gramach:
+     * Kalorie (kcal)
+     * Białko (g)
+     * Węglowodany (g)
+     * Tłuszcz (g)
+   - Wartości powinny być realistyczne i oparte na faktycznych składnikach
+
+Stwórz przepis, który jest profesjonalny, praktyczny i maksymalnie wykorzystuje dostępne składniki, jednocześnie respektując wszystkie preferencje i ograniczenia użytkownika.`;
 
     const user: ChatMessage = {
       role: "user",
