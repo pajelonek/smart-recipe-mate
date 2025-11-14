@@ -1,4 +1,4 @@
-# HealthyMeal
+# Smart Recipe Mate
 
 ![Status](https://img.shields.io/badge/status-MVP%20in%20progress-orange)
 ![Version](https://img.shields.io/badge/version-0.0.1-blue)
@@ -19,49 +19,46 @@
 
 ## 1. Project Name
 
-HealthyMeal
+Smart Recipe Mate
 
 ## 2. Project Description
 
-HealthyMeal is a desktop-first MVP web application that helps people with dietary requirements plan meals safely and efficiently. It combines a streamlined onboarding experience, a structured personal recipe repository, and an AI assistant that generates tailored recipes based on pantry ingredients and saved preferences.
+Smart Recipe Mate is a web application MVP that supports people planning meals in adapting their diet to dietary preferences. The system combines a simple user account, mandatory nutritional preference configuration, and a recipe repository stored in a standardized text structure (title, ingredients, preparation). The key advantage is integration with AI, which generates recipes from scratch based on the provided ingredients from the fridge and the user's saved preferences, delivering the result in an agreed JSON format. The application works exclusively in the desktop browser, and every AI generation, recipes, and preferences are linked to the user account.
 
-HealthyMeal solves common pain points for health-conscious cooks:
+It solves user problems such as manually adapting online recipes to dietary needs, which is time-consuming and often inconsistent. The app collects preferences immediately after registration, allows storing recipes in a consistent format, and enables AI generation of new tailored recipes.
 
-- Collects dietary preferences, preferred ingredients, cuisines, and allergens through a mandatory five-step wizard during first login.
-- Stores recipes in a standardized text format (`Title`, `Ingredients`, `Preparation`) with tagging, search, and editing capabilities.
-- Generates new recipes via an AI chat that respects profile data and blocks concurrent prompts until a response is received.
-- Detects allergens at save time and surfaces warnings in recipe lists and detail views.
-- Logs AI interactions and critical user actions for diagnostics and future analytics.
-
-For the full product requirements, refer to [`./.ai/prd.md`](./.ai/prd.md).
+For full product requirements, refer to [`./.ai/prd.md`](./.ai/prd.md).
 
 ## 3. Tech Stack
 
 ### Frontend
 
-- Astro 5 for fast, content-first pages with minimal runtime overhead.
-- React 19 for interactive components within Astro islands.
-- TypeScript 5 to ensure type-safe development and better tooling.
-- Tailwind CSS 4 and `tailwind-merge` for utility-first styling.
-- Shadcn/ui and Radix UI primitives for accessible UI elements.
-- Lucide React icons for consistent iconography.
+- Astro 5 for creating fast, efficient pages and applications with minimal JavaScript.
+- React 19 for interactivity where needed.
+- TypeScript 5 for static typing and better IDE support.
+- Tailwind 4 for convenient application styling.
+- Shadcn/ui provides a library of accessible React components for the UI.
 
 ### Backend & Data
 
-- Supabase (PostgreSQL + auth + storage) as the backend-as-a-service.
-- Supabase authentication flows for email verification, session management, and password resets.
+- Supabase as a comprehensive backend solution:
+  - Provides PostgreSQL database.
+  - Provides SDKs in multiple languages as Backend-as-a-Service.
+  - Open source solution that can be hosted locally or on your own server.
+  - Built-in user authentication.
 
 ### AI & Integrations
 
-- OpenRouter.ai for routing to multiple AI models (OpenAI, Anthropic, Google, etc.) with cost controls.
-- REST-based AI messaging with JSON payloads for prompts and responses.
+- Communication with models through OpenRouter.ai service:
+  - Access to a wide range of models (OpenAI, Anthropic, Google, and many others) for high efficiency and low costs.
+  - Allows setting financial limits on API keys.
 
 ### Testing
 
-- **Vitest** for unit testing with fast execution and TypeScript support, integrated with Vite.
-- **React Testing Library** for testing React components with a user-centric approach.
-- **MSW (Mock Service Worker)** for mocking API calls in unit tests.
-- **Playwright** for end-to-end (E2E) testing across real browsers (Chrome, Firefox, WebKit).
+- Vitest as a unit testing framework - integrated with Vite used by Astro, provides fast test execution and excellent TypeScript support.
+- React Testing Library for testing React components - ensures user-perspective testing and adherence to best practices.
+- MSW (Mock Service Worker) for mocking API calls - allows isolating unit tests from external dependencies.
+- Playwright for end-to-end (E2E) testing - provides testing in real browsers (Chrome, Firefox, WebKit) and automatic handling of asynchronous operations.
 
 ### Tooling & Infrastructure
 
@@ -72,13 +69,13 @@ For the full product requirements, refer to [`./.ai/prd.md`](./.ai/prd.md).
 - DigitalOcean for Docker-based hosting.
 - Supabase CLI (`npm run supabase:start`) to provision local services during development.
 
-For a condensed overview of the technology choices, see [`./.ai/tech-stack.md`](./.ai/tech-stack.md).
+For a condensed overview, see [`./.ai/tech-stack.md`](./.ai/tech-stack.md).
 
 ## 4. Getting Started Locally
 
 ### Prerequisites
 
-- Node.js `22.14.0` (use [`nvm`](https://github.com/nvm-sh/nvm) to match `.nvmrc`).
+- Node.js `22.14.0` (use [nvm](https://github.com/nvm-sh/nvm) to match `.nvmrc`).
 - npm (bundled with Node.js).
 - Git for cloning the repository.
 - Supabase account and CLI access for local services.
@@ -127,9 +124,11 @@ For a condensed overview of the technology choices, see [`./.ai/tech-stack.md`](
    ```
 
 6. **Launch the Astro development server**
+
    ```bash
    npm run dev
    ```
+
    Astro serves the application at `http://localhost:4321` by default.
 
 ### Additional Tips
@@ -143,6 +142,7 @@ For a condensed overview of the technology choices, see [`./.ai/tech-stack.md`](
 | Script                   | Description                                          |
 | ------------------------ | ---------------------------------------------------- |
 | `npm run dev`            | Start the Astro development server with hot reload.  |
+| `npm run dev:e2e`        | Start the Astro development server in test mode.     |
 | `npm run build`          | Generate a production build.                         |
 | `npm run preview`        | Preview the production build locally.                |
 | `npm run astro`          | Access the Astro CLI for custom commands.            |
@@ -150,26 +150,33 @@ For a condensed overview of the technology choices, see [`./.ai/tech-stack.md`](
 | `npm run lint:fix`       | Run ESLint with automatic fixes enabled.             |
 | `npm run format`         | Format files using Prettier.                         |
 | `npm run test`           | Run unit tests with Vitest.                          |
-| `npm run test:watch`     | Run unit tests in watch mode.                        |
+| `npm run test:ui`        | Run unit tests with Vitest UI.                       |
 | `npm run test:coverage`  | Generate test coverage report.                       |
 | `npm run test:e2e`       | Run end-to-end tests with Playwright.                |
+| `npm run test:e2e:ui`    | Run E2E tests with Playwright UI.                    |
+| `npm run test:e2e:headed`| Run E2E tests in headed mode.                        |
+| `npm run test:e2e:codegen`| Generate E2E tests with Playwright codegen.         |
+| `npm run test:e2e:debug` | Debug E2E tests with Playwright.                     |
 | `npm run supabase:start` | Boot Supabase services locally via the Supabase CLI. |
+| `npm run supabase:migrate`| Apply Supabase migrations.                           |
+| `npm run supabase:reset` | Reset the Supabase database.                         |
+| `npm run supabase:generate-types` | Generate TypeScript types from Supabase schema. |
+| `npm run supabase:status`| Show Supabase status and export env vars.            |
 
 ## 6. Project Scope
 
 ### MVP Features
 
-- **Accounts & Security**: Email/password registration with complexity checks, email verification, login for verified accounts only, password reset via one-time links, and protection of authenticated resources.
-- **Onboarding & Preferences**: Mandatory five-step wizard (intro, diet type, preferred ingredients, cuisines, allergies) on first login with validation and full restart on interruption; editable profile that tracks last update metadata and refreshes session data.
-- **Recipe Repository**: User-specific recipe list, search by title, tag-based filtering, up to ten tags per recipe with autocomplete, standardized recipe structure, detail view, editing with overwrite semantics, and deletion with confirmation.
-- **AI Recipe Generation**: Ingredient-driven prompts that produce new recipes in `Summary`, `Ingredients`, `Preparation` JSON structure; ability to accept/tag/save or dismiss results; conversation history linked to stored recipes; single in-flight request enforced.
-- **Safety & Compliance**: Allergen detection during save with warning modals and list indicators, plus guidance links.
-- **History & Observability**: Persistent history of AI conversations, logging of AI requests/responses/errors, and tracking of key user actions.
+- **Accounts & Security**: Email/password registration with complexity checks, email verification, login for verified accounts only, password reset via one-time links, and protection of authenticated resources (US-001).
+- **Onboarding & Preferences**: Mandatory five-step wizard (diet type, preferred ingredients, cuisines, allergies) on first login with validation; editable profile that tracks last update metadata (US-005, US-006).
+- **Recipe Repository**: User-specific recipe list, search by title, tag-based filtering (up to 10 tags with autocomplete), standardized structure, detail view, editing, and soft deletion (US-007, US-008, US-010, US-011, US-012).
+- **AI Recipe Generation**: Ingredient-driven prompts producing new recipes in JSON (Summary, Ingredients, Preparation); accept/tag/save or dismiss; history of generations (US-013, US-014, US-016).
+- **Safety & Error Handling**: Allergen detection, error logging for AI, user-friendly error messages (US-015, US-017).
 
 ### Out of Scope for MVP
 
 - Importing recipes from URLs.
-- Media upload and storage (images, video, files).
+- Media upload and storage (images, videos, files).
 - Sharing recipes or social features.
 - Additional transactional emails beyond registration and password reset.
 - Recipe export workflows.
@@ -184,22 +191,22 @@ For a condensed overview of the technology choices, see [`./.ai/tech-stack.md`](
 
 ### Risks & Open Questions
 
-- Undefined strategy for scaling the recipe list (pagination, lazy loading).
-- Missing analytics instrumentation may hinder measurement of business KPIs.
-- Reliance on third-party AI could affect latency, availability, and cost.
-- Absence of automated content validation may impact recipe consistency.
+- Scaling the recipe list (pagination, lazy loading).
+- Analytics instrumentation for business KPIs.
+- AI API reliability, latency, and costs.
+- Content validation for recipe consistency.
 
 ## 7. Project Status
 
 🚧 **MVP development in progress**
 
-Core functionality is under active construction according to the product requirements. Success metrics under consideration include:
+Core functionality is under active construction according to the product requirements in `.ai/prd.md`. Success metrics include:
 
-- 90% of new users completing the preference wizard within 7 days.
-- 75% of active users generating at least one AI-driven recipe per week.
-- Operational monitoring via AI interaction logs until formal analytics are introduced.
+- 90% of registered users completing preferences within 7 days.
+- 75% of active users generating at least one AI recipe per week.
+- Monitoring via AI interaction logs.
 
-Contributions should align with the scenarios documented in [`./.ai/prd.md`](./.ai/prd.md) and the user stories defined there.
+Contributions should align with the user stories in `.ai/prd.md`.
 
 ## 8. License
 
