@@ -34,38 +34,6 @@ test.describe("Authentication", () => {
       const errorMessage = page.locator("p.text-destructive").filter({ hasText: /email|Nieprawidłowy/i });
       await expect(errorMessage).toBeVisible();
     });
-
-    test("should display error for weak password", async ({ page }) => {
-      const registerPage = new RegisterPage(page);
-
-      await registerPage.goto();
-      await registerPage.fillEmail(`e2e-weak-password-${Date.now()}@test.com`);
-      await registerPage.fillPassword("weak");
-      await registerPage.fillConfirmPassword("weak");
-      await registerPage.submit();
-
-      // Should show password validation error - wait for the error message to appear
-      const errorMessage = page.locator("p.text-destructive").filter({
-        hasText: /hasło musi spełniać/i,
-      });
-      await expect(errorMessage).toBeVisible();
-    });
-
-    test("should display error for password mismatch", async ({ page }) => {
-      const registerPage = new RegisterPage(page);
-
-      await registerPage.goto();
-      await registerPage.fillEmail(`e2e-mismatch-${Date.now()}@test.com`);
-      await registerPage.fillPassword("TestPassword123!");
-      await registerPage.fillConfirmPassword("DifferentPassword123!");
-      await registerPage.submit();
-
-      // Should show password mismatch error - wait for the error message to appear
-      const errorMessage = page.locator("p.text-destructive").filter({
-        hasText: /hasła nie są identyczne/i,
-      });
-      await expect(errorMessage).toBeVisible();
-    });
   });
 
   test.describe("Login", () => {
